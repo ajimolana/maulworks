@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Lanyard from "./components/Lanyard/Lanyard";
 import RotatingText from "./components/RotatingText/RotatingText";
 import SplitText from "./components/SplitText/SplitText";
@@ -633,7 +633,7 @@ export default function Home() {
   }, [lightbox.isOpen, activeProject]);
 
   // 2. LOGIKA GYROSCOPE (DEVICE ORIENTATION)
-  const handleOrientation = (event: DeviceOrientationEvent) => {
+  const handleOrientation = useCallback((event: DeviceOrientationEvent) => {
     let { beta, gamma } = event;
     if (beta === null || gamma === null) return;
 
@@ -646,42 +646,50 @@ export default function Home() {
     const gz = (beta - 45) * 0.6; // Anggap posisi rileks HP adalah miring 45 derajat
 
     setGyroGravity([gx, -40, gz]);
-  };
+  }, []);
 
+  // Manage listener based on isGyroEnabled
   useEffect(() => {
-    if (typeof window !== "undefined" && window.DeviceOrientationEvent) {
-      if (typeof (DeviceOrientationEvent as any).requestPermission !== 'function') {
-        // Jika Android atau browser lain, langsung jalankan
-        window.addEventListener('deviceorientation', handleOrientation);
-        setIsGyroEnabled(true);
+    if (isGyroEnabled && typeof window !== "undefined" && window.DeviceOrientationEvent) {
+      window.addEventListener('deviceorientation', handleOrientation);
+    } else {
+      if (typeof window !== "undefined") {
+        window.removeEventListener('deviceorientation', handleOrientation);
       }
+      setGyroGravity([0, -40, 0]);
     }
     return () => {
       if (typeof window !== "undefined") {
         window.removeEventListener('deviceorientation', handleOrientation);
       }
     };
+  }, [isGyroEnabled, handleOrientation]);
+
+  // Initial check for Android
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.DeviceOrientationEvent) {
+      if (typeof (DeviceOrientationEvent as any).requestPermission !== 'function') {
+        // Jika Android atau browser lain, langsung jalankan
+        setIsGyroEnabled(true);
+      }
+    }
   }, []);
 
   const toggleGyro = async () => {
     if (isGyroEnabled) {
-      window.removeEventListener('deviceorientation', handleOrientation);
       setIsGyroEnabled(false);
-      setGyroGravity([0, -40, 0]);
     } else {
       if (typeof window !== "undefined" && window.DeviceOrientationEvent) {
         if (typeof (DeviceOrientationEvent as any).requestPermission === 'function') {
           try {
             const permission = await (DeviceOrientationEvent as any).requestPermission();
             if (permission === 'granted') {
-              window.addEventListener('deviceorientation', handleOrientation);
               setIsGyroEnabled(true);
             }
           } catch (e) {
             console.error("Gyro error:", e);
           }
         } else {
-          window.addEventListener('deviceorientation', handleOrientation);
           setIsGyroEnabled(true);
         }
       }
@@ -829,7 +837,7 @@ export default function Home() {
 
 
       {/* PILL NAV */}
-      <PillNav items={navItems} forceClose={isOverlayOpen} togglePerformanceMode={togglePerformanceMode} isGyroEnabled={isGyroEnabled} toggleGyro={toggleGyro} />
+      <PillNav items={navItems} forceClose={isOverlayOpen} togglePerformanceMode={togglePerformanceMode} isGyroEnabled={isGyroEnabled} toggleGyro={toggleGyro} isLowPerformanceMode={isLowPerformanceMode} />
 
       {/* HEADER SECTION */}
       <div className="w-full relative overflow-visible">

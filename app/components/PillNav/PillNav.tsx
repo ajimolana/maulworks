@@ -16,9 +16,10 @@ interface PillNavProps {
   togglePerformanceMode?: () => void;
   isGyroEnabled?: boolean;
   toggleGyro?: () => void;
+  isLowPerformanceMode?: boolean;
 }
 
-export default function PillNav({ items, forceClose, togglePerformanceMode, isGyroEnabled, toggleGyro }: PillNavProps) {
+export default function PillNav({ items, forceClose, togglePerformanceMode, isGyroEnabled, toggleGyro, isLowPerformanceMode }: PillNavProps) {
   const [activeItem, setActiveItem] = useState(items[0]?.id);
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -101,7 +102,24 @@ export default function PillNav({ items, forceClose, togglePerformanceMode, isGy
                 className="w-6 h-6 object-contain transition-transform duration-300 hover:-rotate-6 cursor-pointer" 
               />
             </button>
-            <span>Maulana&apos;s Portfolio</span>
+            <span className="relative flex items-center">
+              Maulana&apos;s Portfolio
+              <AnimatePresence>
+                {isLowPerformanceMode && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.5 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.5 }}
+                    className="absolute -right-6 flex items-center justify-center"
+                    title="Low Performance Mode Active"
+                  >
+                    <svg viewBox="0 0 24 24" className="w-4 h-4 fill-none stroke-[#C6F10E] stroke-[2.5] stroke-linecap-round stroke-linejoin-round">
+                      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                    </svg>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </span>
           </motion.div>
 
           {/* DESKTOP LINKS */}
@@ -190,18 +208,20 @@ export default function PillNav({ items, forceClose, togglePerformanceMode, isGy
               );
             })}
 
-            {/* GYRO SWITCH AT BOTTOM */}
-            <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex items-center gap-3">
-              <span className="text-white/80 font-medium tracking-wide text-sm">Enable Gyro</span>
-              <button
-                onClick={toggleGyro}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isGyroEnabled ? 'bg-[#C6F10E]' : 'bg-white/20'}`}
-              >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-black transition-transform ${isGyroEnabled ? 'translate-x-6' : 'translate-x-1'}`}
-                />
-              </button>
-            </div>
+            {/* GYRO SWITCH AT BOTTOM (ONLY IF NOT IN LOW PERFORMANCE MODE) */}
+            {!isLowPerformanceMode && (
+              <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex items-center gap-3">
+                <span className="text-white/80 font-medium tracking-wide text-sm">Enable Gyro</span>
+                <button
+                  onClick={toggleGyro}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isGyroEnabled ? 'bg-[#C6F10E]' : 'bg-white/20'}`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-black transition-transform ${isGyroEnabled ? 'translate-x-6' : 'translate-x-1'}`}
+                  />
+                </button>
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

@@ -320,10 +320,15 @@ export const LogoLoop = React.memo<LogoLoopProps>(
     );
 
     const handleMouseEnter = useCallback(() => {
-      if (effectiveHoverSpeed !== undefined) setIsHovered(true);
+      if (typeof window !== 'undefined' && window.matchMedia('(hover: hover)').matches) {
+        if (effectiveHoverSpeed !== undefined) setIsHovered(true);
+      }
     }, [effectiveHoverSpeed]);
+    
     const handleMouseLeave = useCallback(() => {
-      if (effectiveHoverSpeed !== undefined) setIsHovered(false);
+      if (typeof window !== 'undefined' && window.matchMedia('(hover: hover)').matches) {
+        if (effectiveHoverSpeed !== undefined) setIsHovered(false);
+      }
     }, [effectiveHoverSpeed]);
 
     const handlePointerDown = useCallback(
