@@ -511,7 +511,7 @@ export default function Home() {
 
   // --- STATE UNTUK GYROSCOPE LANYARD ---
   const [gyroGravity, setGyroGravity] = useState<[number, number, number]>([0, -40, 0]);
-  const [showGyroPermission, setShowGyroPermission] = useState(false);
+  const [isGyroEnabled, setIsGyroEnabled] = useState(false);
 
   const [pageReady, setPageReady] = useState(false);
   const [isLowPerformanceMode, setIsLowPerformanceMode] = useState(false);
@@ -650,12 +650,10 @@ export default function Home() {
 
   useEffect(() => {
     if (typeof window !== "undefined" && window.DeviceOrientationEvent) {
-      if (typeof (DeviceOrientationEvent as any).requestPermission === 'function') {
-        // Jika iOS 13+, butuh permission (tampilkan tombol)
-        setShowGyroPermission(true);
-      } else {
+      if (typeof (DeviceOrientationEvent as any).requestPermission !== 'function') {
         // Jika Android atau browser lain, langsung jalankan
         window.addEventListener('deviceorientation', handleOrientation);
+        setIsGyroEnabled(true);
       }
     }
     return () => {
@@ -665,18 +663,27 @@ export default function Home() {
     };
   }, []);
 
-  const requestGyro = async () => {
-    if (typeof (DeviceOrientationEvent as any).requestPermission === 'function') {
-      try {
-        const permission = await (DeviceOrientationEvent as any).requestPermission();
-        if (permission === 'granted') {
-          window.addEventListener('deviceorientation', handleOrientation);
-          setShowGyroPermission(false);
+  const toggleGyro = async () => {
+    if (isGyroEnabled) {
+      window.removeEventListener('deviceorientation', handleOrientation);
+      setIsGyroEnabled(false);
+      setGyroGravity([0, -40, 0]);
+    } else {
+      if (typeof window !== "undefined" && window.DeviceOrientationEvent) {
+        if (typeof (DeviceOrientationEvent as any).requestPermission === 'function') {
+          try {
+            const permission = await (DeviceOrientationEvent as any).requestPermission();
+            if (permission === 'granted') {
+              window.addEventListener('deviceorientation', handleOrientation);
+              setIsGyroEnabled(true);
+            }
+          } catch (e) {
+            console.error("Gyro error:", e);
+          }
         } else {
-          setShowGyroPermission(false); // Sembunyikan tombol jika ditolak
+          window.addEventListener('deviceorientation', handleOrientation);
+          setIsGyroEnabled(true);
         }
-      } catch (e) {
-        console.error("Gyro error:", e);
       }
     }
   };
@@ -819,29 +826,10 @@ export default function Home() {
   return (
     <div id="profile" className="min-h-screen overflow-x-hidden bg-[#101010] relative pt-0 pb-10">
 
-      {/* PERFORMANCE TOGGLE */}
-      <button
-        onClick={togglePerformanceMode}
-        className="fixed z-50 bottom-4 left-4 sm:bottom-6 sm:left-6 flex items-center justify-center w-12 h-12 sm:w-auto sm:h-auto sm:px-3 sm:py-2 gap-2 bg-[#111111]/60 hover:bg-[#111111]/80 backdrop-blur-md border border-white/20 text-white/80 rounded-full sm:rounded-xl transition-all duration-300 shadow-[0_0_15px_rgba(255,255,255,0.05)]"
-        aria-label="Toggle Performance Mode"
-        title={isLowPerformanceMode ? "Enable High Performance Mode" : "Enable Low Performance Mode"}
-      >
-        {isLowPerformanceMode ? (
-          <svg viewBox="0 0 24 24" className="w-5 h-5 fill-none stroke-currentColor stroke-[1.5] stroke-linecap-round stroke-linejoin-round">
-            <rect x="2" y="7" width="16" height="10" rx="2" ry="2"></rect>
-            <line x1="22" y1="11" x2="22" y2="13"></line>
-            <line x1="6" y1="11" x2="6" y2="13"></line>
-          </svg>
-        ) : (
-          <svg viewBox="0 0 24 24" className="w-5 h-5 fill-none stroke-[#C6F10E] stroke-[1.5] stroke-linecap-round stroke-linejoin-round">
-            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-          </svg>
-        )}
-        <span className="text-xs font-medium hidden sm:inline">{isLowPerformanceMode ? "Low Performance" : "High Performance"}</span>
-      </button>
+
 
       {/* PILL NAV */}
-      <PillNav items={navItems} forceClose={isOverlayOpen} />
+      <PillNav items={navItems} forceClose={isOverlayOpen} togglePerformanceMode={togglePerformanceMode} isGyroEnabled={isGyroEnabled} toggleGyro={toggleGyro} />
 
       {/* HEADER SECTION */}
       <div className="w-full relative overflow-visible">
@@ -879,21 +867,6 @@ export default function Home() {
               </div>
             </div>
             <div className={`col-span-1 xl:col-span-6 relative z-0 overflow-visible order-1 xl:order-2 ${!isLowPerformanceMode ? '-mt-56 sm:-mt-64 md:-mt-80 lg:-mt-10 xl:-mt-0' : 'hidden'}`}>
-              {/* TOMBOL REQUEST GYRO (HANYA MUNCUL DI iOS 13+) */}
-              {showGyroPermission && !isLowPerformanceMode && (
-                <button
-                  onClick={requestGyro}
-                  className="absolute z-30 bottom-10 right-4 sm:right-10 flex items-center gap-2 bg-[#111111]/60 hover:bg-[#111111]/80 backdrop-blur-md border border-white/20 text-white/80 px-3 py-2 rounded-xl transition-all duration-300 shadow-[0_0_15px_rgba(255,255,255,0.05)]"
-                  aria-label="Enable 3D Interaction"
-                >
-                  <svg viewBox="0 0 24 24" className="w-5 h-5 fill-none stroke-currentColor stroke-[1.5] stroke-linecap-round stroke-linejoin-round" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-                    <line x1="12" y1="22.08" x2="12" y2="12"></line>
-                  </svg>
-                  <span className="text-xs font-medium">Enable 3D</span>
-                </button>
-              )}
 
               {/* Setting untuk Ukuran Lanyard */}
               <div className="relative w-[280%] -ml-[90%] sm:w-[300%] sm:-ml-[100%] md:w-[350%] md:-ml-[125%] lg:w-[350%] lg:-ml-[125%] xl:w-[400%] xl:-ml-[130%] 2xl:w-[450%] 2xl:-ml-[150%] flex items-center justify-center">

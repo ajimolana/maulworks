@@ -13,9 +13,12 @@ export interface PillNavItem {
 interface PillNavProps {
   items: PillNavItem[];
   forceClose?: boolean;
+  togglePerformanceMode?: () => void;
+  isGyroEnabled?: boolean;
+  toggleGyro?: () => void;
 }
 
-export default function PillNav({ items, forceClose }: PillNavProps) {
+export default function PillNav({ items, forceClose, togglePerformanceMode, isGyroEnabled, toggleGyro }: PillNavProps) {
   const [activeItem, setActiveItem] = useState(items[0]?.id);
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -70,24 +73,35 @@ export default function PillNav({ items, forceClose }: PillNavProps) {
   return (
     <>
       <div
-        className={`fixed top-0 inset-x-0 z-[100] flex justify-center px-4 sm:px-6 pointer-events-none transition-opacity duration-300 ${forceClose ? "opacity-0" : "opacity-100"
+        className={`fixed top-0 inset-x-0 z-[100] flex justify-center px-2 lg:px-6 pointer-events-none transition-opacity duration-300 ${forceClose ? "opacity-0" : "opacity-100"
           }`}
       >
         <motion.div
           layout
           transition={{ type: "spring", bounce: 0, duration: 1.2 }}
-          className={`pointer-events-auto flex items-center justify-between overflow-hidden mt-4 py-2 border ${isScrolled
-            ? "bg-[#111111]/80 backdrop-blur-md rounded-full border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.4)] px-5 sm:px-6 w-full max-w-[1366px]"
-            : "bg-transparent rounded-none border-transparent px-5 sm:px-6 w-full max-w-[1680px]"
+          className={`pointer-events-auto flex items-center justify-between overflow-hidden mt-2 lg:mt-4 py-2 border ${isScrolled
+            ? "bg-[#111111]/80 backdrop-blur-md rounded-full border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.4)] px-4 lg:px-6 w-full lg:max-w-[1366px]"
+            : "bg-transparent rounded-none border-transparent px-4 lg:px-6 w-full lg:max-w-[1680px]"
             }`}
         >
           {/* LOGO / TITLE */}
           <motion.div
             layout
             transition={{ type: "spring", bounce: 0, duration: 1.2 }}
-            className="flex-shrink-0 font-semibold tracking-tight transition-colors text-white text-lg pl-2"
+            className="flex-shrink-0 flex items-center gap-2 font-semibold tracking-tight transition-colors text-white text-lg"
           >
-            Maulana&apos;s Portfolio
+            <button 
+              onClick={togglePerformanceMode} 
+              className="outline-none focus:outline-none"
+              aria-label="Toggle Performance Mode"
+            >
+              <img 
+                src="/favicon.ico" 
+                alt="Logo" 
+                className="w-6 h-6 object-contain transition-transform duration-300 hover:-rotate-6 cursor-pointer" 
+              />
+            </button>
+            <span>Maulana&apos;s Portfolio</span>
           </motion.div>
 
           {/* DESKTOP LINKS */}
@@ -175,6 +189,19 @@ export default function PillNav({ items, forceClose }: PillNavProps) {
                 </motion.div>
               );
             })}
+
+            {/* GYRO SWITCH AT BOTTOM */}
+            <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex items-center gap-3">
+              <span className="text-white/80 font-medium tracking-wide text-sm">Enable Gyro</span>
+              <button
+                onClick={toggleGyro}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isGyroEnabled ? 'bg-[#C6F10E]' : 'bg-white/20'}`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-black transition-transform ${isGyroEnabled ? 'translate-x-6' : 'translate-x-1'}`}
+                />
+              </button>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
