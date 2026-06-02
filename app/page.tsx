@@ -9,7 +9,7 @@ import BlurText from "./components/BlurText/BlurText";
 import AnimatedContent from "./components/AnimatedContent/AnimatedContent";
 import DotGrid from "./components/DotGrid/DotGrid";
 import ColorBends from "./components/ColorBends/ColorBends";
-import CardNav from "./components/CardNav/CardNav";
+import PillNav from "./components/PillNav/PillNav";
 import LogoLoop from "./components/LogoLoop/LogoLoop";
 
 
@@ -39,6 +39,7 @@ type Project = {
   role?: string;
   details?: DetailItem[];
   heroImage?: string;
+  logo?: string;
   gallery?: GalleryItem[];
   link?: string | null;
   links?: ProjectLink[];
@@ -68,11 +69,11 @@ const galleryItems = (gallery: GalleryItem[] = []) =>
 const renderMultilineText = (text: string | string[]) =>
   Array.isArray(text)
     ? text.map((line: string, index: number) => (
-        <span key={index}>
-          {line}
-          {index < text.length - 1 && <br />}
-        </span>
-      ))
+      <span key={index}>
+        {line}
+        {index < text.length - 1 && <br />}
+      </span>
+    ))
     : text;
 
 const renderDetails = (details: DetailItem[] = []) =>
@@ -106,7 +107,7 @@ const renderDetails = (details: DetailItem[] = []) =>
 const experiencesData = [
   {
     id: "internbi",
-    cardTag: "Internship", 
+    cardTag: "Internship",
     year: "2025",
     title: "Bank Indonesia South Sulawesi",
     shortDesc: "Data Entry Automation and Forecasting support",
@@ -130,14 +131,15 @@ const experiencesData = [
     ],
     heroImage: "/assets/experience/internbi/Capstone Presentation.jpg",
     gallery: [
-      ["/assets/experience/internbi/Capstone Presentation.jpg","Capstone Presentation"],
-      ["/assets/experience/internbi/Onboarding.jpg","Onboarding"],
-      ["/assets/experience/internbi/Mentors and Partner.jpg","Mentors and Partner"],
-      ["/assets/experience/internbi/3rd Floor Fellows.jpg","3rd Floor Fellows"],
-      ["/assets/experience/internbi/Internal Project Fellows.jpg","Internal Project Fellows"]
+      ["/assets/experience/internbi/Capstone Presentation.jpg", "Capstone Presentation"],
+      ["/assets/experience/internbi/Onboarding.jpg", "Onboarding"],
+      ["/assets/experience/internbi/Mentors and Partner.jpg", "Mentors and Partner"],
+      ["/assets/experience/internbi/3rd Floor Fellows.jpg", "3rd Floor Fellows"],
+      ["/assets/experience/internbi/Internal Project Fellows.jpg", "Internal Project Fellows"]
     ],
+    logo: "/assets/experience/internbi/Logo BI.png",
     link: null
-  } 
+  }
 ];
 
 const projectsData = [
@@ -374,6 +376,72 @@ const researchData = [
   },
 ];
 
+const organizationsData: Project[] = [
+  {
+    id: "org-softball",
+    cardTag: "President",
+    year: "2024",
+    title: "Softball Student Activity Unit",
+    shortDesc: "UKM Softball-Baseball Unhas",
+    period: "Jan 2024 - Dec 2024",
+    roleLabel: "Role",
+    role: "President",
+    details: [
+      {
+        label: "Native Name",
+        value: "Unit Kegiatan Mahasiswa Softball-Baseball Universitas Hasanuddin"
+      },
+      {
+        label: "Task",
+        value: [
+          "Coordinated 24 daily board members and 52 junior members in executing organizational activities.",
+          "Built bonding and instilled a competitive spirit in members, leading to 1st Place achievements for both Men’s and Women’s teams at the 2024 Airlangga National Championship."
+        ],
+        list: true
+      }
+    ],
+    heroImage: "",
+    logo: "/assets/organizations/softball/Logo UKM Softball Unhas.png",
+    gallery: [
+      ["/assets/organizations/softball/Certificate of Appreciation.jpg", "Certificate of Appreciation"],
+      ["/assets/organizations/softball/Champion Team.jpg", "Champion Team"],
+      ["/assets/organizations/softball/Unhas Day 2024.jpg", "Unhas Day 2024"],
+      ["/assets/organizations/softball/Softball Club Fellows.jpg", "Softball Club Fellows"],
+    ],
+    link: null
+  },
+  {
+    id: "org-himatika",
+    cardTag: "Academic Coordinator",
+    year: "2023",
+    title: "Mathematics Student Club",
+    shortDesc: "Himatika FMIPA Unhas",
+    period: "Nov 2023 - Jun 2024",
+    roleLabel: "Role",
+    role: "Coordinator of Academic & Student Affairs",
+    details: [
+      {
+        label: "Native Name",
+        value: "Himpunan Mahasiswa Matematika FMIPA Universitas Hasanuddin"
+      },
+      {
+        label: "Task",
+        value: [
+          "Coordinated 15 daily board members to provide academic assistance for 120 junior members.",
+          "Maintained student integrity within the association to ensure members complete their studies on time."
+        ],
+        list: true
+      }
+    ],
+    heroImage: "",
+    logo: "/assets/organizations/himatika/Logo Himatika FMIPA Unhas.png",
+    gallery: [
+      ["/assets/organizations/himatika/Executive Board.jpg", "Executive Board"],
+    ],
+    link: null
+  }
+];
+
 const achievements: AchievementItem[] = [
   {
     title: "Top 10 Paper",
@@ -390,7 +458,7 @@ const achievements: AchievementItem[] = [
   {
     title: "Outstanding Student",
     competitionType: "Recognition",
-    organizer: "Math Dept, Hasanuddin University",
+    organizer: "Math Dept. Hasanuddin University",
     date: "Aug 2024",
   },
   {
@@ -440,23 +508,55 @@ export default function Home() {
     index: 0
   });
   const [lanyardOffsetY, setLanyardOffsetY] = useState(0);
-  
+
   // --- STATE UNTUK GYROSCOPE LANYARD ---
   const [gyroGravity, setGyroGravity] = useState<[number, number, number]>([0, -40, 0]);
   const [showGyroPermission, setShowGyroPermission] = useState(false);
 
   const [pageReady, setPageReady] = useState(false);
+  const [isLowPerformanceMode, setIsLowPerformanceMode] = useState(false);
 
   useEffect(() => {
     setPageReady(true);
+
+    // Performance Check for heavy animations
+    const checkPerformance = () => {
+      const hardwareConcurrency = navigator.hardwareConcurrency || 4;
+      const isLowEndHardware = hardwareConcurrency <= 4;
+      const isMobile = window.innerWidth < 768;
+      const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      // Enable low performance mode if reduced motion is preferred OR it's a low-end mobile device
+      setIsLowPerformanceMode(prefersReducedMotion || (isLowEndHardware && isMobile));
+    };
+
+    checkPerformance();
+
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const handleMotionChange = (e: MediaQueryListEvent) => {
+      if (e.matches) setIsLowPerformanceMode(true);
+      else checkPerformance();
+    };
+
+    mediaQuery.addEventListener("change", handleMotionChange);
+    return () => mediaQuery.removeEventListener("change", handleMotionChange);
   }, []);
-  
+
   // --- REFERENSI & LOGIKA SCROLL DOCUMENTATION ---
   const docsScrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const updateLanyardOffset = () => {
-      setLanyardOffsetY(window.innerWidth >= 1024 ? 0.4 : 0);
+      const width = window.innerWidth;
+      if (width >= 1366) {
+        setLanyardOffsetY(0.4);
+      } else if (width >= 1024) {
+        setLanyardOffsetY(0.6);
+      } else if (width >= 768) {
+        setLanyardOffsetY(-0.8);
+      } else {
+        setLanyardOffsetY(0);
+      }
     };
 
     updateLanyardOffset();
@@ -482,22 +582,13 @@ export default function Home() {
   }, [activeProject]);
 
   const navItems = [
-    {
-      label: "About", bgColor: "#1B1722", textColor: "#fff",
-      links: [
-        { label: "Profile", ariaLabel: "About Profile", href: "#profile" },
-        { label: "Experiences", ariaLabel: "About Experiences", href: "#experiences" },
-        { label: "Contacts", ariaLabel: "About Contacts", href: "#contacts" },
-      ]
-    },
-    {
-      label: "Projects", bgColor: "#2F293A", textColor: "#fff",
-      links: [
-        { label: "Projects", ariaLabel: "Projects Projects", href: "#projects" },
-        { label: "Research", ariaLabel: "Projects Research", href: "#research" },
-        { label: "Achievements", ariaLabel: "Projects Achievements", href: "#achievements" },
-      ]
-    },
+    { id: "profile", label: "Profile", href: "#profile" },
+    { id: "experiences", label: "Experiences", href: "#experiences" },
+    { id: "projects", label: "Projects", href: "#projects" },
+    { id: "research", label: "Research", href: "#research" },
+    { id: "organizations", label: "Organizations", href: "#organizations" },
+    { id: "achievements", label: "Achievements", href: "#achievements" },
+    { id: "contacts", label: "Contacts", href: "#contacts" },
   ];
 
   // 1. LOGIKA HISTORY BROWSER
@@ -529,7 +620,7 @@ export default function Home() {
   const handleOrientation = (event: DeviceOrientationEvent) => {
     let { beta, gamma } = event;
     if (beta === null || gamma === null) return;
-    
+
     // Batasi nilai kemiringan ekstrem
     beta = Math.max(-90, Math.min(90, Math.floor(beta)));
     gamma = Math.max(-90, Math.min(90, Math.floor(gamma)));
@@ -537,7 +628,7 @@ export default function Home() {
     // Konversi kemiringan X dan Y menjadi sumbu gravitasi X dan Z (Rapier physics)
     const gx = gamma * 0.6;
     const gz = (beta - 45) * 0.6; // Anggap posisi rileks HP adalah miring 45 derajat
-    
+
     setGyroGravity([gx, -40, gz]);
   };
 
@@ -637,7 +728,8 @@ export default function Home() {
   const achievementTargetById = (id: string) =>
     researchData.find((project) => project.id === id) ||
     projectsData.find((project) => project.id === id) ||
-    experiencesData.find((project) => project.id === id);
+    experiencesData.find((project) => project.id === id) ||
+    organizationsData.find((project) => project.id === id);
 
   const techLogos = achievements.map((item, index) => {
     const combinedTitle = item.title.trim();
@@ -710,28 +802,29 @@ export default function Home() {
 
   return (
     <div id="profile" className="min-h-screen overflow-x-hidden bg-[#101010] relative pt-0 pb-10">
-      
-      {/* CARD NAV DENGAN LOGIKA HIDE SAAT MODAL TERBUKA */}
-      <div 
-        className="md:transition-none" 
-        style={{ opacity: isOverlayOpen ? 0 : 1, pointerEvents: isOverlayOpen ? 'none' : 'auto' }}
-      >
-        <CardNav logo="" logoAlt="" title="Maulana's Portfolio" items={navItems} baseColor="#fff" menuColor="#fff" ease="power3.out" />
-      </div>
+
+      {/* PILL NAV */}
+      <PillNav items={navItems} forceClose={isOverlayOpen} />
 
       {/* HEADER SECTION */}
       <div className="w-full relative overflow-visible">
         <div className="absolute inset-0 w-full h-full pointer-events-none">
           <div style={{ width: '100%', height: '100%', position: 'relative', WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%)', maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%)' }}>
-            <ColorBends colors={["#19382e"]} rotation={90} speed={0.2} scale={1} frequency={1} warpStrength={1} mouseInfluence={1} noise={0.15} parallax={0.5} iterations={1} intensity={1.5} bandWidth={6} transparent autoRotate={0} />
-            <DotGrid dotSize={5} gap={15} baseColor="#2F293A" activeColor="#5227FF" proximity={120} shockRadius={250} shockStrength={5} resistance={750} returnDuration={1.5} />
+            {!isLowPerformanceMode ? (
+              <>
+                <ColorBends colors={["#19382e"]} rotation={90} speed={0.2} scale={1} frequency={1} warpStrength={1} mouseInfluence={1} noise={0.15} parallax={0.5} iterations={1} intensity={1.5} bandWidth={6} transparent autoRotate={0} />
+                <DotGrid dotSize={5} gap={15} baseColor="#2F293A" activeColor="#5227FF" proximity={120} shockRadius={250} shockStrength={5} resistance={750} returnDuration={1.5} />
+              </>
+            ) : (
+              <div className="absolute inset-0 bg-gradient-to-br from-[#101010] via-[#15241e] to-[#101010] opacity-80" />
+            )}
           </div>
         </div>
-        <div className="mx-auto max-w-[1366px] min-h-screen px-4 sm:px-6">
-          <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 xl:gap-0">
-            <div className="col-span-1 xl:col-span-6 h-full relative z-10 order-2 xl:order-1">
-              <div className="flex items-start xl:items-center h-full">
-                <div className={`flex flex-col gap-6 -mt-28 sm:-mt-20 md:-mt-48 lg:-mt-64 xl:mt-0 transition-opacity duration-300 ${!pageReady ? 'opacity-0 invisible' : 'opacity-100 visible'}`}>
+        <div className={`mx-auto max-w-[1366px] min-h-screen px-4 sm:px-6 ${isLowPerformanceMode ? 'flex items-center' : ''}`}>
+          <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 xl:gap-0 w-full">
+            <div className={`col-span-1 h-full relative z-10 order-2 xl:order-1 ${!isLowPerformanceMode ? 'xl:col-span-6' : 'xl:col-span-12'}`}>
+              <div className={`flex ${!isLowPerformanceMode ? 'items-start xl:items-center' : 'items-center'} h-full w-full`}>
+                <div className={`flex flex-col gap-6 ${!isLowPerformanceMode ? '-mt-28 sm:-mt-20 md:-mt-10 lg:-mt-64 xl:mt-0' : 'w-full max-w-5xl mx-auto'} transition-opacity duration-300 ${!pageReady ? 'opacity-0 invisible' : 'opacity-100 visible'}`}>
                   <AnimatedContent distance={100} direction="vertical" reverse={false} duration={0.8} ease="power3.out" initialOpacity={0} animateOpacity scale={1} threshold={0.1} delay={0}>
                     <div className="flex flex-col sm:flex-row sm:items-center gap-2 mt-0 sm:mt-0 md:mt-14">
                       <h1 className="text-lg sm:text-2xl text-white font-bold">Open to Position as a</h1>
@@ -743,28 +836,35 @@ export default function Home() {
                     <SplitText text="Actuarial Science Graduate" className="text-xl sm:text-2xl md:text-4xl lg:text-5xl font-semibold text-start text-[#C6F10E]" textAlign="left" delay={75} from={{ opacity: 0, transform: 'translate3d(0,50px,0)' }} to={{ opacity: 1, transform: 'translate3d(0,0,0)' }} threshold={0.1} rootMargin="-0px" />
                   </div>
                   <div className="flex flex-col items-start">
-                    <BlurText text="Actuarial Science graduate specializing in data analytics and machine learning. Gained practical experience as an intern at Bank Indonesia South Sulawesi, with an innovation through data entry automation. Proficient in forecasting and data visualization. Certified Data Analyst by BNSP and in Data Science by Startup Campus. Possesses strong public speaking, leadership, and problem solving skills, backed by a record of achievements. Eager to continuously learn." delay={20} animateBy="words" direction="top" className="text-base sm:text-lg md:text-xl mb-6 md:mb-8 max-w-xl sm:max-w-2xl md:max-w-7xl" />
+                    <BlurText text="Actuarial Science graduate with a concentration in data analytics, currently focusing on AI Automation. Demonstrated leader with strong leadership skills and a history of accomplishments. Effective communicator in both Indonesian and English, equipped with a solid skillset in management and creative sectors." delay={20} animateBy="words" direction="top" className="text-base sm:text-lg md:text-xl mb-6 md:mb-8 max-w-xl sm:max-w-2xl md:max-w-7xl" />
                   </div>
                 </div>
               </div>
             </div>
-            <div className="col-span-1 xl:col-span-6 relative z-0 overflow-visible order-1 xl:order-2 -mt-56 sm:-mt-64 md:-mt-80 lg:-mt-10 xl:-mt-0">
+            <div className={`col-span-1 xl:col-span-6 relative z-0 overflow-visible order-1 xl:order-2 ${!isLowPerformanceMode ? '-mt-56 sm:-mt-64 md:-mt-80 lg:-mt-10 xl:-mt-0' : 'hidden'}`}>
+              {/* TOMBOL REQUEST GYRO (HANYA MUNCUL DI iOS 13+) */}
+              {showGyroPermission && !isLowPerformanceMode && (
+                <button
+                  onClick={requestGyro}
+                  className="absolute z-30 bottom-10 right-4 sm:right-10 flex items-center gap-2 bg-[#111111]/60 hover:bg-[#111111]/80 backdrop-blur-md border border-white/20 text-white/80 px-3 py-2 rounded-xl transition-all duration-300 shadow-[0_0_15px_rgba(255,255,255,0.05)]"
+                  aria-label="Enable 3D Interaction"
+                >
+                  <svg viewBox="0 0 24 24" className="w-5 h-5 fill-none stroke-currentColor stroke-[1.5] stroke-linecap-round stroke-linejoin-round" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                    <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                  </svg>
+                  <span className="text-xs font-medium">Enable 3D</span>
+                </button>
+              )}
+
               {/* Setting untuk Ukuran Lanyard */}
               <div className="relative w-[280%] -ml-[90%] sm:w-[300%] sm:-ml-[100%] md:w-[350%] md:-ml-[125%] lg:w-[350%] lg:-ml-[125%] xl:w-[400%] xl:-ml-[130%] 2xl:w-[450%] 2xl:-ml-[150%] flex items-center justify-center">
-                
-                {/* TOMBOL REQUEST GYRO (HANYA MUNCUL DI iOS 13+) */}
-                {showGyroPermission && (
-                  <button 
-                    onClick={requestGyro}
-                    className="absolute z-20 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/30 text-white text-sm font-semibold py-2 px-4 rounded-full transition-all duration-300"
-                    style={{ top: '40%' }} // Menyesuaikan dengan tinggi Lanyard
-                  >
-                    Enable 3D Lanyard
-                  </button>
-                )}
 
                 {/* GRAVITASI LANYARD SUDAH DINAMIS */}
-                <Lanyard position={[0, 0, 15]} gravity={gyroGravity} lanyardOffsetY={lanyardOffsetY} />
+                {!isLowPerformanceMode && (
+                  <Lanyard position={[0, 0, 15]} gravity={gyroGravity} lanyardOffsetY={lanyardOffsetY} />
+                )}
 
               </div>
             </div>
@@ -773,7 +873,7 @@ export default function Home() {
       </div>
 
       {/* 1. SECTION EXPERIENCES */}
-      <section id="experiences" className="w-full mt-10">
+      <section id="experiences" className="w-full mt-10 scroll-mt-28">
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
           <h2 className="text-3xl sm:text-4xl font-semibold text-white mb-6">Experiences</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -803,7 +903,7 @@ export default function Home() {
       </section>
 
       {/* 2. SECTION PROJECTS */}
-      <section id="projects" className="w-full mt-20">
+      <section id="projects" className="w-full mt-20 scroll-mt-28">
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
           <h2 className="text-3xl sm:text-4xl font-semibold text-white mb-6">Projects</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -833,7 +933,7 @@ export default function Home() {
       </section>
 
       {/* 3. SECTION RESEARCH */}
-      <section id="research" className="w-full mt-20">
+      <section id="research" className="w-full mt-20 scroll-mt-28">
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
           <h2 className="text-3xl sm:text-4xl font-semibold text-white mb-6">Research</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -862,8 +962,44 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 4. SECTION ACHIEVEMENTS */}
-      <section id="achievements" className="w-full mt-20">
+      {/* 4. SECTION ORGANIZATIONS */}
+      <section id="organizations" className="w-full mt-20 scroll-mt-28">
+        <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
+          <h2 className="text-3xl sm:text-4xl font-semibold text-white mb-6">Organizations</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {organizationsData.map((project) => (
+              <button
+                key={project.id}
+                type="button"
+                onClick={() => openProjectModal(project)}
+                className="group relative text-left rounded-3xl border border-white/15 bg-[#111111] p-4 transition-all duration-300 hover:-translate-y-1.5 hover:border-white/70 hover:shadow-[0_20px_60px_rgba(255,255,255,0.15)] flex items-center gap-4"
+              >
+                <div className="pointer-events-none absolute inset-0 rounded-3xl opacity-0 transition-opacity duration-300 group-hover:opacity-100" style={{ boxShadow: '0 0 80px rgba(255,255,255,0.18)' }} />
+
+                {/* SMALL LOGO */}
+                {project.logo && (
+                  <div className="flex-shrink-0 flex items-center justify-center w-12 h-12">
+                    <img src={project.logo} alt={project.title} className="max-w-full max-h-full object-contain" />
+                  </div>
+                )}
+
+                {/* TEXT CONTENT */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs sm:text-xs uppercase tracking-wide text-white/60 truncate mr-2">{project.cardTag}</p>
+                    <p className="text-xs sm:text-xs uppercase tracking-wide text-white/60 flex-shrink-0">{project.year}</p>
+                  </div>
+                  <h3 className="mt-1 text-base sm:text-lg font-semibold text-white truncate">{project.title}</h3>
+                  <p className="mt-1 text-xs text-white/60 truncate">{project.shortDesc}</p>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 5. SECTION ACHIEVEMENTS */}
+      <section id="achievements" className="w-full mt-20 scroll-mt-28">
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
           <h2 className="text-3xl sm:text-4xl font-semibold text-white mb-6">Achievements</h2>
           <div className="py-2 overflow-visible">
@@ -883,58 +1019,58 @@ export default function Home() {
       </section>
 
       {/* FOOTER */}
-      <footer id="contacts" className="w-full mt-28 mb-20 border-t border-white/10 pt-10 flex flex-col items-center justify-center gap-6">
+      <footer id="contacts" className="w-full mt-28 mb-20 border-t border-white/10 pt-10 flex flex-col items-center justify-center gap-6 scroll-mt-28">
         <div className="flex items-center justify-center gap-6">
-          <a 
-            href="mailto:maulanarajisf@gmail.com" 
-            target="_blank" 
-            rel="noreferrer" 
-            className="transition-opacity hover:opacity-80" 
+          <a
+            href="mailto:maulanarajisf@gmail.com"
+            target="_blank"
+            rel="noreferrer"
+            className="transition-opacity hover:opacity-80"
             aria-label="Email"
           >
-            <img 
-              src="https://img.icons8.com/?size=100&id=12623&format=png&color=888888" 
-              alt="Email Logo" 
-              className="w-7 h-7" // Ukuran 28px (w-7 = 1.75rem = 28px)
+            <img
+              src="https://img.icons8.com/?size=100&id=12623&format=png&color=888888"
+              alt="Email Logo"
+              className="h-7 w-7"
             />
           </a>
-          <a 
-            href="https://github.com/ajimolana" 
-            target="_blank" 
-            rel="noreferrer" 
-            className="transition-opacity hover:opacity-80" 
+          <a
+            href="https://github.com/ajimolana"
+            target="_blank"
+            rel="noreferrer"
+            className="transition-opacity hover:opacity-80"
             aria-label="GitHub"
           >
-            <img 
-              src="https://img.icons8.com/?size=100&id=12599&format=png&color=888888" 
-              alt="GitHub Logo" 
-              className="w-7 h-7" // Ukuran 28px (w-7 = 1.75rem = 28px)
+            <img
+              src="https://img.icons8.com/?size=100&id=12599&format=png&color=888888"
+              alt="GitHub Logo"
+              className="h-7 w-7"
             />
           </a>
-          <a 
-            href="https://linkedin.com/in/maulanaraji/" 
-            target="_blank" 
-            rel="noreferrer" 
-            className="transition-opacity hover:opacity-80" 
+          <a
+            href="https://linkedin.com/in/maulanaraji/"
+            target="_blank"
+            rel="noreferrer"
+            className="transition-opacity hover:opacity-80"
             aria-label="LinkedIn"
           >
-            <img 
-              src="https://img.icons8.com/?size=100&id=8808&format=png&color=888888" 
-              alt="LinkedIn Logo" 
-              className="w-7 h-7" // Ukuran 28px (w-7 = 1.75rem = 28px)
+            <img
+              src="https://img.icons8.com/?size=100&id=8808&format=png&color=888888"
+              alt="LinkedIn Logo"
+              className="h-7 w-7"
             />
           </a>
-           <a 
-            href="https://instagram.com/ajimolana/" 
-            target="_blank" 
-            rel="noreferrer" 
-            className="transition-opacity hover:opacity-80" 
+          <a
+            href="https://instagram.com/ajimolana/"
+            target="_blank"
+            rel="noreferrer"
+            className="transition-opacity hover:opacity-80"
             aria-label="Instagram"
           >
-            <img 
-              src="https://img.icons8.com/?size=100&id=32309&format=png&color=888888" 
-              alt="Instagram Logo" 
-              className="w-7 h-7" // Ukuran 28px (w-7 = 1.75rem = 28px)
+            <img
+              src="https://img.icons8.com/?size=100&id=32309&format=png&color=888888"
+              alt="Instagram Logo"
+              className="h-7 w-7"
             />
           </a>
         </div>
@@ -954,7 +1090,12 @@ export default function Home() {
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex-none flex items-center justify-between bg-[#111111] px-5 py-4 sm:px-6 sm:py-5 border-b border-white/10 z-10">
-              <h3 className="text-sm md:text-base font-semibold pr-4">{activeProject.title}</h3>
+              <div className="flex items-center gap-3">
+                {activeProject.logo && (
+                  <img src={activeProject.logo} alt={activeProject.title} className="w-8 h-8 object-contain flex-shrink-0" />
+                )}
+                <h3 className="text-sm md:text-base font-semibold pr-4">{activeProject.title}</h3>
+              </div>
               <button
                 type="button"
                 className="flex-shrink-0 flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full border border-white/20 bg-black/60 text-white/80 transition hover:border-white/60 hover:text-white"
@@ -1052,7 +1193,7 @@ export default function Home() {
 
       {/* LIGHTBOX UNTUK PREVIEW GAMBAR */}
       {lightbox.isOpen && (
-        <div 
+        <div
           className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4"
           onClick={closeLightbox}
         >
@@ -1065,9 +1206,9 @@ export default function Home() {
 
           <div className="relative w-full max-w-5xl max-h-[85vh] flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
             <div className="flex w-full flex-col items-center">
-              <img 
-                src={lightbox.images[lightbox.index]} 
-                alt="Preview" 
+              <img
+                src={lightbox.images[lightbox.index]}
+                alt="Preview"
                 className="max-w-full max-h-[80vh] object-contain rounded-lg"
               />
               {lightbox.captions[lightbox.index] && (
@@ -1078,13 +1219,13 @@ export default function Home() {
             </div>
             {lightbox.images.length > 1 && (
               <>
-                <button 
+                <button
                   onClick={prevImage}
                   className="absolute left-0 sm:-left-12 top-1/2 -translate-y-1/2 p-2 text-white/50 hover:text-white bg-black/40 hover:bg-black/80 rounded-r-lg sm:rounded-full transition"
                 >
                   <svg viewBox="0 0 24 24" className="h-8 w-8" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 18l-6-6 6-6" /></svg>
                 </button>
-                <button 
+                <button
                   onClick={nextImage}
                   className="absolute right-0 sm:-right-12 top-1/2 -translate-y-1/2 p-2 text-white/50 hover:text-white bg-black/40 hover:bg-black/80 rounded-l-lg sm:rounded-full transition"
                 >
@@ -1095,7 +1236,7 @@ export default function Home() {
           </div>
         </div>
       )}
-      
+
 
     </div>
   );

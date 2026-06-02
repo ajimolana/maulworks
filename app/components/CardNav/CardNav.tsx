@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useLayoutEffect, useRef, useState } from 'react';
+import React, { useLayoutEffect, useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { GoArrowUpRight } from 'react-icons/go';
 import GlassSurface from '../GlassSurface/GlassSurface';
@@ -48,6 +48,7 @@ export interface CardNavProps {
   title?: string;
   ctaLabel?: string;
   ctaHref?: string;
+  forceClose?: boolean;
 }
 
 const CardNav: React.FC<CardNavProps> = ({
@@ -62,7 +63,8 @@ const CardNav: React.FC<CardNavProps> = ({
   buttonTextColor,
   title,
   ctaLabel,
-  ctaHref
+  ctaHref,
+  forceClose
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [containerWidth, setContainerWidth] = useState<number | null>(null);
@@ -216,6 +218,26 @@ const CardNav: React.FC<CardNavProps> = ({
     return () => window.removeEventListener('resize', handleResize);
   }, [isExpanded]);
 
+  useEffect(() => {
+    if (forceClose && isExpanded) {
+      setIsExpanded(false);
+      if (tlRef.current) {
+        tlRef.current.kill();
+      }
+      
+      const width = measureCollapsedWidth();
+      collapsedWidthRef.current = width;
+      setContainerWidth(width);
+      
+      gsap.set(containerRef.current, { width });
+      gsap.set(navRef.current, { height: 50 });
+      gsap.set(cardsRef.current, { y: 50, opacity: 0 });
+      
+      const newTl = createTimeline();
+      if (newTl) tlRef.current = newTl;
+    }
+  }, [forceClose, isExpanded]);
+
   const toggleMenu = () => {
     const tl = tlRef.current;
     if (!tl) return;
@@ -312,6 +334,11 @@ const CardNav: React.FC<CardNavProps> = ({
                         aria-label={lnk.ariaLabel}
                         target={lnk.openInNewTab ? "_blank" : undefined}
                         rel={lnk.openInNewTab ? "noreferrer" : undefined}
+                        onClick={() => {
+                          if (isExpanded) {
+                            toggleMenu();
+                          }
+                        }}
                       >
                         <GoArrowUpRight className="nav-card-link-icon shrink-0" aria-hidden="true" />
                         {lnk.label}

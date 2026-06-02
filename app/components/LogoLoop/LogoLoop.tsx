@@ -151,7 +151,10 @@ const useAnimationLoop = (
     }
 
     if (prefersReduced) {
-      track.style.transform = isVertical ? 'translate3d(0, 0, 0)' : 'translate3d(0, 0, 0)';
+      const transformValue = isVertical
+        ? `translate3d(0, ${-offsetRef.current}px, 0)`
+        : `translate3d(${-offsetRef.current}px, 0, 0)`;
+      track.style.transform = transformValue;
       return () => {
         lastTimestampRef.current = null;
       };
@@ -593,7 +596,6 @@ export const LogoLoop = React.memo<LogoLoopProps>(
         <div
           className={cx(
             'flex will-change-transform select-none relative z-0',
-            'motion-reduce:transform-none',
             isVertical ? 'flex-col h-max w-full' : 'flex-row w-max'
           )}
           ref={trackRef}
