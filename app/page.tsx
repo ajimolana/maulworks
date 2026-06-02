@@ -521,8 +521,14 @@ export default function Home() {
 
     // Performance Check for heavy animations
     const checkPerformance = () => {
+      const storedPref = localStorage.getItem("performanceMode");
+      if (storedPref) {
+        setIsLowPerformanceMode(storedPref === "low");
+        return;
+      }
+
       const hardwareConcurrency = navigator.hardwareConcurrency || 4;
-      const isLowEndHardware = hardwareConcurrency <= 4;
+      const isLowEndHardware = hardwareConcurrency < 4;
       const isMobile = window.innerWidth < 768;
       const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -534,6 +540,8 @@ export default function Home() {
 
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
     const handleMotionChange = (e: MediaQueryListEvent) => {
+      const storedPref = localStorage.getItem("performanceMode");
+      if (storedPref) return; // Don't override manual preference
       if (e.matches) setIsLowPerformanceMode(true);
       else checkPerformance();
     };
@@ -541,6 +549,14 @@ export default function Home() {
     mediaQuery.addEventListener("change", handleMotionChange);
     return () => mediaQuery.removeEventListener("change", handleMotionChange);
   }, []);
+
+  const togglePerformanceMode = () => {
+    setIsLowPerformanceMode((prev) => {
+      const newMode = !prev;
+      localStorage.setItem("performanceMode", newMode ? "low" : "high");
+      return newMode;
+    });
+  };
 
   // --- REFERENSI & LOGIKA SCROLL DOCUMENTATION ---
   const docsScrollRef = useRef<HTMLDivElement>(null);
@@ -802,6 +818,27 @@ export default function Home() {
 
   return (
     <div id="profile" className="min-h-screen overflow-x-hidden bg-[#101010] relative pt-0 pb-10">
+
+      {/* PERFORMANCE TOGGLE */}
+      <button
+        onClick={togglePerformanceMode}
+        className="fixed z-50 bottom-4 left-4 sm:bottom-6 sm:left-6 flex items-center justify-center w-12 h-12 sm:w-auto sm:h-auto sm:px-3 sm:py-2 gap-2 bg-[#111111]/60 hover:bg-[#111111]/80 backdrop-blur-md border border-white/20 text-white/80 rounded-full sm:rounded-xl transition-all duration-300 shadow-[0_0_15px_rgba(255,255,255,0.05)]"
+        aria-label="Toggle Performance Mode"
+        title={isLowPerformanceMode ? "Enable High Performance Mode" : "Enable Low Performance Mode"}
+      >
+        {isLowPerformanceMode ? (
+          <svg viewBox="0 0 24 24" className="w-5 h-5 fill-none stroke-currentColor stroke-[1.5] stroke-linecap-round stroke-linejoin-round">
+            <rect x="2" y="7" width="16" height="10" rx="2" ry="2"></rect>
+            <line x1="22" y1="11" x2="22" y2="13"></line>
+            <line x1="6" y1="11" x2="6" y2="13"></line>
+          </svg>
+        ) : (
+          <svg viewBox="0 0 24 24" className="w-5 h-5 fill-none stroke-[#C6F10E] stroke-[1.5] stroke-linecap-round stroke-linejoin-round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+          </svg>
+        )}
+        <span className="text-xs font-medium hidden sm:inline">{isLowPerformanceMode ? "Low Performance" : "High Performance"}</span>
+      </button>
 
       {/* PILL NAV */}
       <PillNav items={navItems} forceClose={isOverlayOpen} />
