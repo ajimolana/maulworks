@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import Lanyard from "./components/Lanyard/Lanyard";
@@ -44,6 +43,15 @@ type Project = {
   link?: string | null;
   links?: ProjectLink[];
   ctaLabel?: string;
+};
+
+type AchievementItem = {
+  title: string;
+  competitionType: string;
+  organizer: string;
+  date: string;
+  image?: string;
+  href?: string;
 };
 
 const galleryItems = (gallery: GalleryItem[] = []) =>
@@ -95,39 +103,6 @@ const renderDetails = (details: DetailItem[] = []) =>
       </div>
     ));
 
-const achievements = [
-  {
-    label: "Top 10 Paper | Aksinomi Sulampua, BI Sulsel (Oct 2025)",
-    openResearchId: "aksinomi2025",
-  },
-  {
-    label: "Top 10 Ambassador | Cinta Bangga Paham Rupiah, BI Sulsel (Jun 2025)"
-  },
-  {
-    label: "Outstanding Student in Competition | Mathematics Dept. Hasanuddin University (Aug 2024)",
-    title: "Outstanding Student in Competition | Mathematics Dept. Hasanuddin University (Aug 2023)"
-  },
-  {
-    label: "1st Place Softball Fast-Pitch Men | Airlangga National Championship (Jul 2024)"
-  },
-  {
-    label: "Outstanding Student in Competition | Mathematics Dept. Hasanuddin University (Aug 2023)"
-  },
-  {
-    label: "2nd Place Softball Fast-Pitch Men | UGM Cup (Jun 2023)"
-  },
-  {
-    label: "2nd Place Videography | National Environmental Expo (Jun 2023)"
-  },
-  {
-    label: "4th Runner-Up Infographic | Celebes Plano Fest (Nov 2023)"
-  },
-  {
-    label: "1st Place Paper | Milky Way Scientific Paper Competition (Dec 2022)",
-    openResearchId: "smartcelldrybox",
-  }
-];
-
 const experiencesData = [
   {
     id: "internbi",
@@ -146,26 +121,56 @@ const experiencesData = [
       {
         label: "Task",
         value: [
-          "Managed monthly food price and balance sheet updates across multiple web portals.",
-          "Developed an automation tool using Fuzzy Matching with Levenshtein Distance algorithm to accelerate monthly Data Entry of 5,000+ entries from 52 different spreadsheets with time efficiency up to 90% (from 5 hours to 30 minutes).",
-          "Participated in an internal project to develop a Farmer Planting Calendar dashboard. Performed Data Wrangling, SARIMA based Forecasting, and Data Visualization in Power BI to provide optimal planting period recommendations for farmers."
+          "Developed a streamlining tool using Fuzzy Matching with Levenshtein Distance algorithm to accelerate monthly Data Entry of 5,000+ entries from 52 different spreadsheets with time efficiency up to 75% (from 2 hours to 30 minutes).",
+          "Participated in an internal project to develop a Farmer Planting Calendar dashboard. Performed Data Analysis, Forecasting, and Data Visualization in Power BI to provide optimal planting period recommendations for farmers.",
+          "Managed monthly food price and balance sheet updates across multiple web portals."
         ],
         list: true
       }
     ],
-    heroImage: "https://media.licdn.com/dms/image/v2/D562DAQGMUUFba6ExVw/profile-treasury-image-shrink_800_800/B56Z3jyeiNKwAY-/0/1777643154684?e=1779541200&v=beta&t=ggeWAfe5Nr2fePvfCB43DSlzvn6DWlTTkiCgmaXwtaE",
+    heroImage: "/assets/experience/internbi/Capstone Presentation.jpg",
     gallery: [
-      ["https://media.licdn.com/dms/image/v2/D562DAQGMUUFba6ExVw/profile-treasury-image-shrink_800_800/B56Z3jyeiNKwAY-/0/1777643154684?e=1779541200&v=beta&t=ggeWAfe5Nr2fePvfCB43DSlzvn6DWlTTkiCgmaXwtaE","Capstone Presentation"],
-      ["https://media.licdn.com/dms/image/v2/D562DAQFd8xtNMMIXWQ/profile-treasury-image-shrink_800_800/B56Z3jwnkrG0AY-/0/1777642668840?e=1779541200&v=beta&t=g3GxyMaNaAhE-OiXR0cdl7IXIg6goftanlgjKtnmYj8","Onboarding"],
-      ["https://media.licdn.com/dms/image/v2/D562DAQGmfBLms9a98g/profile-treasury-image-shrink_800_800/B56Z3jyeiOK4AY-/0/1777643155073?e=1779541200&v=beta&t=n954n4IHgPJ4-LCZJOvcIBX4K1UJRizvx_5JFhfyki0","Mentors and Partner"],
-      ["https://media.licdn.com/dms/image/v2/D562DAQFcUbzBFBrV8Q/profile-treasury-image-shrink_800_800/B56Z3jwnktKYBM-/0/1777642667345?e=1779541200&v=beta&t=h8AX5hN69Xi2GXpUJ4Ak7JZVlXu8kMKqkrUKN-m8670","3rd Floor Fellows"],
-      ["https://media.licdn.com/dms/image/v2/D562DAQEJRiUOwpL5tg/profile-treasury-image-shrink_800_800/B56Z3jyeiNHEAY-/0/1777643155060?e=1779541200&v=beta&t=XowNlGQVbBLM1tjD8ya_vzx4TVGKhfZK03Tht8P-fMo","Internal Project Fellows"]
+      ["/assets/experience/internbi/Capstone Presentation.jpg","Capstone Presentation"],
+      ["/assets/experience/internbi/Onboarding.jpg","Onboarding"],
+      ["/assets/experience/internbi/Mentors and Partner.jpg","Mentors and Partner"],
+      ["/assets/experience/internbi/3rd Floor Fellows.jpg","3rd Floor Fellows"],
+      ["/assets/experience/internbi/Internal Project Fellows.jpg","Internal Project Fellows"]
     ],
     link: null
   } 
 ];
 
 const projectsData = [
+  {
+    id: "intelligentcoffeeshop",
+    cardTag: "NextJS, n8n",
+    year: "2025",
+    title: "Intelligent Coffee Shop Automation",
+    shortDesc: "AI Generated Insights for Coffee Shop Businesses",
+    period: "May 2026",
+    roleLabel: "Tools",
+    role: "NextJS, n8n",
+    details: [
+      {
+        label: "Description",
+        value: "Intelligent Coffee Shop Automation merupakan project full-stack yang saya kerjakan bersama teman. Berawal dari keresahan terhadap naiknya harga menu dari coffee shop favorit saya, memunculkan ide untuk membuat aplikasi ini. Juga mengingat banyaknya Coffee Shop di kota saya, Makassar dan menempati peringkat 1 Coffee Shop terbanyak di Indonesia. Kami membuat sistem cerdas untuk memaksimalkan kinerja operasional melalui AI Agent. Dasbor bisa menghasilkan laporan layaknya data analyst dan business intelligence kepada owner, sehingga memudahkan decision making. Sistem dibekali dengan intelligence stock untuk mencatat segala bahan keluar secara otomatis, menampilkan sisa menu available, dan early warning. Selain itu, sistem bisa memberikan rekomendasi upselling yang langsung muncul di layar kasir menggunakan algoritma taste-profile seperti Netflix."
+      },
+      {
+        label: "Task",
+        value: [
+          "-",
+          "-"
+        ],
+        list: true
+      }
+    ],
+    heroImage: "./assets/projects/intelligentcoffeeshop/frontend.jpeg",
+    gallery: [
+      "./assets/projects/intelligentcoffeeshop/frontend.jpeg",
+      "./assets/projects/intelligentcoffeeshop/backend.png",
+    ],
+    // link: "https://foodsecurityforecasting.streamlit.app/"
+  },
   {
     id: "foodsecurity",
     cardTag: "Streamlit",
@@ -189,11 +194,11 @@ const projectsData = [
         list: true
       }
     ],
-    heroImage: "./assets/projects/foodsecurity1.png",
+    heroImage: "./assets/projects/foodsecurity/foodsecurity1.png",
     gallery: [
-      "./assets/projects/foodsecurity1.png",
-      "./assets/projects/foodsecurity2.png",
-      "./assets/projects/foodsecurity3.png"
+      "./assets/projects/foodsecurity/foodsecurity1.png",
+      "./assets/projects/foodsecurity/foodsecurity2.png",
+      "./assets/projects/foodsecurity/foodsecurity3.png"
     ],
     link: "https://foodsecurityforecasting.streamlit.app/"
   },
@@ -201,7 +206,7 @@ const projectsData = [
     id: "pensionfund",
     cardTag: "Streamlit",
     year: "2025",
-    title: "Pension Fund Calculator",
+    title: "Pension Fund Actuarial Simulator",
     shortDesc: "Count pension fund premium costs.",
     period: "Oct 2025 - Jan 2026",
     roleLabel: "Tools",
@@ -220,19 +225,19 @@ const projectsData = [
         list: true
       }
     ],
-    heroImage: "./assets/projects/pensionfund1.png",
+    heroImage: "./assets/projects/pensionfund/pensionfund1.png",
     gallery: [
-      "./assets/projects/pensionfund1.png",
-      "./assets/projects/pensionfund2.png",
-      "./assets/projects/pensionfund3.png"
+      "./assets/projects/pensionfund/pensionfund1.png",
+      "./assets/projects/pensionfund/pensionfund2.png",
+      "./assets/projects/pensionfund/pensionfund3.png"
     ],
     link: "https://danapensiun.streamlit.app/"
   },
   {
-    id: "smarthighland",
+    id: "cultivatedhighland",
     cardTag: "Colab, Looker",
     year: "2024",
-    title: "Smart Highland Agriculture",
+    title: "Cultivated Highland Agriculture",
     shortDesc: "Best time for plant and crop forecaster.",
     period: "Jan 2024 - Apr 2024",
     roleLabel: "Tools",
@@ -251,9 +256,9 @@ const projectsData = [
         list: true
       }
     ],
-    heroImage: "./assets/projects/smarthighland1.png",
+    heroImage: "./assets/projects/cultivatedhighland/cultivatedhighland1.png",
     gallery: [
-      "./assets/projects/smarthighland1.png"
+      "./assets/projects/cultivatedhighland/cultivatedhighland1.png"
     ],
     links: [
       {
@@ -301,7 +306,7 @@ const researchData = [
     link: ""
   },
   {
-    id: "aksinomi2025",
+    id: "sipekan",
     cardTag: "Scientific Paper Competition",
     year: "2025",
     title: "SIPEKAN: Food Security Prediction System",
@@ -337,7 +342,7 @@ const researchData = [
     ]
   },
   {
-    id: "aksinomi2024",
+    id: "ecobluevillage",
     cardTag: "Scientific Paper Competition",
     year: "2024",
     title: "Eco Blue Village: Seaweed Biofuel Innovation",
@@ -367,6 +372,63 @@ const researchData = [
     gallery: [],
     link: ""
   },
+];
+
+const achievements: AchievementItem[] = [
+  {
+    title: "Top 10 Paper",
+    competitionType: "Scientific Paper",
+    organizer: "Aksinomi Sulampua, BI Sulsel",
+    date: "Oct 2025",
+  },
+  {
+    title: "Top 10 Ambassador",
+    competitionType: "Ambassador",
+    organizer: "CBP Rupiah, BI Sulsel",
+    date: "Jun 2025",
+  },
+  {
+    title: "Outstanding Student",
+    competitionType: "Recognition",
+    organizer: "Math Dept, Hasanuddin University",
+    date: "Aug 2024",
+  },
+  {
+    title: "1st Place Softball Men's",
+    competitionType: "Sports",
+    organizer: "Airlangga National Championship",
+    date: "Jul 2024",
+  },
+  {
+    title: "Outstanding Student",
+    competitionType: "Recognition",
+    organizer: "Math Dept. Hasanuddin University",
+    date: "Aug 2023",
+  },
+  {
+    title: "2nd Place Softball Men's",
+    competitionType: "Sports",
+    organizer: "UGM Cup",
+    date: "Jun 2023",
+  },
+  {
+    title: "2nd Place Videography",
+    competitionType: "Creative",
+    organizer: "National Environmental Expo",
+    date: "Jun 2023",
+  },
+  {
+    title: "4th Runner-Up Infographic",
+    competitionType: "Creative",
+    organizer: "Celebes Plano Fest",
+    date: "Nov 2023",
+  },
+  {
+    title: "1st Place Paper",
+    competitionType: "Scientific Paper",
+    organizer: "Milky Way Scientific Paper Competition",
+    date: "Dec 2022",
+  }
 ];
 
 export default function Home() {
@@ -433,6 +495,7 @@ export default function Home() {
       links: [
         { label: "Projects", ariaLabel: "Projects Projects", href: "#projects" },
         { label: "Research", ariaLabel: "Projects Research", href: "#research" },
+        { label: "Achievements", ariaLabel: "Projects Achievements", href: "#achievements" },
       ]
     },
   ];
@@ -571,26 +634,76 @@ export default function Home() {
     setLightbox((prev) => ({ ...prev, index: (prev.index - 1 + prev.images.length) % prev.images.length }));
   };
 
-  const researchById = (id?: string) => researchData.find((project) => project.id === id);
-  const techLogos = achievements.map((item) => {
-    const label = item.label;
-    const title = item.title ?? item.label;
-    const targetResearch = researchById(item.openResearchId);
-    const node = targetResearch ? (
-      <button
-        type="button"
-        onClick={() => openProjectModal(targetResearch)}
-        className="text-white font-medium whitespace-nowrap hover:opacity-80 transition-opacity"
-      >
-        {label}
-      </button>
-    ) : (
-      <span className="text-white font-medium whitespace-nowrap">{label}</span>
+  const achievementTargetById = (id: string) =>
+    researchData.find((project) => project.id === id) ||
+    projectsData.find((project) => project.id === id) ||
+    experiencesData.find((project) => project.id === id);
+
+  const techLogos = achievements.map((item, index) => {
+    const combinedTitle = item.title.trim();
+    const isExternal = item.href?.startsWith("http");
+    const targetId = item.href?.startsWith("#") ? item.href.slice(1) : undefined;
+    const modalTarget = targetId ? achievementTargetById(targetId) : undefined;
+
+    const card = (
+      <div className="w-[260px] sm:w-[300px] rounded-3xl border border-white/15 bg-[#111111] p-4 text-left transition-all duration-300 hover:scale-[1.02] hover:border-white my-2">
+        <div className="flex items-center justify-between">
+          <p className="text-xs uppercase tracking-wide text-white/60 truncate">{item.competitionType}</p>
+          <p className="text-xs uppercase tracking-wide text-white/60 truncate">{item.date}</p>
+        </div>
+        <h3 className="mt-1 text-base font-semibold text-white truncate">{combinedTitle}</h3>
+        <p className="mt-1 text-xs text-white/60 truncate">{item.organizer}</p>
+      </div>
     );
 
+    if (modalTarget) {
+      return {
+        node: (
+          <button
+            type="button"
+            onClick={() => openProjectModal(modalTarget)}
+            className="block"
+            aria-label={`Open ${combinedTitle}`}
+          >
+            {card}
+          </button>
+        ),
+        title: combinedTitle
+      };
+    }
+
+    if (item.href && isExternal) {
+      return {
+        node: (
+          <a
+            href={item.href}
+            target="_blank"
+            rel="noreferrer"
+            className="block"
+            aria-label={`Open ${combinedTitle}`}
+          >
+            {card}
+          </a>
+        ),
+        title: combinedTitle
+      };
+    }
+
+    if (item.href) {
+      return {
+        node: (
+          <Link href={item.href} className="block" aria-label={`Open ${combinedTitle}`}>
+            {card}
+          </Link>
+        ),
+        title: combinedTitle
+      };
+    }
+
     return {
-      node,
-      title,
+      node: <div className="block">{card}</div>,
+      title: combinedTitle,
+      ariaLabel: `Achievement ${index + 1}`
     };
   });
 
@@ -600,7 +713,7 @@ export default function Home() {
       
       {/* CARD NAV DENGAN LOGIKA HIDE SAAT MODAL TERBUKA */}
       <div 
-        className="md:transition-opacity md:duration-300 md:ease-in-out" 
+        className="md:transition-none" 
         style={{ opacity: isOverlayOpen ? 0 : 1, pointerEvents: isOverlayOpen ? 'none' : 'auto' }}
       >
         <CardNav logo="" logoAlt="" title="Maulana's Portfolio" items={navItems} baseColor="#fff" menuColor="#fff" ease="power3.out" />
@@ -621,7 +734,7 @@ export default function Home() {
                 <div className={`flex flex-col gap-6 -mt-28 sm:-mt-20 md:-mt-48 lg:-mt-64 xl:mt-0 transition-opacity duration-300 ${!pageReady ? 'opacity-0 invisible' : 'opacity-100 visible'}`}>
                   <AnimatedContent distance={100} direction="vertical" reverse={false} duration={0.8} ease="power3.out" initialOpacity={0} animateOpacity scale={1} threshold={0.1} delay={0}>
                     <div className="flex flex-col sm:flex-row sm:items-center gap-2 mt-0 sm:mt-0 md:mt-14">
-                      <h1 className="text-lg sm:text-2xl text-white font-bold">I'm Open to Position as a</h1>
+                      <h1 className="text-lg sm:text-2xl text-white font-bold">Open to Position as a</h1>
                       <RotatingText texts={['Data Analyst', 'Data Scientist', 'Risk Analyst', 'Management Trainee']} mainClassName="px-2 sm:px-2 md:px-3 bg-[#C6F10E] text-black overflow-hidden py-0.5 sm:py-1 justify-center rounded-lg text-lg sm:text-2xl font-bold inline-flex transition-all" staggerFrom="last" initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "-120%" }} staggerDuration={0.025} splitLevelClassName="overflow-hidden pb-0.5 sm:pb-1 md:pb-1" transition={{ type: "spring", damping: 30, stiffness: 400 }} rotationInterval={2000} animatePresenceMode="wait" animatePresenceInitial={false} splitBy="characters" auto loop />
                     </div>
                   </AnimatedContent>
@@ -737,11 +850,11 @@ export default function Home() {
                 </div>
                 <div className="px-2 pt-1 pb-1">
                   <div className="flex items-center justify-between">
-                    <p className="text-xs sm:text-xs tracking-wide text-white/60">{project.cardTag}</p>
+                    <p className="text-xs sm:text-xs uppercase tracking-wide text-white/60">{project.cardTag}</p>
                     <p className="text-xs sm:text-xs uppercase tracking-wide text-white/60">{project.year}</p>
                   </div>
                   <h3 className="mt-1 text-m sm:text-l font-semibold text-white truncate">{project.title}</h3>
-                  <p className="mt-2 text-xs sm:text-xs text-white/60 truncate">{project.shortDesc}</p>
+                  <p className="mt-1 text-xs sm:text-xs text-white/60 truncate">{project.shortDesc}</p>
                 </div>
               </button>
             ))}
@@ -749,28 +862,25 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 4. SECTION LOGO LOOP */}
-      {/* <section id="stack" className="w-full mt-20">
+      {/* 4. SECTION ACHIEVEMENTS */}
+      <section id="achievements" className="w-full mt-20">
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
           <h2 className="text-3xl sm:text-4xl font-semibold text-white mb-6">Achievements</h2>
-            <div className="flex justify-center items-center">
-              <div style={{ height: '250px', position: 'relative', overflow: 'hidden'}}>
-                <LogoLoop
-                  logos={techLogos}
-                  speed={60}
-                  direction="up"
-                  logoHeight={25}
-                  gap={30}
-                  hoverSpeed={60}
-                  scaleOnHover
-                  fadeOut
-                  fadeOutColor="#101010"
-                  ariaLabel="Achievements"
-                />
-              </div>
-            </div>
+          <div className="py-2 overflow-visible">
+            <LogoLoop
+              logos={techLogos}
+              speed={60}
+              direction="left"
+              gap={12}
+              pauseOnHover
+              enableDrag
+              fadeOut
+              fadeOutColor="#101010"
+              ariaLabel="Achievements"
+            />
+          </div>
         </div>
-      </section> */}
+      </section>
 
       {/* FOOTER */}
       <footer id="contacts" className="w-full mt-28 mb-20 border-t border-white/10 pt-10 flex flex-col items-center justify-center gap-6">

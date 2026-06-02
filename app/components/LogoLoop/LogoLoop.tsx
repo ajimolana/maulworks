@@ -30,6 +30,8 @@ export interface LogoLoopProps {
   fadeOut?: boolean;
   fadeOutColor?: string;
   scaleOnHover?: boolean;
+  enableDrag?: boolean;
+  enableWheel?: boolean;
   renderItem?: (item: LogoItem, key: React.Key) => React.ReactNode;
   ariaLabel?: string;
   className?: string;
@@ -122,12 +124,12 @@ const useAnimationLoop = (
   seqHeight: number,
   isHovered: boolean,
   hoverSpeed: number | undefined,
-  isVertical: boolean
+  isVertical: boolean,
+  offsetRef: React.MutableRefObject<number>,
+  velocityRef: React.MutableRefObject<number>
 ) => {
   const rafRef = useRef<number | null>(null);
   const lastTimestampRef = useRef<number | null>(null);
-  const offsetRef = useRef(0);
-  const velocityRef = useRef(0);
 
   useEffect(() => {
     const track = trackRef.current;
@@ -207,6 +209,8 @@ export const LogoLoop = React.memo<LogoLoopProps>(
     fadeOut = false,
     fadeOutColor,
     scaleOnHover = false,
+    enableDrag = false,
+    enableWheel = false,
     renderItem,
     ariaLabel = 'Partner logos',
     className,
@@ -215,6 +219,9 @@ export const LogoLoop = React.memo<LogoLoopProps>(
     const containerRef = useRef<HTMLDivElement>(null);
     const trackRef = useRef<HTMLDivElement>(null);
     const seqRef = useRef<HTMLUListElement>(null);
+    const offsetRef = useRef(0);
+    const velocityRef = useRef(0);
+    const dragStateRef = useRef({ active: false, start: 0, offset: 0 });
 
     const [seqWidth, setSeqWidth] = useState<number>(0);
     const [seqHeight, setSeqHeight] = useState<number>(0);
@@ -271,7 +278,17 @@ export const LogoLoop = React.memo<LogoLoopProps>(
 
     useImageLoader(seqRef, updateDimensions, [logos, gap, logoHeight, isVertical]);
 
-    useAnimationLoop(trackRef, targetVelocity, seqWidth, seqHeight, isHovered, effectiveHoverSpeed, isVertical);
+    useAnimationLoop(
+      trackRef,
+      targetVelocity,
+      seqWidth,
+      seqHeight,
+      isHovered,
+      effectiveHoverSpeed,
+      isVertical,
+      offsetRef,
+      velocityRef
+    );
 
     const cssVariables = useMemo(
       () =>
@@ -287,15 +304,16 @@ export const LogoLoop = React.memo<LogoLoopProps>(
       () =>
         cx(
           'relative group',
-          isVertical ? 'overflow-hidden h-full inline-block' : 'overflow-x-hidden',
+          isVertical ? 'overflow-hidden h-full inline-block' : 'overflow-hidden',
           '[--logoloop-gap:32px]',
           '[--logoloop-logoHeight:28px]',
           '[--logoloop-fadeColorAuto:#ffffff]',
           'dark:[--logoloop-fadeColorAuto:#0b0b0b]',
           scaleOnHover && 'py-[calc(var(--logoloop-logoHeight)*0.1)]',
+          enableDrag && 'cursor-grab active:cursor-grabbing',
           className
         ),
-      [isVertical, scaleOnHover, className]
+      [isVertical, scaleOnHover, enableDrag, className]
     );
 
     const handleMouseEnter = useCallback(() => {
@@ -304,6 +322,102 @@ export const LogoLoop = React.memo<LogoLoopProps>(
     const handleMouseLeave = useCallback(() => {
       if (effectiveHoverSpeed !== undefined) setIsHovered(false);
     }, [effectiveHoverSpeed]);
+
+    const handlePointerDown = useCallback(
+      (event: React.PointerEvent<HTMLDivElement>) => {
+        if (!enableDrag) return;
+        const seqSize = isVertical ? seqHeight : seqWidth;
+        if (seqSize <= 0) return;
+
+        event.preventDefault();
+        dragStateRef.current = {
+          active: true,
+          start: isVertical ? event.clientY : event.clientX,
+          offset: offsetRef.current
+        };
+        velocityRef.current = 0;
+        if (effectiveHoverSpeed !== undefined) setIsHovered(true);
+        event.currentTarget.setPointerCapture(event.pointerId);
+      },
+      [enableDrag, isVertical, seqHeight, seqWidth, effectiveHoverSpeed]
+    );
+
+    const handlePointerMove = useCallback(
+      (event: React.PointerEvent<HTMLDivElement>) => {
+        if (!enableDrag || !dragStateRef.current.active) return;
+        const seqSize = isVertical ? seqHeight : seqWidth;
+        if (seqSize <= 0) return;
+
+        const current = isVertical ? event.clientY : event.clientX;
+        const delta = current - dragStateRef.current.start;
+        let nextOffset = dragStateRef.current.offset - delta;
+        nextOffset = ((nextOffset % seqSize) + seqSize) % seqSize;
+        offsetRef.current = nextOffset;
+        velocityRef.current = 0;
+
+        if (trackRef.current) {
+          const transformValue = isVertical
+            ? `translate3d(0, ${-nextOffset}px, 0)`
+            : `translate3d(${-nextOffset}px, 0, 0)`;
+          trackRef.current.style.transform = transformValue;
+        }
+      },
+      [enableDrag, isVertical, seqHeight, seqWidth]
+    );
+
+    const handlePointerUp = useCallback(
+      (event: React.PointerEvent<HTMLDivElement>) => {
+        if (!enableDrag) return;
+        if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+          event.currentTarget.releasePointerCapture(event.pointerId);
+        }
+        dragStateRef.current.active = false;
+        if (effectiveHoverSpeed !== undefined) setIsHovered(false);
+      },
+      [enableDrag, effectiveHoverSpeed]
+    );
+
+    const handlePointerLeave = useCallback(() => {
+      if (!enableDrag) return;
+      dragStateRef.current.active = false;
+      if (effectiveHoverSpeed !== undefined) setIsHovered(false);
+    }, [enableDrag, effectiveHoverSpeed]);
+
+    const wheelTimeoutRef = useRef<number | null>(null);
+
+    const handleWheel = useCallback(
+      (event: React.WheelEvent<HTMLDivElement>) => {
+        if (!enableWheel) return;
+        const seqSize = isVertical ? seqHeight : seqWidth;
+        if (seqSize <= 0) return;
+
+        event.preventDefault();
+        const delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
+        let nextOffset = offsetRef.current + delta;
+        nextOffset = ((nextOffset % seqSize) + seqSize) % seqSize;
+        offsetRef.current = nextOffset;
+        velocityRef.current = 0;
+
+        if (trackRef.current) {
+          const transformValue = isVertical
+            ? `translate3d(0, ${-nextOffset}px, 0)`
+            : `translate3d(${-nextOffset}px, 0, 0)`;
+          trackRef.current.style.transform = transformValue;
+        }
+
+        if (effectiveHoverSpeed !== undefined) {
+          setIsHovered(true);
+          if (wheelTimeoutRef.current) {
+            window.clearTimeout(wheelTimeoutRef.current);
+          }
+          wheelTimeoutRef.current = window.setTimeout(() => {
+            setIsHovered(false);
+            wheelTimeoutRef.current = null;
+          }, 300);
+        }
+      },
+      [enableWheel, isVertical, seqHeight, seqWidth, effectiveHoverSpeed]
+    );
 
     const renderLogoItem = useCallback(
       (item: LogoItem, key: React.Key) => {
@@ -423,10 +537,11 @@ export const LogoLoop = React.memo<LogoLoopProps>(
             ? undefined
             : toCssLength(width)
           : (toCssLength(width) ?? '100%'),
+        ...(enableDrag && { touchAction: isVertical ? 'pan-x' : 'pan-y' }),
         ...cssVariables,
         ...style
       }),
-      [width, cssVariables, style, isVertical]
+      [width, cssVariables, style, isVertical, enableDrag]
     );
 
     return (
@@ -484,6 +599,12 @@ export const LogoLoop = React.memo<LogoLoopProps>(
           ref={trackRef}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onPointerCancel={handlePointerLeave}
+          onPointerLeave={handlePointerLeave}
+          onWheel={handleWheel}
         >
           {logoLists}
         </div>
