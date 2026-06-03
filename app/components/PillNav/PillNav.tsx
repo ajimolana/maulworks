@@ -114,7 +114,7 @@ export default function PillNav({ items, forceClose, togglePerformanceMode, isGy
               aria-label="Toggle Performance Mode"
             >
               <Image 
-                src="/favicon.ico" 
+                src="/assets/icon/memoji.png" 
                 alt="Logo" 
                 width={32}
                 height={32}
