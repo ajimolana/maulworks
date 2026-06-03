@@ -338,7 +338,7 @@ export const organizationsData: Project[] = [
     logo: "/assets/organizations/softball/Logo UKM Softball Unhas.png",
     gallery: [
       ["/assets/organizations/softball/Certificate of Appreciation.jpg", "Certificate of Appreciation"],
-      ["/assets/organizations/softball/Champion Team.jpg", "Champion Team"],
+      ["/assets/organizations/softball/Champion Team.JPG", "Champion Team"],
       ["/assets/organizations/softball/Unhas Day 2024.jpg", "Unhas Day 2024"],
       ["/assets/organizations/softball/Softball Club Fellows.jpg", "Softball Club Fellows"],
     ],
