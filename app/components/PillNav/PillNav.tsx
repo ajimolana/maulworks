@@ -108,17 +108,18 @@ export default function PillNav({ items, forceClose, togglePerformanceMode, isGy
             transition={{ type: "spring", bounce: 0, duration: 1.2 }}
             className="flex-shrink-0 flex items-center gap-2 font-semibold tracking-tight transition-colors text-white text-lg"
           >
-            <button 
-              onClick={togglePerformanceMode} 
+            <button
+              onClick={togglePerformanceMode}
               className="outline-none focus:outline-none relative"
               aria-label="Toggle Performance Mode"
             >
-              <Image 
-                src="/assets/icon/memoji.png" 
-                alt="Logo" 
-                width={32}
-                height={32}
-                className="object-contain transition-transform duration-300 hover:-rotate-6 cursor-pointer" 
+              <Image
+                src="/assets/icon/memoji.png"
+                alt="Logo"
+                width={128}
+                height={128}
+                quality={100}
+                className={`w-auto h-8 object-contain transition-transform duration-300 cursor-pointer ${isLowPerformanceMode ? '-rotate-6' : 'hover:-rotate-6'}`}
               />
               <AnimatePresence>
                 {isLowPerformanceMode && (
@@ -136,8 +137,8 @@ export default function PillNav({ items, forceClose, togglePerformanceMode, isGy
                 )}
               </AnimatePresence>
             </button>
-            <Link 
-              href="#profile" 
+            <Link
+              href="#profile"
               onClick={() => handleItemClick("profile")}
               className={`relative px-4 py-2 flex items-center transition-colors rounded-full ${activeItem === "profile" ? "text-white lg:text-black" : "hover:text-white/80"}`}
             >
