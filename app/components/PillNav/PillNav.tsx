@@ -114,11 +114,11 @@ export default function PillNav({ items, forceClose, togglePerformanceMode, isGy
               aria-label="Toggle Performance Mode"
             >
               <Image
-                src="/favicon.ico"
+                src="/assets/icon/memoji.png"
                 alt="Logo"
-                width={32}
-                height={32}
-                unoptimized
+                width={128}
+                height={128}
+                quality={100}
                 className={`w-auto h-8 object-contain transition-transform duration-300 cursor-pointer ${isLowPerformanceMode ? '-rotate-6' : 'hover:-rotate-6'}`}
               />
               <AnimatePresence>
