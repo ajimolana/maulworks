@@ -2,21 +2,21 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 export type LogoItem =
   | {
-      node: React.ReactNode;
-      href?: string;
-      title?: string;
-      ariaLabel?: string;
-    }
+    node: React.ReactNode;
+    href?: string;
+    title?: string;
+    ariaLabel?: string;
+  }
   | {
-      src: string;
-      alt?: string;
-      href?: string;
-      title?: string;
-      srcSet?: string;
-      sizes?: string;
-      width?: number;
-      height?: number;
-    };
+    src: string;
+    alt?: string;
+    href?: string;
+    title?: string;
+    srcSet?: string;
+    sizes?: string;
+    width?: number;
+    height?: number;
+  };
 
 export interface LogoLoopProps {
   logos: LogoItem[];
@@ -320,27 +320,169 @@ export const LogoLoop = React.memo<LogoLoopProps>(
     );
 
     const handleMouseEnter = useCallback(() => {
-      if (typeof window !== 'undefined' && window.matchMedia('(hover: hover)').matches) {
-        if (effectiveHoverSpeed !== undefined) setIsHovered(true);
-      }
+      if (effectiveHoverSpeed !== undefined) setIsHovered(true);
     }, [effectiveHoverSpeed]);
-    
     const handleMouseLeave = useCallback(() => {
-      if (typeof window !== 'undefined' && window.matchMedia('(hover: hover)').matches) {
-        if (effectiveHoverSpeed !== undefined) setIsHovered(false);
-      }
+      if (effectiveHoverSpeed !== undefined) setIsHovered(false);
     }, [effectiveHoverSpeed]);
 
-    const handlePointerDown = useCallback(
-      (event: React.PointerEvent<HTMLDivElement>) => {
-        if (!enableDrag) return;
+    const wheelTimeoutRef = useRef<number | null>(null);
+
+    // Shared velocity tracker for flick momentum
+    // Stores the last N pointer positions + timestamps to compute px/sec at release
+    const flickSamplesRef = useRef<Array<{ pos: number; t: number }>>([]);
+    const MAX_FLICK_VELOCITY = 4000; // px/s cap so it doesn't go insane
+    const FLICK_WINDOW_MS = 100;     // only look at the last 100ms of motion
+
+    const recordSample = (pos: number) => {
+      const now = performance.now();
+      flickSamplesRef.current.push({ pos, t: now });
+      // Trim samples older than the window
+      const cutoff = now - FLICK_WINDOW_MS;
+      flickSamplesRef.current = flickSamplesRef.current.filter(s => s.t >= cutoff);
+    };
+
+    const computeFlickVelocity = (): number => {
+      const samples = flickSamplesRef.current;
+      if (samples.length < 2) return 0;
+      const first = samples[0];
+      const last = samples[samples.length - 1];
+      const dt = (last.t - first.t) / 1000;
+      if (dt <= 0) return 0;
+      // displacement is negative when dragging left (offset increases) — flip sign
+      const dpx = -(last.pos - first.pos);
+      const rawVelocity = dpx / dt;
+      return Math.max(-MAX_FLICK_VELOCITY, Math.min(MAX_FLICK_VELOCITY, rawVelocity));
+    };
+
+    // ── Native drag (touch) via useEffect with passive:false ─────────────────
+    // React's synthetic onPointer* are passive by default in React 17+, so
+    // event.preventDefault() silently fails on mobile. Native addEventListener
+    // with passive:false is the only reliable fix.
+    useEffect(() => {
+      const track = trackRef.current;
+      if (!track || !enableDrag) return;
+
+      const onTouchStart = (e: TouchEvent) => {
+        const seqSize = isVertical ? seqHeight : seqWidth;
+        if (seqSize <= 0) return;
+        const pos = isVertical ? e.touches[0].clientY : e.touches[0].clientX;
+        flickSamplesRef.current = [];
+        recordSample(pos);
+        dragStateRef.current = {
+          active: true,
+          start: pos,
+          offset: offsetRef.current
+        };
+        velocityRef.current = 0;
+        if (effectiveHoverSpeed !== undefined) setIsHovered(true);
+      };
+
+      const onTouchMove = (e: TouchEvent) => {
+        if (!dragStateRef.current.active) return;
         const seqSize = isVertical ? seqHeight : seqWidth;
         if (seqSize <= 0) return;
 
-        event.preventDefault();
+        const touch = e.touches[0];
+        const currentX = touch.clientX;
+        const currentY = touch.clientY;
+
+        // Determine swipe direction on first meaningful move
+        const deltaX = Math.abs(currentX - dragStateRef.current.start);
+        const deltaY = Math.abs(currentY - (isVertical ? dragStateRef.current.start : currentY));
+        if (!isVertical && deltaY > deltaX && deltaX < 8) {
+          // Looks like a vertical scroll — abort drag so page scrolls normally
+          dragStateRef.current.active = false;
+          return;
+        }
+
+        e.preventDefault();
+
+        const current = isVertical ? currentY : currentX;
+        recordSample(current);
+
+        const delta = current - dragStateRef.current.start;
+        let nextOffset = dragStateRef.current.offset - delta;
+        nextOffset = ((nextOffset % seqSize) + seqSize) % seqSize;
+        offsetRef.current = nextOffset;
+        // Keep velocityRef at 0 during active drag so animation loop doesn't fight us
+        velocityRef.current = 0;
+
+        if (trackRef.current) {
+          trackRef.current.style.transform = isVertical
+            ? `translate3d(0, ${-nextOffset}px, 0)`
+            : `translate3d(${-nextOffset}px, 0, 0)`;
+        }
+      };
+
+      const onTouchEnd = () => {
+        if (!dragStateRef.current.active) return;
+        dragStateRef.current.active = false;
+        // Inject flick velocity so the animation loop coasts and decelerates
+        const flick = computeFlickVelocity();
+        velocityRef.current = flick;
+        flickSamplesRef.current = [];
+        if (effectiveHoverSpeed !== undefined) setIsHovered(false);
+      };
+
+      track.addEventListener('touchstart', onTouchStart, { passive: true });
+      track.addEventListener('touchmove', onTouchMove, { passive: false });
+      track.addEventListener('touchend', onTouchEnd, { passive: true });
+      track.addEventListener('touchcancel', onTouchEnd, { passive: true });
+
+      return () => {
+        track.removeEventListener('touchstart', onTouchStart);
+        track.removeEventListener('touchmove', onTouchMove);
+        track.removeEventListener('touchend', onTouchEnd);
+        track.removeEventListener('touchcancel', onTouchEnd);
+      };
+    }, [enableDrag, isVertical, seqHeight, seqWidth, effectiveHoverSpeed]);
+
+    // ── Wheel (native, passive:false so preventDefault works) ─────────────────
+    useEffect(() => {
+      const track = trackRef.current;
+      if (!track || !enableWheel) return;
+
+      const onWheel = (e: WheelEvent) => {
+        const seqSize = isVertical ? seqHeight : seqWidth;
+        if (seqSize <= 0) return;
+        e.preventDefault();
+        const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+        let nextOffset = offsetRef.current + delta;
+        nextOffset = ((nextOffset % seqSize) + seqSize) % seqSize;
+        offsetRef.current = nextOffset;
+        velocityRef.current = 0;
+        if (track) {
+          track.style.transform = isVertical
+            ? `translate3d(0, ${-nextOffset}px, 0)`
+            : `translate3d(${-nextOffset}px, 0, 0)`;
+        }
+        if (effectiveHoverSpeed !== undefined) {
+          setIsHovered(true);
+          if (wheelTimeoutRef.current) window.clearTimeout(wheelTimeoutRef.current);
+          wheelTimeoutRef.current = window.setTimeout(() => {
+            setIsHovered(false);
+            wheelTimeoutRef.current = null;
+          }, 300);
+        }
+      };
+
+      track.addEventListener('wheel', onWheel, { passive: false });
+      return () => track.removeEventListener('wheel', onWheel);
+    }, [enableWheel, isVertical, seqHeight, seqWidth, effectiveHoverSpeed]);
+
+    // ── Mouse drag (desktop pointer events via React synthetic) ───────────────
+    const handlePointerDown = useCallback(
+      (event: React.PointerEvent<HTMLDivElement>) => {
+        if (!enableDrag || event.pointerType === 'touch') return;
+        const seqSize = isVertical ? seqHeight : seqWidth;
+        if (seqSize <= 0) return;
+        flickSamplesRef.current = [];
+        const pos = isVertical ? event.clientY : event.clientX;
+        recordSample(pos);
         dragStateRef.current = {
           active: true,
-          start: isVertical ? event.clientY : event.clientX,
+          start: pos,
           offset: offsetRef.current
         };
         velocityRef.current = 0;
@@ -352,22 +494,20 @@ export const LogoLoop = React.memo<LogoLoopProps>(
 
     const handlePointerMove = useCallback(
       (event: React.PointerEvent<HTMLDivElement>) => {
-        if (!enableDrag || !dragStateRef.current.active) return;
+        if (!enableDrag || event.pointerType === 'touch' || !dragStateRef.current.active) return;
         const seqSize = isVertical ? seqHeight : seqWidth;
         if (seqSize <= 0) return;
-
         const current = isVertical ? event.clientY : event.clientX;
+        recordSample(current);
         const delta = current - dragStateRef.current.start;
         let nextOffset = dragStateRef.current.offset - delta;
         nextOffset = ((nextOffset % seqSize) + seqSize) % seqSize;
         offsetRef.current = nextOffset;
         velocityRef.current = 0;
-
         if (trackRef.current) {
-          const transformValue = isVertical
+          trackRef.current.style.transform = isVertical
             ? `translate3d(0, ${-nextOffset}px, 0)`
             : `translate3d(${-nextOffset}px, 0, 0)`;
-          trackRef.current.style.transform = transformValue;
         }
       },
       [enableDrag, isVertical, seqHeight, seqWidth]
@@ -375,11 +515,15 @@ export const LogoLoop = React.memo<LogoLoopProps>(
 
     const handlePointerUp = useCallback(
       (event: React.PointerEvent<HTMLDivElement>) => {
-        if (!enableDrag) return;
+        if (!enableDrag || event.pointerType === 'touch') return;
         if (event.currentTarget.hasPointerCapture(event.pointerId)) {
           event.currentTarget.releasePointerCapture(event.pointerId);
         }
         dragStateRef.current.active = false;
+        // Inject flick velocity so the animation loop coasts and decelerates
+        const flick = computeFlickVelocity();
+        velocityRef.current = flick;
+        flickSamplesRef.current = [];
         if (effectiveHoverSpeed !== undefined) setIsHovered(false);
       },
       [enableDrag, effectiveHoverSpeed]
@@ -390,42 +534,6 @@ export const LogoLoop = React.memo<LogoLoopProps>(
       dragStateRef.current.active = false;
       if (effectiveHoverSpeed !== undefined) setIsHovered(false);
     }, [enableDrag, effectiveHoverSpeed]);
-
-    const wheelTimeoutRef = useRef<number | null>(null);
-
-    const handleWheel = useCallback(
-      (event: React.WheelEvent<HTMLDivElement>) => {
-        if (!enableWheel) return;
-        const seqSize = isVertical ? seqHeight : seqWidth;
-        if (seqSize <= 0) return;
-
-        event.preventDefault();
-        const delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
-        let nextOffset = offsetRef.current + delta;
-        nextOffset = ((nextOffset % seqSize) + seqSize) % seqSize;
-        offsetRef.current = nextOffset;
-        velocityRef.current = 0;
-
-        if (trackRef.current) {
-          const transformValue = isVertical
-            ? `translate3d(0, ${-nextOffset}px, 0)`
-            : `translate3d(${-nextOffset}px, 0, 0)`;
-          trackRef.current.style.transform = transformValue;
-        }
-
-        if (effectiveHoverSpeed !== undefined) {
-          setIsHovered(true);
-          if (wheelTimeoutRef.current) {
-            window.clearTimeout(wheelTimeoutRef.current);
-          }
-          wheelTimeoutRef.current = window.setTimeout(() => {
-            setIsHovered(false);
-            wheelTimeoutRef.current = null;
-          }, 300);
-        }
-      },
-      [enableWheel, isVertical, seqHeight, seqWidth, effectiveHoverSpeed]
-    );
 
     const renderLogoItem = useCallback(
       (item: LogoItem, key: React.Key) => {
@@ -453,7 +561,7 @@ export const LogoLoop = React.memo<LogoLoopProps>(
               'inline-flex items-center',
               'motion-reduce:transition-none',
               scaleOnHover &&
-                'transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] group-hover/item:scale-120'
+              'transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] group-hover/item:scale-120'
             )}
             aria-hidden={!!(item as any).href && !(item as any).ariaLabel}
           >
@@ -467,7 +575,7 @@ export const LogoLoop = React.memo<LogoLoopProps>(
               '[image-rendering:-webkit-optimize-contrast]',
               'motion-reduce:transition-none',
               scaleOnHover &&
-                'transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] group-hover/item:scale-120'
+              'transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] group-hover/item:scale-120'
             )}
             src={(item as any).src}
             srcSet={(item as any).srcSet}
@@ -545,11 +653,10 @@ export const LogoLoop = React.memo<LogoLoopProps>(
             ? undefined
             : toCssLength(width)
           : (toCssLength(width) ?? '100%'),
-        ...(enableDrag && { touchAction: isVertical ? 'pan-x' : 'pan-y' }),
         ...cssVariables,
         ...style
       }),
-      [width, cssVariables, style, isVertical, enableDrag]
+      [width, cssVariables, style, isVertical]
     );
 
     return (
@@ -609,9 +716,7 @@ export const LogoLoop = React.memo<LogoLoopProps>(
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
-          onPointerCancel={handlePointerLeave}
           onPointerLeave={handlePointerLeave}
-          onWheel={handleWheel}
         >
           {logoLists}
         </div>

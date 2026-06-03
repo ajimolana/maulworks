@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 
 export interface PillNavItem {
   id: string;
@@ -20,9 +21,21 @@ interface PillNavProps {
 }
 
 export default function PillNav({ items, forceClose, togglePerformanceMode, isGyroEnabled, toggleGyro, isLowPerformanceMode }: PillNavProps) {
-  const [activeItem, setActiveItem] = useState(items[0]?.id);
+  const [activeItem, setActiveItem] = useState<string | null>("profile");
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const isClickingRef = useRef(false);
+  const clickTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleItemClick = (id: string) => {
+    setActiveItem(id);
+    isClickingRef.current = true;
+    if (clickTimeoutRef.current) clearTimeout(clickTimeoutRef.current);
+    clickTimeoutRef.current = setTimeout(() => {
+      isClickingRef.current = false;
+    }, 1000);
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -33,6 +46,8 @@ export default function PillNav({ items, forceClose, togglePerformanceMode, isGy
         setIsScrolled(false);
       }
 
+      if (isClickingRef.current) return;
+
       // Check if user is at the bottom of the page
       const isAtBottom = Math.ceil(window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 50;
 
@@ -40,17 +55,19 @@ export default function PillNav({ items, forceClose, togglePerformanceMode, isGy
         setActiveItem(items[items.length - 1].id);
       } else {
         // Update active item based on scroll position
-        let currentSection = items[0]?.id;
+        let currentSection: string | null = null;
+        const triggerPoint = window.innerHeight * 0.5;
         for (const item of items) {
           const section = document.getElementById(item.id);
           if (section) {
             const rect = section.getBoundingClientRect();
-            if (rect.top <= 150) {
+            if (rect.top <= triggerPoint) {
               currentSection = item.id;
             }
           }
         }
-        setActiveItem(currentSection);
+        // If we haven't scrolled down to the first section yet, set active to profile
+        setActiveItem(currentSection || "profile");
       }
     };
 
@@ -93,33 +110,48 @@ export default function PillNav({ items, forceClose, togglePerformanceMode, isGy
           >
             <button 
               onClick={togglePerformanceMode} 
-              className="outline-none focus:outline-none"
+              className="outline-none focus:outline-none relative"
               aria-label="Toggle Performance Mode"
             >
-              <img 
+              <Image 
                 src="/favicon.ico" 
                 alt="Logo" 
-                className="w-6 h-6 object-contain transition-transform duration-300 hover:-rotate-6 cursor-pointer" 
+                width={32}
+                height={32}
+                className="object-contain transition-transform duration-300 hover:-rotate-6 cursor-pointer" 
               />
-            </button>
-            <span className="relative flex items-center">
-              Maulana&apos;s Portfolio
               <AnimatePresence>
                 {isLowPerformanceMode && (
                   <motion.div
                     initial={{ opacity: 0, scale: 0.5 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.5 }}
-                    className="absolute -right-6 flex items-center justify-center"
+                    className="absolute -bottom-1 -right-2 flex items-center justify-center pointer-events-none"
                     title="Low Performance Mode Active"
                   >
-                    <svg viewBox="0 0 24 24" className="w-4 h-4 fill-none stroke-[#C6F10E] stroke-[2.5] stroke-linecap-round stroke-linejoin-round">
+                    <svg viewBox="0 0 24 24" className="w-4 h-4 fill-[#101010] stroke-[#C6F10E] stroke-[2.5] stroke-linecap-round stroke-linejoin-round">
                       <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
                     </svg>
                   </motion.div>
                 )}
               </AnimatePresence>
-            </span>
+            </button>
+            <Link 
+              href="#profile" 
+              onClick={() => handleItemClick("profile")}
+              className={`relative px-4 py-2 flex items-center transition-colors rounded-full ${activeItem === "profile" ? "text-white lg:text-black" : "hover:text-white/80"}`}
+            >
+              {activeItem === "profile" && (
+                <motion.div
+                  layoutId="pillNavActiveBackground"
+                  className="absolute inset-0 bg-white rounded-full hidden lg:block"
+                  transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                />
+              )}
+              <span className="relative z-10 flex items-center">
+                Maulana&apos;s Portfolio
+              </span>
+            </Link>
           </motion.div>
 
           {/* DESKTOP LINKS */}
@@ -130,7 +162,7 @@ export default function PillNav({ items, forceClose, togglePerformanceMode, isGy
                 <Link
                   key={item.id}
                   href={item.href}
-                  onClick={() => setActiveItem(item.id)}
+                  onClick={() => handleItemClick(item.id)}
                   className={`relative px-4 py-2 text-[14px] font-medium transition-colors rounded-full whitespace-nowrap ${isActive ? "text-black" : "text-white/70 hover:text-white"
                     }`}
                 >
@@ -196,7 +228,7 @@ export default function PillNav({ items, forceClose, togglePerformanceMode, isGy
                   <Link
                     href={item.href}
                     onClick={() => {
-                      setActiveItem(item.id);
+                      handleItemClick(item.id);
                       setMobileMenuOpen(false);
                     }}
                     className={`text-2xl font-semibold tracking-wide transition-colors ${isActive ? "text-[#C6F10E]" : "text-white/70 hover:text-white"
@@ -208,20 +240,18 @@ export default function PillNav({ items, forceClose, togglePerformanceMode, isGy
               );
             })}
 
-            {/* GYRO SWITCH AT BOTTOM (ONLY IF NOT IN LOW PERFORMANCE MODE) */}
-            {!isLowPerformanceMode && (
-              <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex items-center gap-3">
-                <span className="text-white/80 font-medium tracking-wide text-sm">Enable Gyro</span>
-                <button
-                  onClick={toggleGyro}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isGyroEnabled ? 'bg-[#C6F10E]' : 'bg-white/20'}`}
-                >
-                  <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-black transition-transform ${isGyroEnabled ? 'translate-x-6' : 'translate-x-1'}`}
-                  />
-                </button>
-              </div>
-            )}
+            {/* GYRO SWITCH AT BOTTOM */}
+            <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex items-center gap-3">
+              <span className="text-white/80 font-medium tracking-wide text-sm">Enable Gyro</span>
+              <button
+                onClick={toggleGyro}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isGyroEnabled ? 'bg-[#C6F10E]' : 'bg-white/20'}`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-black transition-transform ${isGyroEnabled ? 'translate-x-6' : 'translate-x-1'}`}
+                />
+              </button>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
