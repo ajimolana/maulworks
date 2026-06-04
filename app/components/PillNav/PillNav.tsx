@@ -151,7 +151,11 @@ export default function PillNav({ items, forceClose, togglePerformanceMode, isGy
                 if (togglePerformanceMode) togglePerformanceMode();
                 setMemojiClicked(true);
               }}
-              onMouseEnter={() => setMemojiHovered(true)}
+              onMouseEnter={() => {
+                if (typeof window !== 'undefined' && window.innerWidth >= 768) {
+                  setMemojiHovered(true);
+                }
+              }}
               onMouseLeave={() => {
                 setMemojiHovered(false);
                 setMemojiClicked(false);
