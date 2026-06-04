@@ -1,6 +1,5 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import Image from "next/image";
 
 interface LightboxProps {
   isOpen: boolean;
@@ -12,6 +11,15 @@ interface LightboxProps {
 }
 
 export default function Lightbox({ isOpen, images, captions, index, onClose, setIndex }: LightboxProps) {
+  const [isDesktop, setIsDesktop] = useState(() => 
+    typeof window !== 'undefined' ? window.innerWidth >= 1366 : true
+  );
+
+  useEffect(() => {
+    const handleResize = () => setIsDesktop(window.innerWidth >= 1366);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
   useEffect(() => {
     if (!isOpen) return;
 
@@ -49,15 +57,18 @@ export default function Lightbox({ isOpen, images, captions, index, onClose, set
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4"
+          className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4"
           onClick={onClose}
         >
           <button
-            className="absolute top-4 right-4 sm:top-6 sm:right-6 text-white/70 hover:text-white p-2 z-10"
-            onClick={onClose}
+            className="absolute top-6 right-4 sm:top-8 sm:right-8 text-white p-3 z-[110] bg-black/60 hover:bg-black/90 rounded-full backdrop-blur-sm transition-all shadow-lg"
+            onClick={(e) => {
+              e.stopPropagation();
+              onClose();
+            }}
             aria-label="Close Lightbox"
           >
-            <svg viewBox="0 0 24 24" className="h-8 w-8" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 6l12 12" /><path d="M18 6l-12 12" /></svg>
+            <svg viewBox="0 0 24 24" className="h-6 w-6 sm:h-8 sm:w-8" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 6l12 12" /><path d="M18 6l-12 12" /></svg>
           </button>
 
           <motion.div
@@ -65,20 +76,17 @@ export default function Lightbox({ isOpen, images, captions, index, onClose, set
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="relative w-full max-w-[90vw] 2xl:max-w-[1400px] max-h-[90vh] flex items-center justify-center"
+            className="relative flex items-center justify-center max-w-[90vw] xl:max-w-[1200px]"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex w-full flex-col items-center relative h-[85vh]">
-              <Image
-                src={images[index]}
+            <div className="flex flex-col items-center relative">
+              <img
+                src={isDesktop ? images[index] : `/_next/image?url=${encodeURIComponent(images[index])}&w=1080&q=75`}
                 alt={captions[index] || "Preview image"}
-                fill
-                className="object-contain rounded-lg"
-                sizes="(max-width: 1024px) 100vw, 1024px"
-                unoptimized
+                className="max-h-[85vh] max-w-[90vw] xl:max-w-[1200px] object-contain rounded-lg"
               />
               {captions[index] && (
-                <p className="absolute -bottom-10 text-sm text-white/70 bg-black/50 px-3 py-1 rounded-full">
+                <p className="absolute -bottom-10 text-sm text-white/70 bg-black/50 px-3 py-1 rounded-full whitespace-nowrap">
                   {captions[index]}
                 </p>
               )}
