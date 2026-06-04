@@ -5,7 +5,7 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 
 const poppins = Poppins({
-  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+  weight: ["400", "500", "600", "700"],
   style: ["normal", "italic"],
   subsets: ["latin"],
   variable: "--font-poppins",
@@ -15,6 +15,16 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   title: "Maulana's Portfolio",
   description: "Explore the portfolio of Maulana Raji Shofil Fuadi, a Data Analyst and Actuarial Science graduate specializing in AI automation and data-driven insights.",
+  openGraph: {
+    title: "Maulana's Portfolio",
+    description: "Explore the portfolio of Maulana Raji Shofil Fuadi, a Data Analyst and Actuarial Science graduate specializing in AI automation and data-driven insights.",
+    siteName: "Maulana's Portfolio",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Maulana's Portfolio",
+  },
 };
 
 export default function RootLayout({
@@ -24,6 +34,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={cn("dark", poppins.variable, "font-sans", GeistSans.variable)}>
+      <head>
+        <link rel="preload" href="/assets/lanyard/card.glb" as="fetch" crossOrigin="anonymous" />
+        <link rel="preload" href="/assets/lanyard/lanyard.png" as="image" />
+      </head>
       <body className={`${poppins.className} ${poppins.variable} antialiased`}>
         {children}
       </body>
