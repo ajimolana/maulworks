@@ -3,18 +3,19 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect, useCallback } from "react";
-import Lanyard from "./components/Lanyard/Lanyard";
 import RotatingText from "./components/RotatingText/RotatingText";
 import SplitText from "./components/SplitText/SplitText";
 import BlurText from "./components/BlurText/BlurText";
 import AnimatedContent from "./components/AnimatedContent/AnimatedContent";
-import DotGrid from "./components/DotGrid/DotGrid";
-import ColorBends from "./components/ColorBends/ColorBends";
 import PillNav from "./components/PillNav/PillNav";
-import LogoLoop from "./components/LogoLoop/LogoLoop";
-import ProjectCard from "./components/ProjectCard";
-import ProjectModal from "./components/ProjectModal";
-import Lightbox from "./components/Lightbox";
+import dynamic from "next/dynamic";
+
+const Lanyard = dynamic(() => import("./components/Lanyard/Lanyard"), { ssr: false });
+const ColorBends = dynamic(() => import("./components/ColorBends/ColorBends"), { ssr: false });
+const LogoLoop = dynamic(() => import("./components/LogoLoop/LogoLoop"));
+const ProjectCard = dynamic(() => import("./components/ProjectCard"));
+const ProjectModal = dynamic(() => import("./components/ProjectModal"));
+const Lightbox = dynamic(() => import("./components/Lightbox"));
 
 import {
   experiencesData,
@@ -327,7 +328,6 @@ export default function Home() {
             {!isLowPerformanceMode ? (
               <>
                 <ColorBends colors={["#19382e"]} rotation={90} speed={0.2} scale={1} frequency={1} warpStrength={1} mouseInfluence={1} noise={0.15} parallax={0.5} iterations={1} intensity={1.5} bandWidth={6} transparent autoRotate={0} />
-                <DotGrid dotSize={5} gap={15} baseColor="#2F293A" activeColor="#5227FF" proximity={120} shockRadius={250} shockStrength={5} resistance={750} returnDuration={1.5} />
               </>
             ) : (
               <div className="absolute inset-0 bg-gradient-to-br from-[#101010] via-[#15241e] to-[#101010] opacity-80" />
@@ -507,7 +507,7 @@ export default function Home() {
             className="transition-opacity hover:opacity-80"
             aria-label="Email Maulana"
           >
-            <Image src="/assets/footer/mail.png" alt="Email Logo" width={28} height={28} />
+            <Image src="/assets/footer/mail.svg" alt="Email Logo" width={28} height={28} />
           </a>
           <a
             href="https://github.com/ajimolana"
@@ -516,7 +516,7 @@ export default function Home() {
             className="transition-opacity hover:opacity-80"
             aria-label="GitHub Profile"
           >
-            <Image src="/assets/footer/github.png" alt="GitHub Logo" width={28} height={28} />
+            <Image src="/assets/footer/github.svg" alt="GitHub Logo" width={28} height={28} />
           </a>
           <a
             href="https://linkedin.com/in/maulanaraji/"
@@ -525,7 +525,7 @@ export default function Home() {
             className="transition-opacity hover:opacity-80"
             aria-label="LinkedIn Profile"
           >
-            <Image src="/assets/footer/linkedin.png" alt="LinkedIn Logo" width={28} height={28} />
+            <Image src="/assets/footer/linkedin.svg" alt="LinkedIn Logo" width={28} height={28} />
           </a>
           <a
             href="https://instagram.com/ajimolana/"
@@ -534,7 +534,7 @@ export default function Home() {
             className="transition-opacity hover:opacity-80"
             aria-label="Instagram Profile"
           >
-            <Image src="/assets/footer/instagram.png" alt="Instagram Logo" width={28} height={28} />
+            <Image src="/assets/footer/instagram.svg" alt="Instagram Logo" width={28} height={28} />
           </a>
         </div>
         <p className="text-sm text-[#dfdfdf] text-center px-4 mt-2">
