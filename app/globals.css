@@ -1,4 +1,5 @@
 @import "tw-animate-css";
+@import "shadcn/tailwind.css";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -128,11 +129,13 @@
 
   * {
     border-color: var(--border);
+    @apply border-border outline-ring;
   }
 
   body {
     background-color: var(--background);
     color: var(--foreground);
+    @apply bg-background text-foreground;
   }
 
   html {
