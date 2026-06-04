@@ -109,6 +109,7 @@ export default function Home() {
     { id: "organizations", label: "Organizations", href: "#organizations" },
     { id: "achievements", label: "Achievements", href: "#achievements" },
     { id: "contacts", label: "Get in Touch", href: "#contacts" },
+    { id: "journey", label: "Journey", href: "/journey" },
   ];
 
   // 1. BROWSER HISTORY LOGIC
@@ -349,7 +350,16 @@ export default function Home() {
                     <SplitText text="Actuarial Science Graduate" className="text-xl sm:text-2xl md:text-4xl lg:text-5xl font-semibold text-start text-[#C6F10E]" textAlign="left" delay={75} from={{ opacity: 0, transform: 'translate3d(0,50px,0)' }} to={{ opacity: 1, transform: 'translate3d(0,0,0)' }} threshold={0.1} rootMargin="-0px" />
                   </div>
                   <div className="flex flex-col items-start">
-                    <BlurText text="Actuarial Science graduate with a concentration in data analytics, currently focusing on AI Automation. Demonstrated leader with strong leadership skills and a history of accomplishments. Effective communicator in both Indonesian and English, equipped with a solid skillset in management and creative sectors." delay={20} animateBy="words" direction="top" className="text-base sm:text-lg md:text-xl mb-6 md:mb-8 max-w-xl sm:max-w-2xl md:max-w-7xl" />
+                    <BlurText text="Based in Makassar • Open to Remote / Relocation" delay={15} animateBy="words" direction="top" className="text-sm sm:text-base font-medium text-white/70 mb-4" />
+                    <BlurText text="Built ML models that predict food security for 127 regional points. Automated 5,000+ monthly data entries. Led a 76-member student organization to a national championship." delay={20} animateBy="words" direction="top" className="text-base sm:text-lg md:text-xl mb-6 md:mb-8 max-w-xl sm:max-w-2xl md:max-w-7xl" />
+                    <div className="flex flex-wrap gap-4 mt-2 mb-6 md:mb-8">
+                      <Link href="/journey" className="px-6 py-3 bg-[#C6F10E] text-black font-bold rounded-full hover:scale-105 transition-transform duration-300">
+                        See My Journey
+                      </Link>
+                      <a href="#projects" className="px-6 py-3 bg-white/10 text-white font-bold rounded-full border border-white/20 hover:bg-white/20 transition-colors duration-300">
+                        See My Work
+                      </a>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -397,7 +407,7 @@ export default function Home() {
                       <p className="font-medium text-white">Hasanuddin University</p>
                       <p className="text-white/60 text-sm whitespace-nowrap">Aug 2021 – Feb 2026</p>
                     </div>
-                    <p className="text-white/80 text-sm">Bachelor of Actuarial Science</p>
+                    <p className="text-white/80 text-sm">Bachelor of Actuarial Science • GPA: 3.51/4.00</p>
                     <p className="text-white/60 text-sm">Scholarships: BSI Scholarship Prestasi (2022), BSI Scholarship Talenta (2024)</p>
                   </div>
                 </div>
@@ -484,7 +494,12 @@ export default function Home() {
       {/* FOOTER */}
       <footer id="contacts" className="w-full mt-28 mb-20 border-t border-white/10 pt-10 flex flex-col items-center justify-center gap-6 scroll-mt-24 md:scroll-mt-28">
         <h2 className="text-2xl sm:text-3xl font-semibold text-white">Get in Touch</h2>
-        <div className="flex items-center justify-center gap-6">
+
+        <a href="/assets/cv.pdf" target="_blank" rel="noopener noreferrer" className="px-8 py-3 bg-[#C6F10E] text-black font-bold rounded-full hover:scale-105 transition-transform duration-300">
+          Download CV
+        </a>
+
+        <div className="flex items-center justify-center gap-6 mt-2">
           <a
             href="mailto:maulanarajisf@gmail.com"
             target="_blank"

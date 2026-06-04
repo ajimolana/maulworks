@@ -18,15 +18,41 @@ interface PillNavProps {
   isGyroEnabled?: boolean;
   toggleGyro?: () => void;
   isLowPerformanceMode?: boolean;
+  titleOverride?: string;
+  homeHref?: string;
+  activeItemOverride?: string;
+  disableScrollSpy?: boolean;
 }
 
-export default function PillNav({ items, forceClose, togglePerformanceMode, isGyroEnabled, toggleGyro, isLowPerformanceMode }: PillNavProps) {
-  const [activeItem, setActiveItem] = useState<string | null>("profile");
-  const [isScrolled, setIsScrolled] = useState(false);
+export default function PillNav({ items, forceClose, togglePerformanceMode, isGyroEnabled, toggleGyro, isLowPerformanceMode, titleOverride, homeHref, activeItemOverride, disableScrollSpy }: PillNavProps) {
+  const [activeItem, setActiveItem] = useState<string | null>(activeItemOverride || "profile");
+  // Initialize from actual scroll position to avoid animated jump on mount
+  const [isScrolled, setIsScrolled] = useState(() =>
+    typeof window !== "undefined" ? window.scrollY > 50 : false
+  );
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  // Delay layoutId activation to prevent cross-page jump on mount
+  const [pillReady, setPillReady] = useState(false);
+  const [memojiHovered, setMemojiHovered] = useState(false);
+  const [memojiClicked, setMemojiClicked] = useState(false);
 
   const isClickingRef = useRef(false);
   const clickTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Activate layoutId only after mount to prevent cross-page pill jump
+  useEffect(() => {
+    let raf1: number;
+    let raf2: number;
+    raf1 = requestAnimationFrame(() => {
+      raf2 = requestAnimationFrame(() => {
+        setPillReady(true);
+      });
+    });
+    return () => {
+      cancelAnimationFrame(raf1);
+      cancelAnimationFrame(raf2);
+    };
+  }, []);
 
   const handleItemClick = (id: string) => {
     setActiveItem(id);
@@ -46,13 +72,25 @@ export default function PillNav({ items, forceClose, togglePerformanceMode, isGy
         setIsScrolled(false);
       }
 
+      if (disableScrollSpy) return;
+
       if (isClickingRef.current) return;
 
       // Check if user is at the bottom of the page
       const isAtBottom = Math.ceil(window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 50;
 
       if (isAtBottom && items.length > 0) {
-        setActiveItem(items[items.length - 1].id);
+        let found = false;
+        for (let i = items.length - 1; i >= 0; i--) {
+          if (document.getElementById(items[i].id)) {
+            setActiveItem(items[i].id);
+            found = true;
+            break;
+          }
+        }
+        if (!found) {
+          setActiveItem(items[items.length - 1].id);
+        }
       } else {
         // Update active item based on scroll position
         let currentSection: string | null = null;
@@ -109,7 +147,15 @@ export default function PillNav({ items, forceClose, togglePerformanceMode, isGy
             className="flex-shrink-0 flex items-center gap-2 font-semibold tracking-tight transition-colors text-white text-lg"
           >
             <button
-              onClick={togglePerformanceMode}
+              onClick={() => {
+                if (togglePerformanceMode) togglePerformanceMode();
+                setMemojiClicked(true);
+              }}
+              onMouseEnter={() => setMemojiHovered(true)}
+              onMouseLeave={() => {
+                setMemojiHovered(false);
+                setMemojiClicked(false);
+              }}
               className="outline-none focus:outline-none relative"
               aria-label="Toggle Performance Mode"
             >
@@ -119,7 +165,11 @@ export default function PillNav({ items, forceClose, togglePerformanceMode, isGy
                 width={128}
                 height={128}
                 quality={100}
-                className={`w-auto h-8 object-contain transition-transform duration-300 cursor-pointer ${isLowPerformanceMode ? '-rotate-6' : 'hover:-rotate-6'}`}
+                className={`w-auto h-8 object-contain transition-transform duration-300 cursor-pointer ${memojiHovered ? 'scale-125' : 'scale-100'} ${
+                  isLowPerformanceMode
+                    ? (memojiHovered && !memojiClicked ? 'rotate-0' : '-rotate-6')
+                    : (memojiHovered && !memojiClicked ? '-rotate-6' : 'rotate-0')
+                }`}
               />
               <AnimatePresence>
                 {isLowPerformanceMode && (
@@ -138,19 +188,23 @@ export default function PillNav({ items, forceClose, togglePerformanceMode, isGy
               </AnimatePresence>
             </button>
             <Link
-              href="#profile"
+              href={homeHref || "#profile"}
               onClick={() => handleItemClick("profile")}
               className={`relative px-4 py-2 flex items-center transition-colors rounded-full ${activeItem === "profile" ? "text-white lg:text-black" : "hover:text-white/80"}`}
             >
               {activeItem === "profile" && (
-                <motion.div
-                  layoutId="pillNavActiveBackground"
-                  className="absolute inset-0 bg-white rounded-full hidden lg:block"
-                  transition={{ type: "spring", stiffness: 350, damping: 30 }}
-                />
+                pillReady ? (
+                  <motion.div
+                    layoutId="pillNavActiveBackground"
+                    className="absolute inset-0 bg-white rounded-full hidden lg:block"
+                    transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                  />
+                ) : (
+                  <div className="absolute inset-0 bg-white rounded-full hidden lg:block" />
+                )
               )}
               <span className="relative z-10 flex items-center">
-                Maulana&apos;s Portfolio
+                {titleOverride || "Maulana's Portfolio"}
               </span>
             </Link>
           </motion.div>
@@ -164,15 +218,19 @@ export default function PillNav({ items, forceClose, togglePerformanceMode, isGy
                   key={item.id}
                   href={item.href}
                   onClick={() => handleItemClick(item.id)}
-                  className={`relative px-4 py-2 text-[14px] font-medium transition-colors rounded-full whitespace-nowrap ${isActive ? "text-black" : "text-white/70 hover:text-white"
+                  className={`relative px-4 py-2 text-[14px] font-medium transition-colors rounded-full whitespace-nowrap ${isActive ? "text-black" : item.id === "journey" ? "bg-white/10 text-white border border-white/20 hover:bg-white/20" : "text-white/70 hover:text-white"
                     }`}
                 >
                   {isActive && (
-                    <motion.div
-                      layoutId="pillNavActiveBackground"
-                      className="absolute inset-0 bg-white rounded-full"
-                      transition={{ type: "spring", stiffness: 350, damping: 30 }}
-                    />
+                    pillReady ? (
+                      <motion.div
+                        layoutId="pillNavActiveBackground"
+                        className="absolute inset-0 bg-white rounded-full"
+                        transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                      />
+                    ) : (
+                      <div className="absolute inset-0 bg-white rounded-full" />
+                    )
                   )}
                   <span className="relative z-10 tracking-wide">{item.label}</span>
                 </Link>
@@ -242,17 +300,19 @@ export default function PillNav({ items, forceClose, togglePerformanceMode, isGy
             })}
 
             {/* GYRO SWITCH AT BOTTOM */}
-            <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex items-center gap-3">
-              <span className="text-white/80 font-medium tracking-wide text-sm">Enable Gyro</span>
-              <button
-                onClick={toggleGyro}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isGyroEnabled ? 'bg-[#C6F10E]' : 'bg-white/20'}`}
-              >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-black transition-transform ${isGyroEnabled ? 'translate-x-6' : 'translate-x-1'}`}
-                />
-              </button>
-            </div>
+            {toggleGyro && (
+              <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex items-center gap-3">
+                <span className="text-white/80 font-medium tracking-wide text-sm">Enable Gyro</span>
+                <button
+                  onClick={toggleGyro}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isGyroEnabled ? 'bg-[#C6F10E]' : 'bg-white/20'}`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-black transition-transform ${isGyroEnabled ? 'translate-x-6' : 'translate-x-1'}`}
+                  />
+                </button>
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
