@@ -118,16 +118,20 @@ export const projectsData: Project[] = [
     role: "Streamlit",
     details: [
       {
-        label: "Description",
-        value: "Built a time-series forecasting model to support pension fund planning decisions."
+        label: "Problem",
+        value: "Local governments in the Sulampua region needed a reliable method to predict food security statuses to formulate effective agricultural and economic policies."
       },
       {
-        label: "Task",
-        value: [
-          "Collaborated on building a Machine Learning based Food Security Prediction System using the Streamlit framework.",
-          "Performed Predictive Modeling on 5 variables from the National Food Agency’s Food Security Atlas, covering 127 points in the Sulampua region. Model achieved an R2 score of 0.801 and RMSE of 0.887."
-        ],
-        list: true
+        label: "My Role",
+        value: "Machine Learning Modeler & Data Analyst"
+      },
+      {
+        label: "Method",
+        value: "Developed predictive models using Python, utilizing variables from the National Food Agency's Atlas across 127 data points. Deployed the interactive dashboard via Streamlit."
+      },
+      {
+        label: "Result",
+        value: "Achieved an R² score of 0.801 and RMSE of 0.887, enabling policymakers to simulate and visualize food security risks dynamically."
       }
     ],
     heroImage: "/assets/projects/foodsecurity/foodsecurity1.png",
@@ -149,16 +153,20 @@ export const projectsData: Project[] = [
     role: "Streamlit",
     details: [
       {
-        label: "Description",
-        value: "Built a time-series forecasting model to support pension fund planning decisions."
+        label: "Problem",
+        value: "Calculating pension fund premium costs is mathematically complex and often opaque for participants. There was a need for an accessible tool to simulate different scenarios."
       },
       {
-        label: "Task",
-        value: [
-          "Built a Pension Fund Calculator using the Streamlit framework. Useful for calculating participant premiums, featuring simulation parameters adjustable to user conditions.",
-          "Implemented Entry Age Normal, Attained Age Normal, and Projected Unit Credit formulas into a digital platform for transparent and accessible calculations."
-        ],
-        list: true
+        label: "My Role",
+        value: "Actuarial Developer"
+      },
+      {
+        label: "Method",
+        value: "Translated complex actuarial formulas (Entry Age Normal, Attained Age Normal, Projected Unit Credit) into Python algorithms and built a user-friendly interface with Streamlit."
+      },
+      {
+        label: "Result",
+        value: "Delivered a transparent and interactive simulator that allows users to instantly calculate and visualize their required premiums based on adjustable life parameters."
       }
     ],
     heroImage: "/assets/projects/pensionfund/pensionfund1.png",
@@ -180,16 +188,20 @@ export const projectsData: Project[] = [
     role: "Google Colab, Looker Studio",
     details: [
       {
-        label: "Description",
-        value: "Built a time-series forecasting model to support pension fund planning decisions."
+        label: "Problem",
+        value: "Highland farmers struggle with unpredictable environmental changes, making it difficult to determine the optimal planting periods for various crops."
       },
       {
-        label: "Task",
-        value: [
-          "Collaborated on an Artificial Intelligence based Highland Agriculture Parameter dashboard and identified business opportunities through predictive analysis.",
-          "Managed Data Pipelines and performed Hyperparameter Tuning to optimize model performance across various environmental parameters."
-        ],
-        list: true
+        label: "My Role",
+        value: "Data Engineer & Modeler"
+      },
+      {
+        label: "Method",
+        value: "Managed data pipelines and performed hyperparameter tuning in Google Colab to optimize forecasting models. Visualized the predictions using Looker Studio."
+      },
+      {
+        label: "Result",
+        value: "Created an AI-based agriculture dashboard that provides actionable planting recommendations, identifying new business opportunities for highland agriculture."
       }
     ],
     heroImage: "/assets/projects/cultivatedhighland/cultivatedhighland1.png",
@@ -230,11 +242,11 @@ export const researchData: Project[] = [
       },
       {
         label: "Description",
-        value: "An innovation"
+        value: "Seaweed farmers in Laikang Village faced significant challenges with post-harvest processing, often resulting in degraded quality due to unpredictable weather and inefficient drying methods."
       },
       {
-        label: "Task",
-        value: "Doing research"
+        label: "Mechanism & Impact",
+        value: "We designed the 'Smart Cell Dry Box'—an innovative, practical drying solution that accelerates the drying process while preserving the quality of the seaweed. This practical tool helps farmers stabilize their income by ensuring a consistent, high-quality yield regardless of weather conditions."
       }
     ],
     heroImage: "",
@@ -261,11 +273,11 @@ export const researchData: Project[] = [
       },
       {
         label: "Description",
-        value: "An innovation."
+        value: "A policy formulation paper based on the SIPEKAN machine learning model, aiming to provide a data-driven approach to regional food security."
       },
       {
-        label: "Task",
-        value: "Doing research"
+        label: "Abstract / Key Findings",
+        value: "This research details the methodology behind the SIPEKAN dashboard (see Projects). By utilizing 5 key variables from the Food Security Atlas across 127 points, we proved that predictive modeling can significantly enhance the precision of government intervention policies in the Sulampua region."
       }
     ],
     heroImage: "",
@@ -297,11 +309,11 @@ export const researchData: Project[] = [
       },
       {
         label: "Description",
-        value: "An innovation."
+        value: "A proposal to empower the rural economy in Takalar through the innovative conversion of seaweed into biofuel, managed by local Village-Owned Enterprises (BUMDes)."
       },
       {
-        label: "Task",
-        value: "Doing research"
+        label: "Concept & Impact",
+        value: "The 'Eco Blue Village' concept outlines a scalable biofuel extraction process from abundant local seaweed. By integrating this innovation into the BUMDes framework, the project projects a circular economy model that provides a new renewable energy source while simultaneously boosting local income."
       }
     ],
     heroImage: "",
@@ -332,6 +344,10 @@ export const organizationsData: Project[] = [
           "Built bonding and instilled a competitive spirit in members, leading to 1st Place achievements for both Men’s and Women’s teams at the 2024 Airlangga National Championship."
         ],
         list: true
+      },
+      {
+        label: "Reflection",
+        value: "Leading this organization taught me that true leadership is about aligning individual motivations toward a collective goal. Winning the national championship wasn't just about athletic skill—it was the result of building a culture of trust, discipline, and shared vision over an entire year."
       }
     ],
     heroImage: "",
@@ -362,7 +378,9 @@ export const organizationsData: Project[] = [
         label: "Task",
         value: [
           "Coordinated 15 daily board members to provide academic assistance for 120 junior members.",
-          "Maintained student integrity within the association to ensure members complete their studies on time."
+          "Initiated 'Bakat: Bantuan Akademik', a peer-tutoring program to help students maintain good academic standing and graduate on time.",
+          "Organized the 'National Math Event', a large-scale academic competition.",
+          "Created 'HimatikaTalks', a new seminar program inviting proven alumni to share real-world insights on scholarships and career realities."
         ],
         list: true
       }
@@ -377,6 +395,18 @@ export const organizationsData: Project[] = [
 ];
 
 export const achievements: AchievementItem[] = [
+  {
+    title: "BSI Scholarship Talenta",
+    competitionType: "Scholarship",
+    organizer: "Bank Syariah Indonesia",
+    date: "2024",
+  },
+  {
+    title: "BSI Scholarship Prestasi",
+    competitionType: "Scholarship",
+    organizer: "Bank Syariah Indonesia",
+    date: "2022",
+  },
   {
     title: "Top 10 Paper",
     competitionType: "Scientific Paper",
