@@ -205,8 +205,8 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false, lanyardOffsetY = 
         <group
           scale={2.25}
           position={[0, -1.2, -0.05]}
-          onPointerOver={() => hover(true)}
-          onPointerOut={() => hover(false)}
+          onPointerOver={() => !isMobile && hover(true)}
+          onPointerOut={() => !isMobile && hover(false)}
           onPointerUp={(e: any) => {
             e.target.releasePointerCapture(e.pointerId);
             drag(false);
