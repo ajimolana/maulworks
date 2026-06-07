@@ -107,10 +107,10 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false, lanyardOffsetY = 
   const j3 = useRef<any>(null);
   const card = useRef<any>(null);
 
-  const vec = new THREE.Vector3();
-  const ang = new THREE.Vector3();
-  const rot = new THREE.Vector3();
-  const dir = new THREE.Vector3();
+  const vecRef = useRef(new THREE.Vector3());
+  const angRef = useRef(new THREE.Vector3());
+  const rotRef = useRef(new THREE.Vector3());
+  const dirRef = useRef(new THREE.Vector3());
 
   const segmentProps: any = {
     type: 'dynamic' as RigidBodyProps['type'],
@@ -148,14 +148,14 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false, lanyardOffsetY = 
 
   useFrame((state, delta) => {
     if (dragged && typeof dragged !== 'boolean') {
-      vec.set(state.pointer.x, state.pointer.y, 0.5).unproject(state.camera);
-      dir.copy(vec).sub(state.camera.position).normalize();
-      vec.add(dir.multiplyScalar(state.camera.position.length()));
+      vecRef.current.set(state.pointer.x, state.pointer.y, 0.5).unproject(state.camera);
+      dirRef.current.copy(vecRef.current).sub(state.camera.position).normalize();
+      vecRef.current.add(dirRef.current.multiplyScalar(state.camera.position.length()));
       [card, j1, j2, j3, fixed].forEach(ref => ref.current?.wakeUp());
       card.current?.setNextKinematicTranslation({
-        x: vec.x - dragged.x,
-        y: vec.y - dragged.y,
-        z: vec.z - dragged.z
+        x: vecRef.current.x - dragged.x,
+        y: vecRef.current.y - dragged.y,
+        z: vecRef.current.z - dragged.z
       });
     }
     if (fixed.current) {
@@ -172,9 +172,9 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false, lanyardOffsetY = 
       curve.points[2].copy(j1.current.lerped);
       curve.points[3].copy(fixed.current.translation());
       band.current.geometry.setPoints(curve.getPoints(isMobile ? 16 : 32));
-      ang.copy(card.current.angvel());
-      rot.copy(card.current.rotation());
-      card.current.setAngvel({ x: ang.x, y: ang.y - rot.y * 0.25, z: ang.z });
+      angRef.current.copy(card.current.angvel());
+      rotRef.current.copy(card.current.rotation());
+      card.current.setAngvel({ x: angRef.current.x, y: angRef.current.y - rotRef.current.y * 0.25, z: angRef.current.z });
     }
   });
 
@@ -213,7 +213,7 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false, lanyardOffsetY = 
           }}
           onPointerDown={(e: any) => {
             e.target.setPointerCapture(e.pointerId);
-            drag(new THREE.Vector3().copy(e.point).sub(vec.copy(card.current.translation())));
+            drag(new THREE.Vector3().copy(e.point).sub(vecRef.current.copy(card.current.translation())));
           }}
         >
           <mesh geometry={nodes.card.geometry}>
