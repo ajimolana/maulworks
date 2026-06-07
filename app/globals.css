@@ -59,6 +59,15 @@
   }
 
   :root {
+    /* ============================================
+     * THEME COLOR PALETTE — swap to change theme
+     * ============================================
+     * Lime Green (original):  accent=#C6F10E  bg-gradient=#15241e  colorbends=#19382e
+     * Vivid Blue/Cyan:        accent=#57e5e1  bg-gradient=#101e21  colorbends=#10282b
+     * ============================================ */
+    --theme-main: #101010;
+    --theme-accent: #57e5e1;
+    --theme-bg-gradient: #101e21;
     --background: oklch(1 0 0);
     --foreground: oklch(0.145 0 0);
     --card: oklch(1 0 0);
@@ -94,6 +103,9 @@
   }
 
   .dark {
+    --theme-main: #101010;
+    --theme-accent: #57e5e1;
+    --theme-bg-gradient: #101e21;
     --background: oklch(0.145 0 0);
     --foreground: oklch(0.985 0 0);
     --card: oklch(0.205 0 0);
