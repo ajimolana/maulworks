@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
-import { GeistSans } from "geist/font/sans";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 
@@ -33,10 +32,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={cn("dark", poppins.variable, "font-sans", GeistSans.variable)}>
+    <html lang="en" className={cn("dark", "scroll-smooth", poppins.variable, "font-sans")}>
       <head>
-        <link rel="preload" href="/assets/lanyard/card.glb" as="fetch" crossOrigin="anonymous" />
-        <link rel="preload" href="/assets/lanyard/lanyard.png" as="image" />
       </head>
       <body className={`${poppins.className} ${poppins.variable} antialiased`}>
         {children}
