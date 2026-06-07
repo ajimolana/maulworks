@@ -88,22 +88,22 @@ export default function JourneyPage() {
   ];
 
   return (
-    <main className="min-h-screen bg-[#101010] py-28 md:py-36 px-4 relative">
+    <main className="min-h-screen bg-[var(--theme-main)] py-28 md:py-36 px-4 relative">
       {/* FIXED BACKGROUND */}
       <div className="fixed inset-0 w-full h-full pointer-events-none z-0">
         <div style={{ width: '100%', height: '100%', position: 'relative', WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%)', maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%)' }}>
           {!isLowPerformanceMode ? (
-            <ColorBends colors={["#19382e"]} rotation={90} speed={0.2} scale={1} frequency={1} warpStrength={1} mouseInfluence={1} noise={0.15} parallax={0.5} iterations={1} intensity={1.5} bandWidth={6} transparent autoRotate={0} />
+            <ColorBends colors={["#10282b"]} rotation={90} speed={0.2} scale={1} frequency={1} warpStrength={1} mouseInfluence={1} noise={0.15} parallax={0.5} iterations={1} intensity={1.5} bandWidth={6} transparent autoRotate={0} />
           ) : (
-            <div className="absolute inset-0 bg-gradient-to-br from-[#101010] via-[#15241e] to-[#101010] opacity-80" />
+            <div className="absolute inset-0 bg-gradient-to-br from-[var(--theme-main)] via-[var(--theme-bg-gradient)] to-[var(--theme-main)] opacity-80" />
           )}
         </div>
       </div>
 
       <div className="relative z-10">
-        <PillNav 
-          items={navItems} 
-          forceClose={isOverlayOpen} 
+        <PillNav
+          items={navItems}
+          forceClose={isOverlayOpen}
           homeHref="/"
           activeItemOverride="journey"
           disableScrollSpy={true}
@@ -112,32 +112,32 @@ export default function JourneyPage() {
         />
 
         <div className="max-w-5xl mx-auto mb-10 flex flex-col items-center text-center">
-        <h1 className="text-[26px] min-[400px]:text-3xl sm:text-4xl md:text-5xl font-bold text-white whitespace-nowrap">Journey & Milestones</h1>
-        <p className="text-white/60 mt-4 text-base sm:text-lg max-w-2xl md:max-w-none lg:whitespace-nowrap">
-          A chronological look at my academic journey, professional experiences, and key achievements.
-        </p>
-      </div>
+          <h1 className="text-[26px] min-[400px]:text-3xl sm:text-4xl md:text-5xl font-bold text-white whitespace-nowrap">Journey & Milestones</h1>
+          <p className="text-white/60 mt-4 text-base sm:text-lg max-w-2xl md:max-w-none lg:whitespace-nowrap">
+            A chronological look at my academic journey, professional experiences, and key achievements.
+          </p>
+        </div>
 
-      <div className="pb-20">
-        <Timeline onOpenModal={openProjectModal} />
-      </div>
+        <div className="pb-20">
+          <Timeline onOpenModal={openProjectModal} />
+        </div>
 
-      {/* GLOBAL PROJECT MODAL */}
-      <ProjectModal
-        activeProject={activeProject}
-        onClose={closeProjectModal}
-        onOpenLightbox={openLightbox}
-      />
+        {/* GLOBAL PROJECT MODAL */}
+        <ProjectModal
+          activeProject={activeProject}
+          onClose={closeProjectModal}
+          onOpenLightbox={openLightbox}
+        />
 
-      {/* LIGHTBOX */}
-      <Lightbox
-        isOpen={lightbox.isOpen}
-        images={lightbox.images}
-        captions={lightbox.captions}
-        index={lightbox.index}
-        onClose={closeLightbox}
-        setIndex={setLightboxIndex}
-      />
+        {/* LIGHTBOX */}
+        <Lightbox
+          isOpen={lightbox.isOpen}
+          images={lightbox.images}
+          captions={lightbox.captions}
+          index={lightbox.index}
+          onClose={closeLightbox}
+          setIndex={setLightboxIndex}
+        />
       </div>
     </main>
   );
