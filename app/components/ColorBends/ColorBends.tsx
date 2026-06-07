@@ -20,6 +20,7 @@ type ColorBendsProps = {
   iterations?: number;
   intensity?: number;
   bandWidth?: number;
+  isLowPerformanceMode?: boolean;
 };
 
 const MAX_COLORS = 8 as const;
@@ -143,7 +144,8 @@ export default function ColorBends({
   noise = 0.15,
   iterations = 1,
   intensity = 1.5,
-  bandWidth = 6
+  bandWidth = 6,
+  isLowPerformanceMode = false
 }: ColorBendsProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
@@ -200,7 +202,8 @@ export default function ColorBends({
     });
     rendererRef.current = renderer;
     (renderer as any).outputColorSpace = (THREE as any).SRGBColorSpace;
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.25));
+    const maxDPR = isLowPerformanceMode ? 1.0 : 1.5;
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, maxDPR));
     renderer.setClearColor(0x000000, transparent ? 0 : 1);
     renderer.domElement.style.width = '100%';
     renderer.domElement.style.height = '100%';
@@ -246,11 +249,27 @@ export default function ColorBends({
       rafRef.current = requestAnimationFrame(loop);
     };
     rafRef.current = requestAnimationFrame(loop);
+    
+    const handleVisibility = () => {
+      if (document.hidden) {
+        if (rafRef.current !== null) {
+          cancelAnimationFrame(rafRef.current);
+          rafRef.current = null;
+        }
+      } else {
+        clock.getDelta(); // Reset clock delta so it doesn't jump
+        if (rafRef.current === null) {
+          rafRef.current = requestAnimationFrame(loop);
+        }
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
 
     return () => {
       if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
       if (resizeObserverRef.current) resizeObserverRef.current.disconnect();
       else (window as Window).removeEventListener('resize', handleResize);
+      document.removeEventListener("visibilitychange", handleVisibility);
       geometry.dispose();
       material.dispose();
       renderer.dispose();
