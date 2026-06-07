@@ -59,7 +59,36 @@ const renderDetails = (details: DetailItem[] = []) =>
       </div>
     ));
 
+const ModalImage = ({ src, idx, onOpenLightbox, srcs, caps }: { src: string, idx: number, onOpenLightbox: any, srcs: string[], caps: string[] }) => {
+  const [isLoading, setIsLoading] = React.useState(true);
+  
+  return (
+    <div className="flex-none relative h-40 w-64 bg-white/5 rounded-2xl flex items-center justify-center overflow-hidden border border-white/5">
+      {isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+          <div className="w-6 h-6 border-2 border-white/10 border-t-white/60 rounded-full animate-spin"></div>
+        </div>
+      )}
+      <Image
+        src={src}
+        alt={`Documentation ${idx + 1}`}
+        fill
+        className={`rounded-2xl object-cover cursor-pointer hover:opacity-70 transition-opacity duration-500 ease-in-out ${isLoading ? 'opacity-0' : 'opacity-100'}`}
+        onClick={() => onOpenLightbox(srcs, caps, idx)}
+        sizes="(max-width: 768px) 256px, 256px"
+        quality={50}
+        priority={true}
+        onLoad={() => setIsLoading(false)}
+      />
+    </div>
+  );
+};
+
 export default function ProjectModal({ activeProject, onClose, onOpenLightbox }: ProjectModalProps) {
+  const items = React.useMemo(() => activeProject ? galleryItems(activeProject.gallery) : [], [activeProject]);
+  const srcs = React.useMemo(() => items.map(i => i.src), [items]);
+  const caps = React.useMemo(() => items.map(i => i.caption ?? ""), [items]);
+
   return (
     <AnimatePresence>
       {activeProject && (
@@ -117,33 +146,25 @@ export default function ProjectModal({ activeProject, onClose, onOpenLightbox }:
 
               {renderDetails(activeProject.details)}
 
-              {galleryItems(activeProject.gallery).length > 0 && (
+              {items.length > 0 && (
                 <div>
                   <p className="text-sm text-white/60">Documentation</p>
-                  {/* Removed the hijacking wheel event handling to allow native horizontal scroll */}
                   <div
                     className="mt-3 flex overflow-x-auto gap-3 pb-4 scrollbar-thin scrollbar-thumb-white/20 hover:scrollbar-thumb-white/40"
                     style={{ WebkitOverflowScrolling: 'touch' }}
                   >
-                    {galleryItems(activeProject.gallery).map((item, idx: number) => (
-                      <div key={item.src + idx} className="flex-none relative h-40 w-64">
-                        <Image
+                    {items.map((item, idx: number) => {
+                      return (
+                        <ModalImage 
+                          key={item.src + idx}
                           src={item.src}
-                          alt={`Documentation ${idx + 1}`}
-                          fill
-                          className="rounded-2xl object-cover cursor-pointer hover:opacity-70 transition-opacity"
-                          onClick={() =>
-                            onOpenLightbox(
-                              galleryItems(activeProject.gallery).map((img) => img.src),
-                              galleryItems(activeProject.gallery).map((img) => img.caption ?? ""),
-                              idx
-                            )
-                          }
-                          sizes="(max-width: 768px) 256px, 256px"
-                          quality={50}
+                          idx={idx}
+                          srcs={srcs}
+                          caps={caps}
+                          onOpenLightbox={onOpenLightbox}
                         />
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               )}
