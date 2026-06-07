@@ -9,10 +9,11 @@ import {
   organizationsData,
   achievements,
   Project,
-  AchievementItem
+  AchievementItem,
+  aboutModalData
 } from '../../data/portfolio';
 
-export type TimelineCategory = 'Education' | 'Experience' | 'Project' | 'Research' | 'Organization' | 'Achievement';
+export type TimelineCategory = 'Education' | 'Experience' | 'Project' | 'Research' | 'Organization' | 'Achievement' | 'Certification' | 'Scholarship';
 
 export type TimelineEvent = {
   id: string;
@@ -80,7 +81,9 @@ const categoryColors: Record<TimelineCategory, string> = {
   Project: '#8b5cf6', // violet
   Research: '#f59e0b', // amber
   Organization: '#ec4899', // pink
-  Achievement: '#eab308' // yellow
+  Achievement: '#eab308', // yellow
+  Certification: '#06b6d4', // cyan
+  Scholarship: '#f43f5e' // rose
 };
 
 const categoryIcons: Record<TimelineCategory, string> = {
@@ -89,7 +92,9 @@ const categoryIcons: Record<TimelineCategory, string> = {
   Project: '🚀',
   Research: '🔬',
   Organization: '🤝',
-  Achievement: '🏆'
+  Achievement: '🏆',
+  Certification: '📜',
+  Scholarship: '✨'
 };
 
 interface TimelineProps {
@@ -118,6 +123,42 @@ const SortIcon = ({ order }: { order: 'newest' | 'oldest' }) => (
 const AppleEmoji = ({ emoji, className = "w-4 h-4 inline-block" }: { emoji: string, className?: string }) => (
   <img src={`https://emojicdn.elk.sh/${emoji}?style=apple`} alt={emoji} className={className} loading="lazy" />
 );
+
+const TimelineNodeIcon = ({ color, lineProgress, containerRef }: { color: string, lineProgress: any, containerRef: React.RefObject<HTMLDivElement> }) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const [isFilled, setIsFilled] = useState(false);
+
+  useEffect(() => {
+    const checkFill = (val: number) => {
+      if (!ref.current || !containerRef.current) return;
+      const containerRect = containerRef.current.getBoundingClientRect();
+      const isSm = window.innerWidth >= 640;
+      const topOffset = isSm ? 80 : 56;
+      const lineTipY = containerRect.top + topOffset + ((containerRect.height - topOffset) * val);
+      
+      const circleRect = ref.current.getBoundingClientRect();
+      const targetY = circleRect.top + (circleRect.height * 0.8);
+
+      setIsFilled(lineTipY >= targetY);
+    };
+
+    const unsubscribe = lineProgress.on("change", checkFill);
+    checkFill(lineProgress.get());
+    return unsubscribe;
+  }, [lineProgress, containerRef]);
+
+  return (
+    <div
+      ref={ref}
+      className="relative z-20 w-3 h-3 md:w-4 md:h-4 rounded-full border-[1.5px] md:border-2 transition-all duration-300 md:group-hover:scale-125 bg-[var(--theme-main)]"
+      style={{
+        borderColor: color,
+        backgroundColor: isFilled ? color : 'var(--theme-main)',
+        boxShadow: isFilled ? `0 0 10px ${color}` : 'none'
+      }}
+    />
+  );
+};
 
 type TimelineItemType = { type: 'event', data: TimelineEvent, isLeft: boolean, isHidden?: boolean } | { type: 'year', year: string };
 
@@ -168,7 +209,8 @@ export default function Timeline({ onOpenModal }: TimelineProps) {
       title: 'Bachelor of Actuarial Science',
       dateStr: 'Aug 2021 – Feb 2026',
       sortDate: parseDate('Aug 2021'),
-      shortDesc: 'Hasanuddin University. GPA: 3.51/4.00',
+      shortDesc: 'Hasanuddin University',
+      projectData: aboutModalData.education,
     });
 
     experiencesData.forEach(exp => {
@@ -231,6 +273,36 @@ export default function Timeline({ onOpenModal }: TimelineProps) {
       });
     });
 
+    const { cert_data_analyst, cert_data_science, schol_prestasi, schol_talenta } = aboutModalData;
+
+    if (cert_data_analyst && cert_data_science) {
+      [cert_data_analyst, cert_data_science].forEach(cert => {
+        items.push({
+          id: cert.id,
+          category: 'Certification',
+          title: cert.title,
+          dateStr: cert.period || cert.year,
+          sortDate: parseDate(cert.period || cert.year),
+          shortDesc: cert.shortDesc,
+          projectData: cert,
+        });
+      });
+    }
+
+    if (schol_prestasi && schol_talenta) {
+      [schol_prestasi, schol_talenta].forEach(schol => {
+        items.push({
+          id: schol.id,
+          category: 'Scholarship',
+          title: schol.title,
+          dateStr: schol.period || schol.year,
+          sortDate: parseDate(schol.period || schol.year),
+          shortDesc: schol.shortDesc,
+          projectData: schol,
+        });
+      });
+    }
+
     // Sort chronologically based on sortOrder
     items.sort((a, b) =>
       sortOrder === 'newest'
@@ -241,7 +313,18 @@ export default function Timeline({ onOpenModal }: TimelineProps) {
     // Filter items based on active category
     const filteredItems = activeFilter === 'All'
       ? items
-      : items.filter(item => item.category === activeFilter);
+      : items.filter(item => {
+          if (activeFilter === 'Education') {
+            return ['Education', 'Certification', 'Scholarship'].includes(item.category);
+          }
+          if (activeFilter === 'Experience') {
+            return ['Experience', 'Organization'].includes(item.category);
+          }
+          if (activeFilter === 'Project') {
+            return ['Project', 'Research'].includes(item.category);
+          }
+          return item.category === activeFilter;
+        });
 
     const combinedItems: TimelineItemType[] = [];
     let currentYear = '';
@@ -271,7 +354,7 @@ export default function Timeline({ onOpenModal }: TimelineProps) {
     }
   };
 
-  const categories: ('All' | TimelineCategory)[] = ['All', 'Education', 'Experience', 'Project', 'Research', 'Organization', 'Achievement'];
+  const categories: ('All' | TimelineCategory)[] = ['All', 'Education', 'Experience', 'Project', 'Achievement'];
 
   return (
     <div className="max-w-5xl mx-auto w-full">
@@ -283,7 +366,7 @@ export default function Timeline({ onOpenModal }: TimelineProps) {
             className="w-full flex items-center justify-between px-5 py-3 rounded-xl bg-[#1a1a1a] border border-white/10 text-white font-medium shadow-lg"
           >
             <span className="flex items-center gap-2">
-              {activeFilter === 'All' ? 'All Categories' : <><AppleEmoji emoji={categoryIcons[activeFilter as TimelineCategory]} /> {activeFilter}</>}
+              {activeFilter === 'All' ? 'All Categories' : activeFilter}
             </span>
             <span className={`text-xs transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`}>
               ▼
@@ -308,7 +391,7 @@ export default function Timeline({ onOpenModal }: TimelineProps) {
                     className={`w-full text-left px-5 py-3 text-sm transition-colors ${activeFilter === cat ? 'bg-white/10 text-white font-medium' : 'text-white/60 hover:bg-white/5 hover:text-white'
                       }`}
                   >
-                    {cat === 'All' ? 'All Categories' : <span className="flex items-center gap-2"><AppleEmoji emoji={categoryIcons[cat as TimelineCategory]} /> {cat}</span>}
+                    {cat === 'All' ? 'All Categories' : cat}
                   </button>
                 ))}
               </motion.div>
@@ -337,7 +420,7 @@ export default function Timeline({ onOpenModal }: TimelineProps) {
                 : 'bg-transparent border-white/5 text-white/40 hover:text-white/80 hover:bg-white/5'
               }`}
           >
-            {cat === 'All' ? 'All' : <span className="flex items-center gap-1.5"><AppleEmoji emoji={categoryIcons[cat as TimelineCategory]} /> {cat}</span>}
+            {cat === 'All' ? 'All' : cat}
           </button>
         ))}
 
@@ -421,28 +504,22 @@ export default function Timeline({ onOpenModal }: TimelineProps) {
 
                 {/* Center/Left Icon Area */}
                 <div className="relative z-20 flex items-center order-1 justify-center w-10 h-10 shrink-0 mt-2 md:mt-0">
-                  {/* Mobile small dot */}
-                  <div className="md:hidden relative z-20 w-3 h-3 rounded-full border border-[#111]" style={{ backgroundColor: color, boxShadow: `0 0 10px ${color}` }} />
-                  {/* Desktop icon */}
-                  <div className="hidden md:flex relative z-20 items-center justify-center bg-[#1a1a1a] w-10 h-10 rounded-full border-2 border-[#111] text-lg transition-transform duration-300 group-hover:scale-110" style={{ borderColor: color, boxShadow: `0 0 15px ${color}30` }}>
-                    <AppleEmoji emoji={categoryIcons[event.category]} className="w-5 h-5" />
-                  </div>
+                  <TimelineNodeIcon color={color} lineProgress={lineProgress} containerRef={containerRef} />
                 </div>
 
                 {/* Connector Line */}
                 <div
-                  className="hidden md:block h-[2px] opacity-20 flex-grow mx-1 md:mx-2 lg:mx-3 order-1 transition-all duration-300 group-hover:opacity-60"
-                  style={{ backgroundColor: color }}
+                  className="hidden md:block h-[2px] opacity-20 flex-grow mx-1 md:mx-2 lg:mx-3 order-1 transition-all duration-300 group-hover:opacity-60 bg-white"
                 ></div>
 
                 {/* Content Card */}
                 <div
                   onClick={() => handleClick(event)}
-                  className={`order-1 w-[calc(100%-3.5rem)] md:w-5/12 ml-4 md:ml-0 px-4 py-3 sm:px-5 sm:py-4 rounded-2xl bg-[#131313] border border-white/5 relative transition-all duration-300 overflow-hidden 
+                  className={`order-1 w-[calc(100%-3.5rem)] md:w-5/12 ml-4 md:ml-0 px-3 py-2.5 sm:px-4 sm:py-3 rounded-2xl bg-[#131313] border border-white/5 relative transition-all duration-300 overflow-hidden 
                     ${hasAction ? 'cursor-pointer hover:border-white/20 hover:bg-[#181818] hover:-translate-y-1 hover:shadow-[0_10px_30px_rgba(0,0,0,0.6)]' : ''}`}
                 >
                   {/* Top Row: Category Pill & Date */}
-                  <div className="flex items-center gap-1.5 sm:gap-2 mb-3">
+                  <div className="flex items-center gap-1.5 sm:gap-2 mb-2">
                     <span className="text-[9px] sm:text-[10px] md:text-xs font-bold uppercase tracking-wider px-1.5 sm:px-2.5 py-1 rounded-md whitespace-nowrap shrink-0" style={{ backgroundColor: `${color}15`, color: color }}>
                       {event.category}
                     </span>
@@ -458,7 +535,7 @@ export default function Timeline({ onOpenModal }: TimelineProps) {
                     </span>
                   </div>
 
-                  <h3 className="font-bold text-base md:text-lg text-white mb-2 leading-snug">
+                  <h3 className="font-bold text-base md:text-lg text-white mb-1.5 leading-snug">
                     {event.title}
                   </h3>
 
