@@ -100,9 +100,12 @@ export const projectsData: Project[] = [
         list: true
       }
     ],
-    heroImage: "/assets/projects/intelligentcoffeeshop/frontend.jpeg",
+    heroImage: "/assets/projects/intelligentcoffeeshop/login page.png",
     gallery: [
-      "/assets/projects/intelligentcoffeeshop/frontend.jpeg",
+      "/assets/projects/intelligentcoffeeshop/login page.png",
+      "/assets/projects/intelligentcoffeeshop/dashboard page.png",
+      "/assets/projects/intelligentcoffeeshop/inventory page.png",
+      "/assets/projects/intelligentcoffeeshop/reports page.png",
       "/assets/projects/intelligentcoffeeshop/backend.png",
     ],
     // link: "https://foodsecurityforecasting.streamlit.app/"
