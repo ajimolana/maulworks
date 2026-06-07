@@ -4,15 +4,33 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import RotatingText from "./components/RotatingText/RotatingText";
-import SplitText from "./components/SplitText/SplitText";
-import BlurText from "./components/BlurText/BlurText";
-import AnimatedContent from "./components/AnimatedContent/AnimatedContent";
 import PillNav from "./components/PillNav/PillNav";
 import dynamic from "next/dynamic";
 import { usePerformanceMode } from "@/lib/usePerformanceMode";
 
-const Lanyard = dynamic(() => import("./components/Lanyard/Lanyard"), { ssr: false });
-const ColorBends = dynamic(() => import("./components/ColorBends/ColorBends"), { ssr: false });
+const Lanyard = dynamic(() => import("./components/Lanyard/Lanyard"), {
+  ssr: false,
+  loading: () => (
+    <div className="absolute inset-0 flex items-center justify-center z-[-1]">
+      <style>{`
+        @keyframes loading-bar {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(200%); }
+        }
+      `}</style>
+      <div className="flex flex-col gap-2 mt-40 sm:mt-48 md:mt-80 lg:mt-10 xl:mt-0">
+        <span className="text-white/50 text-sm tracking-widest font-medium text-center">Loading Lanyard</span>
+        <div className="w-full h-[2px] bg-white/10 rounded-full overflow-hidden relative">
+          <div className="absolute top-0 left-0 h-full w-1/2 bg-gray-400 rounded-full" style={{ animation: 'loading-bar 1.5s infinite ease-in-out' }} />
+        </div>
+      </div>
+    </div>
+  )
+});
+const ColorBends = dynamic(() => import("./components/ColorBends/ColorBends"), {
+  ssr: false,
+  loading: () => <div className="absolute inset-0 bg-gradient-to-br from-[var(--theme-main)] via-[var(--theme-bg-gradient)] to-[var(--theme-main)] opacity-80" />
+});
 const LogoLoop = dynamic(() => import("./components/LogoLoop/LogoLoop"));
 const ProjectCard = dynamic(() => import("./components/ProjectCard"));
 const ProjectModal = dynamic(() => import("./components/ProjectModal"));
@@ -24,7 +42,8 @@ import {
   researchData,
   organizationsData,
   achievements,
-  Project
+  Project,
+  aboutModalData
 } from "./data/portfolio";
 
 export default function Home() {
@@ -296,8 +315,8 @@ export default function Home() {
   }), [achievementTargetById]);
 
   return (
-    <div id="profile" className="min-h-screen overflow-x-hidden bg-[#101010] relative pt-0 pb-10">
-      <a href="#about" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-[#C6F10E] text-black px-4 py-2 z-[1000] rounded-md font-bold">
+    <div id="profile" className="min-h-screen overflow-x-hidden bg-[var(--theme-main)] relative pt-0 pb-10">
+      <a href="#about" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-[var(--theme-accent)] text-[var(--theme-main)] px-4 py-2 z-[1000] rounded-md font-bold">
         Skip to content
       </a>
 
@@ -317,10 +336,10 @@ export default function Home() {
           <div style={{ width: '100%', height: '100%', position: 'relative', WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%)', maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%)' }}>
             {!isLowPerformanceMode ? (
               <>
-                <ColorBends colors={["#19382e"]} rotation={90} speed={0.2} scale={1} frequency={1} warpStrength={1} mouseInfluence={1} noise={0.15} parallax={0.5} iterations={1} intensity={1.5} bandWidth={6} transparent autoRotate={0} />
+                <ColorBends colors={["#10282b"]} rotation={90} speed={0.2} scale={1} frequency={1} warpStrength={1} mouseInfluence={1} noise={0.15} parallax={0.5} iterations={1} intensity={1.5} bandWidth={6} transparent autoRotate={0} />
               </>
             ) : (
-              <div className="absolute inset-0 bg-gradient-to-br from-[#101010] via-[#15241e] to-[#101010] opacity-80" />
+              <div className="absolute inset-0 bg-gradient-to-br from-[var(--theme-main)] via-[var(--theme-bg-gradient)] to-[var(--theme-main)] opacity-80" />
             )}
           </div>
         </div>
@@ -328,22 +347,20 @@ export default function Home() {
           <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 xl:gap-0 w-full min-h-[100svh] xl:min-h-screen">
             <div className={`col-span-1 h-full relative z-10 order-2 xl:order-1 ${!isLowPerformanceMode ? 'xl:col-span-6' : 'xl:col-span-12'}`}>
               <div className={`flex ${!isLowPerformanceMode ? 'items-start xl:items-center' : 'items-center'} h-full w-full`}>
-                <div className={`flex flex-col gap-6 ${!isLowPerformanceMode ? '-mt-28 sm:-mt-20 md:-mt-10 lg:-mt-64 xl:mt-0' : 'w-full max-w-5xl mx-auto mt-16 sm:mt-24'} transition-opacity duration-300 ${!pageReady ? 'opacity-0 invisible' : 'opacity-100 visible'}`}>
-                  <AnimatedContent distance={100} direction="vertical" reverse={false} duration={0.8} ease="power3.out" initialOpacity={0} animateOpacity scale={1} threshold={0.1} delay={0}>
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 mt-0 sm:mt-0 md:mt-14">
-                      <p className="text-lg sm:text-2xl text-white font-bold">Open to Position as a</p>
-                      <RotatingText texts={['Data Analyst', 'Data Scientist', 'Risk Analyst', 'Management Trainee']} mainClassName="text-[#C6F10E] overflow-hidden text-lg sm:text-2xl font-bold inline-flex" staggerFrom="first" initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "-120%" }} staggerDuration={0.025} splitLevelClassName="overflow-hidden" transition={{ type: "spring", damping: 30, stiffness: 400 }} rotationInterval={2000} animatePresenceMode="wait" animatePresenceInitial={false} splitBy="characters" auto loop />
-                    </div>
-                  </AnimatedContent>
+                <div className={`flex flex-col gap-6 ${!isLowPerformanceMode ? '-mt-28 sm:-mt-20 md:-mt-10 lg:-mt-64 xl:mt-0' : 'w-full max-w-5xl mx-auto mt-0 sm:mt-4'}`}>
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 mt-0 sm:mt-0 md:mt-14">
+                    <p className="text-lg sm:text-2xl text-white font-bold">Open to Position as a</p>
+                    <RotatingText texts={['Data Analyst', 'Data Scientist', 'Risk Analyst', 'Management Trainee']} mainClassName="text-[var(--theme-accent)] overflow-hidden text-lg sm:text-2xl font-bold inline-flex" staggerFrom="first" initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "-120%" }} staggerDuration={0.025} splitLevelClassName="overflow-hidden" transition={{ type: "spring", damping: 30, stiffness: 400 }} rotationInterval={2000} animatePresenceMode="wait" animatePresenceInitial={false} splitBy="characters" auto loop />
+                  </div>
                   <h1 className="flex flex-col items-start gap-4">
-                    <SplitText text="I'm Maulana Raji Shofil Fuadi" className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-semibold text-start whitespace-normal lg:whitespace-nowrap" textAlign="left" delay={50} from={{ opacity: 0, transform: 'translate3d(0,50px,0)' }} to={{ opacity: 1, transform: 'translate3d(0,0,0)' }} threshold={0.1} rootMargin="-0px" />
-                    <SplitText text="Actuarial Science Graduate" className="text-xl sm:text-2xl md:text-4xl lg:text-5xl font-semibold text-start text-[#C6F10E]" textAlign="left" delay={75} from={{ opacity: 0, transform: 'translate3d(0,50px,0)' }} to={{ opacity: 1, transform: 'translate3d(0,0,0)' }} threshold={0.1} rootMargin="-0px" />
+                    <span className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-semibold text-start whitespace-normal lg:whitespace-nowrap text-white">I'm Maulana Raji Shofil Fuadi</span>
+                    <span className="text-xl sm:text-2xl md:text-4xl lg:text-5xl font-semibold text-start text-[var(--theme-accent)]">Actuarial Science Graduate</span>
                   </h1>
                   <div className="flex flex-col items-start">
-                    <BlurText text="Based in Makassar • Open to Remote / Relocation" delay={15} animateBy="words" direction="top" className="text-sm sm:text-base font-medium text-white/70 mb-4" />
-                    <BlurText text="Built ML models that predict food security for 127 regional points. Automated 5,000+ monthly data entries. Led a 76-member student organization to a national championship." delay={20} animateBy="words" direction="top" className="text-base sm:text-lg md:text-xl mb-6 md:mb-8 max-w-xl sm:max-w-2xl md:max-w-3xl" />
+                    <p className="text-sm sm:text-base font-medium text-white/70 mb-4">Based in Makassar, South Sulawesi, Indonesia</p>
+                    <p className="text-base sm:text-lg md:text-xl mb-6 md:mb-8 text-white">I turn numbers into decisions. My background is a unique blend of actuarial science, research nerd, and proven leadership. Driven by curiosity, I'm always chasing the next frontier, currently pushing into AI automation.</p>
                     <div className="flex flex-wrap gap-4 mt-2 mb-6 md:mb-8">
-                      <Link href="/journey" className="px-6 py-3 bg-[#C6F10E] text-black font-bold rounded-full hover:scale-105 transition-transform duration-300">
+                      <Link href="/journey" className="px-6 py-3 bg-[var(--theme-accent)] text-[var(--theme-main)] font-bold rounded-full hover:scale-105 transition-transform duration-300">
                         See My Journey
                       </Link>
                       <a href="#projects" className="px-6 py-3 bg-white/10 text-white font-bold rounded-full border border-white/20 hover:bg-white/20 transition-colors duration-300">
@@ -370,44 +387,81 @@ export default function Home() {
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
           <h2 className="text-3xl sm:text-4xl font-semibold text-white mb-6">About Me</h2>
           <div className="bg-[#111111] border border-white/15 rounded-3xl p-6 sm:p-10 shadow-[0_20px_60px_rgba(255,255,255,0.05)]">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-              <div className="space-y-6">
-                <p className="text-white/80 leading-relaxed text-base sm:text-lg">
-                  Hello! I'm a passionate Data Analyst and Actuarial Science graduate.
-                  My journey blends rigorous statistical modeling with a deep interest in modern
-                  AI automation and business intelligence. I thrive at the intersection of
-                  complex data and actionable decision-making.
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+
+              {/* ROW 1: Bio + Education */}
+              {/* Bio: Left, 2/3 width */}
+              <div className="space-y-6 lg:col-span-2">
+                <p className="text-white leading-relaxed text-base sm:text-lg">
+                  I don't fit neatly into one box. Analytically trained in actuarial science and certified in data analytics, I'm equally drawn to the creative and human side of problem solving. I research things, build things, and lead people along the way. The common thread across all of it? Curiosity, and a refusal to stop at good enough.
                 </p>
-                <div className="space-y-4">
-                  <h3 className="text-[#C6F10E] font-semibold text-xl">Technical Stack</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {['Python', 'SQL', 'Power BI', 'Streamlit', 'n8n', 'Next.js', 'Machine Learning', 'Data Visualization'].map((skill) => (
-                      <span key={skill} className="px-4 py-2 bg-white/5 border border-white/10 rounded-full text-sm text-white/90">
-                        {skill}
-                      </span>
-                    ))}
+              </div>
+
+              {/* Education: Right, 1/3 width */}
+              <div className="space-y-3 lg:col-span-1">
+                <h3 className="text-[var(--theme-accent)] font-semibold text-xl">Education</h3>
+                <div className="cursor-pointer group bg-white/5 p-4 rounded-2xl border border-white/10 space-y-1 transition-all duration-300 hover:border-white/30 hover:bg-white/10" onClick={() => openProjectModal(aboutModalData.education)}>
+                  <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-1">
+                    <p className="font-medium text-white text-sm">Hasanuddin University</p>
+                    <p className="text-white/60 text-xs whitespace-nowrap">Aug 2021 – Feb 2026</p>
                   </div>
+                  <p className="text-white/80 text-xs">Bachelor of Actuarial Science</p>
                 </div>
               </div>
-              <div className="space-y-6">
-                <div className="space-y-2">
-                  <h3 className="text-white font-semibold text-xl">Education</h3>
-                  <div className="bg-white/5 p-4 rounded-2xl border border-white/10 space-y-2">
+
+              {/* ROW 2: Tech Stack, Certifications, Scholarships */}
+              {/* Tech Stack */}
+              <div className="space-y-3 lg:col-span-1">
+                <h3 className="text-[var(--theme-accent)] font-semibold text-xl">Technical Stack</h3>
+                <div className="flex flex-wrap gap-2">
+                  {['Machine Learning', 'Predictive Modelling', 'n8n', 'SQL', 'R', 'Power BI', 'Looker Studio', 'Tableau', 'Excel', 'Canva'].map((skill) => (
+                    <span key={skill} className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-sm text-white/90">
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Certifications */}
+              <div className="space-y-3 lg:col-span-1">
+                <h3 className="text-[var(--theme-accent)] font-semibold text-xl">Certifications</h3>
+                <div className="space-y-3">
+                  <div className="cursor-pointer group bg-white/5 p-4 rounded-2xl border border-white/10 space-y-1 transition-all duration-300 hover:border-white/30 hover:bg-white/10" onClick={() => openProjectModal(aboutModalData.cert_data_analyst)}>
                     <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-1">
-                      <p className="font-medium text-white">Hasanuddin University</p>
-                      <p className="text-white/60 text-sm whitespace-nowrap">Aug 2021 – Feb 2026</p>
+                      <p className="font-medium text-white text-sm">Data Analyst</p>
+                      <p className="text-white/60 text-xs whitespace-nowrap">Oct 2024</p>
                     </div>
-                    <p className="text-white/80 text-sm">Bachelor of Actuarial Science • GPA: 3.51/4.00</p>
-                    <p className="text-white/60 text-sm">Scholarships: BSI Scholarship Prestasi (2022), BSI Scholarship Talenta (2024)</p>
+                    <p className="text-white/80 text-xs">National Professional Certification Agency</p>
+                  </div>
+                  <div className="cursor-pointer group bg-white/5 p-4 rounded-2xl border border-white/10 space-y-1 transition-all duration-300 hover:border-white/30 hover:bg-white/10" onClick={() => openProjectModal(aboutModalData.cert_data_science)}>
+                    <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-1">
+                      <p className="font-medium text-white text-sm">Data Science & AI</p>
+                      <p className="text-white/60 text-xs whitespace-nowrap">Feb 2024 - Jun 2024</p>
+                    </div>
+                    <p className="text-white/80 text-xs">Startup Campus</p>
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <h3 className="text-white font-semibold text-xl">Interests</h3>
-                  <p className="text-white/80 leading-relaxed text-base">
-                    Beyond writing code and querying databases, I love analyzing business trends, participating in scientific research competitions, and enjoying a good game of softball.
-                  </p>
+              </div>
+
+              {/* Scholarships */}
+              <div className="space-y-3 lg:col-span-1">
+                <h3 className="text-[var(--theme-accent)] font-semibold text-xl">Scholarships</h3>
+                <div className="space-y-3">
+                  {[
+                    { name: 'BSI Scholarship Prestasi', year: '2022', desc: 'Bank Syariah Indonesia', modalData: aboutModalData.schol_prestasi },
+                    { name: 'BSI Scholarship Talenta', year: '2024', desc: 'Bank Syariah Indonesia', modalData: aboutModalData.schol_talenta },
+                  ].map((s) => (
+                    <div key={s.name} className="cursor-pointer group bg-white/5 p-4 rounded-2xl border border-white/10 space-y-1 transition-all duration-300 hover:border-white/30 hover:bg-white/10" onClick={() => openProjectModal(s.modalData)}>
+                      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-1">
+                        <p className="font-medium text-white text-sm">{s.name}</p>
+                        <p className="text-white/60 text-xs whitespace-nowrap">{s.year}</p>
+                      </div>
+                      <p className="text-white/80 text-xs">{s.desc}</p>
+                    </div>
+                  ))}
                 </div>
               </div>
+
             </div>
           </div>
         </div>
@@ -474,7 +528,7 @@ export default function Home() {
               pauseOnHover
               enableDrag
               fadeOut
-              fadeOutColor="#101010"
+              fadeOutColor="var(--theme-main)"
               ariaLabel="Achievements"
             />
           </div>
@@ -510,7 +564,7 @@ export default function Home() {
 
             {/* Right: Download CV */}
             <div className="w-full md:w-1/3 flex justify-center md:justify-end">
-              <a href="/assets/cv.pdf" target="_blank" rel="noopener noreferrer" className="px-8 py-3 bg-[#C6F10E] text-black font-bold rounded-full hover:scale-105 transition-transform duration-300 whitespace-nowrap">
+              <a href="/assets/cv.pdf" target="_blank" rel="noopener noreferrer" className="px-8 py-3 bg-[var(--theme-accent)] text-[var(--theme-main)] font-bold rounded-full hover:scale-105 transition-transform duration-300 whitespace-nowrap">
                 Download CV
               </a>
             </div>
