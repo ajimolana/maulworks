@@ -132,18 +132,14 @@ export default function PillNav({ items, forceClose, togglePerformanceMode, isGy
         className={`fixed top-0 inset-x-0 z-[100] flex justify-center px-2 lg:px-6 pointer-events-none transition-opacity duration-300 ${forceClose ? "opacity-0" : "opacity-100"
           }`}
       >
-        <motion.div
-          layout
-          transition={{ type: "spring", bounce: 0, duration: 1.2 }}
-          className={`pointer-events-auto flex items-center justify-between overflow-hidden mt-2 lg:mt-4 py-2 border ${isScrolled
+        <div
+          className={`pointer-events-auto flex items-center justify-between overflow-hidden mt-2 lg:mt-4 py-2 border transition-all duration-[800ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${isScrolled
             ? "bg-[#111111]/80 backdrop-blur-md rounded-full border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.4)] px-4 lg:px-6 w-full lg:max-w-[1366px]"
             : "bg-transparent rounded-none border-transparent px-4 lg:px-6 w-full lg:max-w-[1680px]"
             }`}
         >
           {/* LOGO / TITLE */}
-          <motion.div
-            layout
-            transition={{ type: "spring", bounce: 0, duration: 1.2 }}
+          <div
             className="flex-shrink-0 flex items-center gap-2 font-semibold tracking-tight transition-colors text-white text-lg"
           >
             <button
@@ -194,27 +190,27 @@ export default function PillNav({ items, forceClose, togglePerformanceMode, isGy
             <Link
               href={homeHref || "#profile"}
               onClick={() => handleItemClick("profile")}
-              className={`relative px-4 py-2 flex items-center transition-colors rounded-full ${activeItem === "profile" ? "text-white lg:text-black" : "hover:text-white/80"}`}
+              className={`relative px-4 py-2 flex items-center transition-colors rounded-full ${activeItem === "profile" ? "text-white xl:text-black" : "hover:text-white/80"}`}
             >
               {activeItem === "profile" && (
                 pillReady ? (
                   <motion.div
                     layoutId="pillNavActiveBackground"
-                    className="absolute inset-0 bg-white rounded-full hidden lg:block"
+                    className="absolute inset-0 bg-white rounded-full hidden xl:block"
                     transition={{ type: "spring", stiffness: 350, damping: 30 }}
                   />
                 ) : (
-                  <div className="absolute inset-0 bg-white rounded-full hidden lg:block" />
+                  <div className="absolute inset-0 bg-white rounded-full hidden xl:block" />
                 )
               )}
               <span className="relative z-10 flex items-center">
                 {titleOverride || "Maulana's Portfolio"}
               </span>
             </Link>
-          </motion.div>
+          </div>
 
           {/* DESKTOP LINKS */}
-          <motion.div layout transition={{ type: "spring", bounce: 0, duration: 1.2 }} className="hidden lg:flex items-center gap-1">
+          <div className="hidden xl:flex items-center gap-1 transition-all duration-[800ms] ease-[cubic-bezier(0.16,1,0.3,1)]">
             {items.map((item) => {
               const isActive = activeItem === item.id;
               return (
@@ -222,7 +218,7 @@ export default function PillNav({ items, forceClose, togglePerformanceMode, isGy
                   key={item.id}
                   href={item.href}
                   onClick={() => handleItemClick(item.id)}
-                  className={`relative px-4 py-2 text-[14px] font-medium transition-colors rounded-full whitespace-nowrap ${isActive ? "text-black" : item.id === "journey" ? "bg-white/10 text-white border border-white/20 hover:bg-white/20" : "text-white/70 hover:text-white"
+                  className={`relative px-4 py-2 text-[14px] font-medium transition-colors rounded-full whitespace-nowrap ${isActive ? (item.id === "journey" ? "text-black border border-transparent" : "text-black") : item.id === "journey" ? "bg-white/10 text-white border border-white/20 hover:bg-white/20" : "text-white/70 hover:text-white"
                     }`}
                 >
                   {isActive && (
@@ -240,10 +236,10 @@ export default function PillNav({ items, forceClose, togglePerformanceMode, isGy
                 </Link>
               );
             })}
-          </motion.div>
+          </div>
 
           {/* MOBILE BURGER */}
-          <motion.div layout transition={{ type: "spring", bounce: 0, duration: 1.2 }} className="lg:hidden flex items-center">
+          <div className="xl:hidden flex items-center transition-all duration-[800ms] ease-[cubic-bezier(0.16,1,0.3,1)]">
             <button
               className="text-white p-2 focus:outline-none"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -264,8 +260,8 @@ export default function PillNav({ items, forceClose, togglePerformanceMode, isGy
                 />
               </div>
             </button>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       </div>
 
       {/* MOBILE FULLSCREEN MENU */}
@@ -276,45 +272,71 @@ export default function PillNav({ items, forceClose, togglePerformanceMode, isGy
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
-            className={`fixed inset-0 z-[99] bg-[#111111]/95 backdrop-blur-xl flex flex-col items-center justify-center gap-6 pt-20 pb-10 px-4 pointer-events-auto ${forceClose ? "hidden" : "flex"
+            className={`fixed inset-0 z-[99] bg-[#111111]/95 backdrop-blur-xl flex flex-col pt-20 pb-8 px-6 pointer-events-auto ${forceClose ? "hidden" : "flex"
               }`}
           >
-            {items.map((item) => {
-              const isActive = activeItem === item.id;
-              return (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  key={item.id}
-                >
-                  <Link
-                    href={item.href}
-                    onClick={() => {
-                      handleItemClick(item.id);
-                      setMobileMenuOpen(false);
-                    }}
-                    className={`text-2xl font-semibold tracking-wide transition-colors ${isActive ? "text-[#C6F10E]" : "text-white/70 hover:text-white"
-                      }`}
+            {/* NAV LINKS — centered in their own flex-1 zone */}
+            <div className="flex-1 flex flex-col items-center justify-center gap-6">
+              {items.map((item) => {
+                const isActive = activeItem === item.id;
+                return (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    key={item.id}
                   >
-                    {item.label}
-                  </Link>
-                </motion.div>
-              );
-            })}
+                    <Link
+                      href={item.href}
+                      onClick={() => {
+                        handleItemClick(item.id);
+                        setMobileMenuOpen(false);
+                      }}
+                      className={`block text-2xl font-semibold tracking-wide transition-all ${
+                        isActive ? "text-[#C6F10E]" : "text-white/70 hover:text-white"
+                      } ${item.id === "journey" ? "underline underline-offset-8 decoration-[#C6F10E]" : ""}`}
+                    >
+                      {item.label}
+                    </Link>
+                  </motion.div>
+                );
+              })}
+            </div>
 
-            {/* GYRO SWITCH AT BOTTOM */}
-            {toggleGyro && (
-              <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex items-center gap-3">
-                <span className="text-white/80 font-medium tracking-wide text-sm">Enable Gyro</span>
-                <button
-                  onClick={toggleGyro}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isGyroEnabled ? 'bg-[#C6F10E]' : 'bg-white/20'}`}
-                >
-                  <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-black transition-transform ${isGyroEnabled ? 'translate-x-6' : 'translate-x-1'}`}
-                  />
-                </button>
+            {/* SETTINGS — always pinned at bottom */}
+            {(toggleGyro || togglePerformanceMode) && (
+              <div className="flex flex-col items-center gap-4 w-full">
+                <div className="w-full border-t border-white/10 mb-2" />
+                {toggleGyro && (
+                  <div className={`flex items-center gap-3 justify-between w-full max-w-xs transition-opacity duration-300 ${isLowPerformanceMode ? 'opacity-40 pointer-events-none' : 'opacity-100'}`}>
+                    <div className="flex items-baseline gap-1.5">
+                      <span className="text-white/80 font-medium tracking-wide text-sm">Enable Gyro</span>
+                      <span className="text-white/30 text-xs tracking-wide">for Lanyard</span>
+                    </div>
+                    <button
+                      onClick={toggleGyro}
+                      disabled={isLowPerformanceMode}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isGyroEnabled ? 'bg-[#C6F10E]' : 'bg-white/20'}`}
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-black transition-transform ${isGyroEnabled ? 'translate-x-6' : 'translate-x-1'}`}
+                      />
+                    </button>
+                  </div>
+                )}
+                {togglePerformanceMode && (
+                  <div className="flex items-center gap-3 justify-between w-full max-w-xs">
+                    <span className="text-white/80 font-medium tracking-wide text-sm">Low Performance Mode</span>
+                    <button
+                      onClick={togglePerformanceMode}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isLowPerformanceMode ? 'bg-[#C6F10E]' : 'bg-white/20'}`}
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-black transition-transform ${isLowPerformanceMode ? 'translate-x-6' : 'translate-x-1'}`}
+                      />
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </motion.div>
