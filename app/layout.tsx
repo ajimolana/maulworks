@@ -12,17 +12,31 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Maulana's Portfolio",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'https://maulworks.vercel.app'),
+  title: {
+    default: "Maulana's Portfolio",
+    template: "%s | Maulana's Portfolio",
+  },
   description: "Explore the portfolio of Maulana Raji Shofil Fuadi, a Data Analyst and Actuarial Science graduate specializing in AI automation and data-driven insights.",
   openGraph: {
     title: "Maulana's Portfolio",
     description: "Explore the portfolio of Maulana Raji Shofil Fuadi, a Data Analyst and Actuarial Science graduate specializing in AI automation and data-driven insights.",
     siteName: "Maulana's Portfolio",
     type: "website",
+    images: [
+      {
+        url: '/og-image.png', // You should place an og-image.png (1200x630) in your /public folder
+        width: 1200,
+        height: 630,
+        alt: "Maulana's Portfolio Preview"
+      }
+    ]
   },
   twitter: {
     card: "summary_large_image",
     title: "Maulana's Portfolio",
+    description: "Explore the portfolio of Maulana Raji Shofil Fuadi, a Data Analyst and Actuarial Science graduate specializing in AI automation and data-driven insights.",
+    images: ['/og-image.png'],
   },
 };
 
