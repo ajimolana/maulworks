@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import RotatingText from "./components/RotatingText/RotatingText";
 import SplitText from "./components/SplitText/SplitText";
 import BlurText from "./components/BlurText/BlurText";
 import AnimatedContent from "./components/AnimatedContent/AnimatedContent";
 import PillNav from "./components/PillNav/PillNav";
 import dynamic from "next/dynamic";
+import { usePerformanceMode } from "@/lib/usePerformanceMode";
 
 const Lanyard = dynamic(() => import("./components/Lanyard/Lanyard"), { ssr: false });
 const ColorBends = dynamic(() => import("./components/ColorBends/ColorBends"), { ssr: false });
@@ -41,56 +42,43 @@ export default function Home() {
   const [isGyroEnabled, setIsGyroEnabled] = useState(false);
 
   const [pageReady, setPageReady] = useState(false);
-  const [isLowPerformanceMode, setIsLowPerformanceMode] = useState(false);
+
+  const { isLowPerformanceMode, togglePerformanceMode } = usePerformanceMode();
 
   useEffect(() => {
     setPageReady(true);
 
-    const checkPerformance = () => {
-      const storedPref = localStorage.getItem("performanceMode");
-      if (storedPref) {
-        setIsLowPerformanceMode(storedPref === "low");
-        return;
-      }
+    // Conditionally preload Lanyard assets if performance mode is high
+    if (!isLowPerformanceMode) {
+      const preloadAssets = [
+        { href: "/assets/lanyard/card.glb", as: "fetch", crossOrigin: "anonymous" },
+        { href: "/assets/lanyard/lanyard.png", as: "image" }
+      ];
 
-      const hardwareConcurrency = navigator.hardwareConcurrency || 4;
-      const isLowEndHardware = hardwareConcurrency < 4;
-      const isMobile = window.innerWidth < 768;
-      const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-      setIsLowPerformanceMode(prefersReducedMotion || (isLowEndHardware && isMobile));
-    };
-
-    checkPerformance();
-
-    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const handleMotionChange = (e: MediaQueryListEvent) => {
-      const storedPref = localStorage.getItem("performanceMode");
-      if (storedPref) return;
-      if (e.matches) setIsLowPerformanceMode(true);
-      else checkPerformance();
-    };
-
-    mediaQuery.addEventListener("change", handleMotionChange);
-    return () => mediaQuery.removeEventListener("change", handleMotionChange);
-  }, []);
-
-  const togglePerformanceMode = () => {
-    setIsLowPerformanceMode((prev) => {
-      const newMode = !prev;
-      localStorage.setItem("performanceMode", newMode ? "low" : "high");
-      return newMode;
-    });
-  };
+      preloadAssets.forEach(asset => {
+        if (!document.querySelector(`link[href="${asset.href}"]`)) {
+          const link = document.createElement("link");
+          link.rel = "preload";
+          link.href = asset.href;
+          link.as = asset.as;
+          if (asset.crossOrigin) link.crossOrigin = asset.crossOrigin;
+          document.head.appendChild(link);
+        }
+      });
+    }
+  }, [isLowPerformanceMode]);
 
   useEffect(() => {
+    const mql1366 = window.matchMedia("(min-width: 1366px)");
+    const mql1024 = window.matchMedia("(min-width: 1024px) and (max-width: 1365px)");
+    const mql768 = window.matchMedia("(min-width: 768px) and (max-width: 1023px)");
+
     const updateLanyardOffset = () => {
-      const width = window.innerWidth;
-      if (width >= 1366) {
+      if (mql1366.matches) {
         setLanyardOffsetY(0.4);
-      } else if (width >= 1024) {
+      } else if (mql1024.matches) {
         setLanyardOffsetY(0.6);
-      } else if (width >= 768) {
+      } else if (mql768.matches) {
         setLanyardOffsetY(-0.8);
       } else {
         setLanyardOffsetY(0);
@@ -98,8 +86,15 @@ export default function Home() {
     };
 
     updateLanyardOffset();
-    window.addEventListener("resize", updateLanyardOffset);
-    return () => window.removeEventListener("resize", updateLanyardOffset);
+    mql1366.addEventListener("change", updateLanyardOffset);
+    mql1024.addEventListener("change", updateLanyardOffset);
+    mql768.addEventListener("change", updateLanyardOffset);
+
+    return () => {
+      mql1366.removeEventListener("change", updateLanyardOffset);
+      mql1024.removeEventListener("change", updateLanyardOffset);
+      mql768.removeEventListener("change", updateLanyardOffset);
+    };
   }, []);
 
   const navItems = [
@@ -202,18 +197,12 @@ export default function Home() {
 
   useEffect(() => {
     if (isOverlayOpen) {
-      const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
       document.body.style.overflow = "hidden";
-      if (scrollBarWidth > 0) {
-        document.body.style.paddingRight = `${scrollBarWidth}px`;
-      }
     } else {
       document.body.style.overflow = "";
-      document.body.style.paddingRight = "";
     }
     return () => {
       document.body.style.overflow = "";
-      document.body.style.paddingRight = "";
     };
   }, [isOverlayOpen]);
 
@@ -231,13 +220,14 @@ export default function Home() {
   const closeLightbox = () => window.history.back();
   const setLightboxIndex = (index: number) => setLightbox(prev => ({ ...prev, index }));
 
-  const achievementTargetById = (id: string) =>
+  const achievementTargetById = useCallback((id: string) =>
     researchData.find((project) => project.id === id) ||
     projectsData.find((project) => project.id === id) ||
     experiencesData.find((project) => project.id === id) ||
-    organizationsData.find((project) => project.id === id);
+    organizationsData.find((project) => project.id === id)
+    , []);
 
-  const techLogos = achievements.map((item, index) => {
+  const techLogos = useMemo(() => achievements.map((item, index) => {
     const combinedTitle = item.title.trim();
     const isExternal = item.href?.startsWith("http");
     const targetId = item.href?.startsWith("#") ? item.href.slice(1) : undefined;
@@ -303,7 +293,7 @@ export default function Home() {
       title: combinedTitle,
       ariaLabel: `Achievement ${index + 1}`
     };
-  });
+  }), [achievementTargetById]);
 
   return (
     <div id="profile" className="min-h-screen overflow-x-hidden bg-[#101010] relative pt-0 pb-10">
@@ -334,24 +324,24 @@ export default function Home() {
             )}
           </div>
         </div>
-        <div className={`mx-auto max-w-[1366px] min-h-screen px-4 sm:px-6 ${isLowPerformanceMode ? 'flex items-center' : ''}`}>
-          <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 xl:gap-0 w-full">
+        <div className={`mx-auto max-w-[1366px] min-h-[100svh] xl:min-h-screen px-4 sm:px-6 ${isLowPerformanceMode ? 'flex items-center' : 'flex items-center xl:items-stretch'}`}>
+          <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 xl:gap-0 w-full min-h-[100svh] xl:min-h-screen">
             <div className={`col-span-1 h-full relative z-10 order-2 xl:order-1 ${!isLowPerformanceMode ? 'xl:col-span-6' : 'xl:col-span-12'}`}>
               <div className={`flex ${!isLowPerformanceMode ? 'items-start xl:items-center' : 'items-center'} h-full w-full`}>
-                <div className={`flex flex-col gap-6 ${!isLowPerformanceMode ? '-mt-28 sm:-mt-20 md:-mt-10 lg:-mt-64 xl:mt-0' : 'w-full max-w-5xl mx-auto'} transition-opacity duration-300 ${!pageReady ? 'opacity-0 invisible' : 'opacity-100 visible'}`}>
+                <div className={`flex flex-col gap-6 ${!isLowPerformanceMode ? '-mt-28 sm:-mt-20 md:-mt-10 lg:-mt-64 xl:mt-0' : 'w-full max-w-5xl mx-auto mt-16 sm:mt-24'} transition-opacity duration-300 ${!pageReady ? 'opacity-0 invisible' : 'opacity-100 visible'}`}>
                   <AnimatedContent distance={100} direction="vertical" reverse={false} duration={0.8} ease="power3.out" initialOpacity={0} animateOpacity scale={1} threshold={0.1} delay={0}>
                     <div className="flex flex-col sm:flex-row sm:items-center gap-2 mt-0 sm:mt-0 md:mt-14">
-                      <h1 className="text-lg sm:text-2xl text-white font-bold">Open to Position as a</h1>
-                      <RotatingText texts={['Data Analyst', 'Data Scientist', 'Risk Analyst', 'Management Trainee']} mainClassName="px-2 sm:px-2 md:px-3 bg-[#C6F10E] text-black overflow-hidden py-0.5 sm:py-1 justify-center rounded-lg text-lg sm:text-2xl font-bold inline-flex transition-all" staggerFrom="last" initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "-120%" }} staggerDuration={0.025} splitLevelClassName="overflow-hidden pb-0.5 sm:pb-1 md:pb-1" transition={{ type: "spring", damping: 30, stiffness: 400 }} rotationInterval={2000} animatePresenceMode="wait" animatePresenceInitial={false} splitBy="characters" auto loop />
+                      <p className="text-lg sm:text-2xl text-white font-bold">Open to Position as a</p>
+                      <RotatingText texts={['Data Analyst', 'Data Scientist', 'Risk Analyst', 'Management Trainee']} mainClassName="text-[#C6F10E] overflow-hidden text-lg sm:text-2xl font-bold inline-flex" staggerFrom="first" initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "-120%" }} staggerDuration={0.025} splitLevelClassName="overflow-hidden" transition={{ type: "spring", damping: 30, stiffness: 400 }} rotationInterval={2000} animatePresenceMode="wait" animatePresenceInitial={false} splitBy="characters" auto loop />
                     </div>
                   </AnimatedContent>
-                  <div className="flex flex-col items-start gap-4">
+                  <h1 className="flex flex-col items-start gap-4">
                     <SplitText text="I'm Maulana Raji Shofil Fuadi" className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-semibold text-start whitespace-normal lg:whitespace-nowrap" textAlign="left" delay={50} from={{ opacity: 0, transform: 'translate3d(0,50px,0)' }} to={{ opacity: 1, transform: 'translate3d(0,0,0)' }} threshold={0.1} rootMargin="-0px" />
                     <SplitText text="Actuarial Science Graduate" className="text-xl sm:text-2xl md:text-4xl lg:text-5xl font-semibold text-start text-[#C6F10E]" textAlign="left" delay={75} from={{ opacity: 0, transform: 'translate3d(0,50px,0)' }} to={{ opacity: 1, transform: 'translate3d(0,0,0)' }} threshold={0.1} rootMargin="-0px" />
-                  </div>
+                  </h1>
                   <div className="flex flex-col items-start">
                     <BlurText text="Based in Makassar • Open to Remote / Relocation" delay={15} animateBy="words" direction="top" className="text-sm sm:text-base font-medium text-white/70 mb-4" />
-                    <BlurText text="Built ML models that predict food security for 127 regional points. Automated 5,000+ monthly data entries. Led a 76-member student organization to a national championship." delay={20} animateBy="words" direction="top" className="text-base sm:text-lg md:text-xl mb-6 md:mb-8 max-w-xl sm:max-w-2xl md:max-w-7xl" />
+                    <BlurText text="Built ML models that predict food security for 127 regional points. Automated 5,000+ monthly data entries. Led a 76-member student organization to a national championship." delay={20} animateBy="words" direction="top" className="text-base sm:text-lg md:text-xl mb-6 md:mb-8 max-w-xl sm:max-w-2xl md:max-w-3xl" />
                     <div className="flex flex-wrap gap-4 mt-2 mb-6 md:mb-8">
                       <Link href="/journey" className="px-6 py-3 bg-[#C6F10E] text-black font-bold rounded-full hover:scale-105 transition-transform duration-300">
                         See My Journey
@@ -364,8 +354,8 @@ export default function Home() {
                 </div>
               </div>
             </div>
-            <div className={`col-span-1 xl:col-span-6 relative z-0 overflow-visible order-1 xl:order-2 ${!isLowPerformanceMode ? '-mt-56 sm:-mt-64 md:-mt-80 lg:-mt-10 xl:-mt-0' : 'hidden'}`}>
-              <div className="relative w-[280%] -ml-[90%] sm:w-[300%] sm:-ml-[100%] md:w-[350%] md:-ml-[125%] lg:w-[350%] lg:-ml-[125%] xl:w-[400%] xl:-ml-[130%] 2xl:w-[450%] 2xl:-ml-[150%] flex items-center justify-center">
+            <div className={`col-span-1 xl:col-span-6 relative z-0 overflow-visible order-1 xl:order-2 ${!isLowPerformanceMode ? '-mt-40 sm:-mt-48 md:-mt-80 lg:-mt-10 xl:-mt-0' : 'hidden'}`}>
+              <div className="relative h-[100svh] xl:h-screen w-[280%] -ml-[90%] sm:w-[300%] sm:-ml-[100%] md:w-[350%] md:-ml-[125%] lg:w-[350%] lg:-ml-[125%] xl:w-[400%] xl:-ml-[130%] 2xl:w-[450%] 2xl:-ml-[150%] flex items-center justify-center">
                 {!isLowPerformanceMode && (
                   <Lanyard position={[0, 0, 15]} gravity={gyroGravity} lanyardOffsetY={lanyardOffsetY} />
                 )}
@@ -376,7 +366,7 @@ export default function Home() {
       </div>
 
       {/* NEW SECTION: ABOUT ME */}
-      <section id="about" className="w-full mt-10 scroll-mt-24 md:scroll-mt-28">
+      <section id="about" className="w-full mt-20 scroll-mt-24 md:scroll-mt-28">
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
           <h2 className="text-3xl sm:text-4xl font-semibold text-white mb-6">About Me</h2>
           <div className="bg-[#111111] border border-white/15 rounded-3xl p-6 sm:p-10 shadow-[0_20px_60px_rgba(255,255,255,0.05)]">
@@ -492,54 +482,46 @@ export default function Home() {
       </section>
 
       {/* FOOTER */}
-      <footer id="contacts" className="w-full mt-28 mb-20 border-t border-white/10 pt-10 flex flex-col items-center justify-center gap-6 scroll-mt-24 md:scroll-mt-28">
-        <h2 className="text-2xl sm:text-3xl font-semibold text-white">Get in Touch</h2>
+      <footer id="contacts" className="w-full mt-28 border-t border-white/10 pt-10 pb-6 flex flex-col scroll-mt-24 md:scroll-mt-28">
+        <div className="mx-auto max-w-[1366px] w-full px-4 sm:px-6">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-8 md:gap-0 w-full">
+            {/* Left: Get in Touch */}
+            <div className="w-full md:w-1/3 flex justify-center md:justify-start">
+              <h2 className="text-2xl sm:text-3xl font-semibold text-white">Get in Touch</h2>
+            </div>
 
-        <a href="/assets/cv.pdf" target="_blank" rel="noopener noreferrer" className="px-8 py-3 bg-[#C6F10E] text-black font-bold rounded-full hover:scale-105 transition-transform duration-300">
-          Download CV
-        </a>
+            {/* Center: Social Icons */}
+            <div className="w-full md:w-1/3 flex justify-center">
+              <div className="flex items-center gap-6">
+                <a href="mailto:maulanarajisf@gmail.com" target="_blank" rel="noreferrer" className="transition-opacity hover:opacity-80" aria-label="Email Maulana">
+                  <Image src="/assets/footer/mail.svg" alt="Email Logo" width={28} height={28} />
+                </a>
+                <a href="https://github.com/ajimolana" target="_blank" rel="noreferrer" className="transition-opacity hover:opacity-80" aria-label="GitHub Profile">
+                  <Image src="/assets/footer/github.svg" alt="GitHub Logo" width={28} height={28} />
+                </a>
+                <a href="https://linkedin.com/in/maulanaraji/" target="_blank" rel="noreferrer" className="transition-opacity hover:opacity-80" aria-label="LinkedIn Profile">
+                  <Image src="/assets/footer/linkedin.svg" alt="LinkedIn Logo" width={28} height={28} />
+                </a>
+                <a href="https://instagram.com/ajimolana/" target="_blank" rel="noreferrer" className="transition-opacity hover:opacity-80" aria-label="Instagram Profile">
+                  <Image src="/assets/footer/instagram.svg" alt="Instagram Logo" width={28} height={28} />
+                </a>
+              </div>
+            </div>
 
-        <div className="flex items-center justify-center gap-6 mt-2">
-          <a
-            href="mailto:maulanarajisf@gmail.com"
-            target="_blank"
-            rel="noreferrer"
-            className="transition-opacity hover:opacity-80"
-            aria-label="Email Maulana"
-          >
-            <Image src="/assets/footer/mail.svg" alt="Email Logo" width={28} height={28} />
-          </a>
-          <a
-            href="https://github.com/ajimolana"
-            target="_blank"
-            rel="noreferrer"
-            className="transition-opacity hover:opacity-80"
-            aria-label="GitHub Profile"
-          >
-            <Image src="/assets/footer/github.svg" alt="GitHub Logo" width={28} height={28} />
-          </a>
-          <a
-            href="https://linkedin.com/in/maulanaraji/"
-            target="_blank"
-            rel="noreferrer"
-            className="transition-opacity hover:opacity-80"
-            aria-label="LinkedIn Profile"
-          >
-            <Image src="/assets/footer/linkedin.svg" alt="LinkedIn Logo" width={28} height={28} />
-          </a>
-          <a
-            href="https://instagram.com/ajimolana/"
-            target="_blank"
-            rel="noreferrer"
-            className="transition-opacity hover:opacity-80"
-            aria-label="Instagram Profile"
-          >
-            <Image src="/assets/footer/instagram.svg" alt="Instagram Logo" width={28} height={28} />
-          </a>
+            {/* Right: Download CV */}
+            <div className="w-full md:w-1/3 flex justify-center md:justify-end">
+              <a href="/assets/cv.pdf" target="_blank" rel="noopener noreferrer" className="px-8 py-3 bg-[#C6F10E] text-black font-bold rounded-full hover:scale-105 transition-transform duration-300 whitespace-nowrap">
+                Download CV
+              </a>
+            </div>
+          </div>
+
+          <div className="mt-12 md:mt-16 w-full text-center">
+            <p className="text-sm text-[#dfdfdf] px-4">
+              Copyright &copy; 2026 Maulana Raji Shofil Fuadi. All rights reserved.
+            </p>
+          </div>
         </div>
-        <p className="text-sm text-[#dfdfdf] text-center px-4 mt-2">
-          Copyright &copy; 2026 Maulana Raji Shofil Fuadi. All rights reserved.
-        </p>
       </footer>
 
       {/* GLOBAL PROJECT MODAL */}
