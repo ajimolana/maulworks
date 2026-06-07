@@ -3,10 +3,13 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import Timeline from "../components/Timeline/Timeline";
-import ProjectModal from "../components/ProjectModal";
-import Lightbox from "../components/Lightbox";
+import dynamic from "next/dynamic";
+import { usePerformanceMode } from "@/lib/usePerformanceMode";
 import PillNav from "../components/PillNav/PillNav";
-import ColorBends from "../components/ColorBends/ColorBends";
+
+const ColorBends = dynamic(() => import("../components/ColorBends/ColorBends"), { ssr: false });
+const ProjectModal = dynamic(() => import("../components/ProjectModal"));
+const Lightbox = dynamic(() => import("../components/Lightbox"));
 import { Project } from "../data/portfolio";
 
 export default function JourneyPage() {
@@ -18,45 +21,7 @@ export default function JourneyPage() {
     index: 0
   });
 
-  const [isLowPerformanceMode, setIsLowPerformanceMode] = useState(false);
-
-  useEffect(() => {
-    const checkPerformance = () => {
-      const storedPref = localStorage.getItem("performanceMode");
-      if (storedPref) {
-        setIsLowPerformanceMode(storedPref === "low");
-        return;
-      }
-
-      const hardwareConcurrency = navigator.hardwareConcurrency || 4;
-      const isLowEndHardware = hardwareConcurrency < 4;
-      const isMobile = window.innerWidth < 768;
-      const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-      setIsLowPerformanceMode(prefersReducedMotion || (isLowEndHardware && isMobile));
-    };
-
-    checkPerformance();
-
-    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const handleMotionChange = (e: MediaQueryListEvent) => {
-      const storedPref = localStorage.getItem("performanceMode");
-      if (storedPref) return;
-      if (e.matches) setIsLowPerformanceMode(true);
-      else checkPerformance();
-    };
-
-    mediaQuery.addEventListener("change", handleMotionChange);
-    return () => mediaQuery.removeEventListener("change", handleMotionChange);
-  }, []);
-
-  const togglePerformanceMode = () => {
-    setIsLowPerformanceMode((prev) => {
-      const newMode = !prev;
-      localStorage.setItem("performanceMode", newMode ? "low" : "high");
-      return newMode;
-    });
-  };
+  const { isLowPerformanceMode, togglePerformanceMode } = usePerformanceMode();
 
   // 1. BROWSER HISTORY LOGIC
   useEffect(() => {
@@ -88,18 +53,12 @@ export default function JourneyPage() {
 
   useEffect(() => {
     if (isOverlayOpen) {
-      const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
       document.body.style.overflow = "hidden";
-      if (scrollBarWidth > 0) {
-        document.body.style.paddingRight = `${scrollBarWidth}px`;
-      }
     } else {
       document.body.style.overflow = "";
-      document.body.style.paddingRight = "";
     }
     return () => {
       document.body.style.overflow = "";
-      document.body.style.paddingRight = "";
     };
   }, [isOverlayOpen]);
 
@@ -152,9 +111,9 @@ export default function JourneyPage() {
           isLowPerformanceMode={isLowPerformanceMode}
         />
 
-        <div className="max-w-5xl mx-auto mb-10">
-        <h1 className="text-4xl md:text-5xl font-bold text-white">Journey & Milestones</h1>
-        <p className="text-white/60 mt-4 text-lg max-w-2xl">
+        <div className="max-w-5xl mx-auto mb-10 flex flex-col items-center text-center">
+        <h1 className="text-[26px] min-[400px]:text-3xl sm:text-4xl md:text-5xl font-bold text-white whitespace-nowrap">Journey & Milestones</h1>
+        <p className="text-white/60 mt-4 text-base sm:text-lg max-w-2xl md:max-w-none lg:whitespace-nowrap">
           A chronological look at my academic journey, professional experiences, and key achievements.
         </p>
       </div>
