@@ -70,6 +70,11 @@ const RotatingText = forwardRef<RotatingTextRef, RotatingTextProps>(
     ref
   ) => {
     const [currentTextIndex, setCurrentTextIndex] = useState<number>(0);
+    const [isMounted, setIsMounted] = useState<boolean>(false);
+
+    useEffect(() => {
+      setIsMounted(true);
+    }, []);
 
     const splitIntoCharacters = (text: string): string[] => {
       if (typeof Intl !== 'undefined' && Intl.Segmenter) {
@@ -202,7 +207,7 @@ const RotatingText = forwardRef<RotatingTextRef, RotatingTextProps>(
                   {wordObj.characters.map((char, charIndex) => (
                     <motion.span
                       key={charIndex}
-                      initial={initial}
+                      initial={isMounted ? initial : false}
                       animate={animate}
                       exit={exit}
                       transition={{

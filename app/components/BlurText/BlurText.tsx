@@ -47,9 +47,11 @@ const BlurText: React.FC<BlurTextProps> = ({
 }) => {
   const elements = animateBy === 'words' ? text.split(' ') : text.split('');
   const [inView, setInView] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const ref = useRef<HTMLParagraphElement>(null);
 
   useEffect(() => {
+    setIsMounted(true);
     if (!ref.current) return;
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -104,8 +106,8 @@ const BlurText: React.FC<BlurTextProps> = ({
         return (
           <motion.span
             key={index}
-            initial={fromSnapshot}
-            animate={inView ? animateKeyframes : fromSnapshot}
+            initial={false}
+            animate={!isMounted || inView ? animateKeyframes : fromSnapshot}
             transition={spanTransition}
             onAnimationComplete={index === elements.length - 1 ? onAnimationComplete : undefined}
             style={{
