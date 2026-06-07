@@ -180,7 +180,7 @@ export default function PillNav({ items, forceClose, togglePerformanceMode, isGy
                     className="absolute -bottom-1 -right-2 flex items-center justify-center pointer-events-none"
                     title="Low Performance Mode Active"
                   >
-                    <svg viewBox="0 0 24 24" className="w-4 h-4 fill-[#101010] stroke-[#C6F10E] stroke-[2.5] stroke-linecap-round stroke-linejoin-round">
+                    <svg viewBox="0 0 24 24" className="w-4 h-4 fill-[var(--theme-main)] stroke-[var(--theme-accent)] stroke-[2.5] stroke-linecap-round stroke-linejoin-round">
                       <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
                     </svg>
                   </motion.div>
@@ -293,8 +293,8 @@ export default function PillNav({ items, forceClose, togglePerformanceMode, isGy
                         setMobileMenuOpen(false);
                       }}
                       className={`block text-2xl font-semibold tracking-wide transition-all ${
-                        isActive ? "text-[#C6F10E]" : "text-white/70 hover:text-white"
-                      } ${item.id === "journey" ? "underline underline-offset-8 decoration-[#C6F10E]" : ""}`}
+                        isActive ? "text-[var(--theme-accent)]" : "text-white/70 hover:text-white"
+                      } ${item.id === "journey" ? "underline underline-offset-8 decoration-[var(--theme-accent)]" : ""}`}
                     >
                       {item.label}
                     </Link>
@@ -316,7 +316,7 @@ export default function PillNav({ items, forceClose, togglePerformanceMode, isGy
                     <button
                       onClick={toggleGyro}
                       disabled={isLowPerformanceMode}
-                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isGyroEnabled ? 'bg-[#C6F10E]' : 'bg-white/20'}`}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isGyroEnabled ? 'bg-[var(--theme-accent)]' : 'bg-white/20'}`}
                     >
                       <span
                         className={`inline-block h-4 w-4 transform rounded-full bg-black transition-transform ${isGyroEnabled ? 'translate-x-6' : 'translate-x-1'}`}
@@ -329,7 +329,7 @@ export default function PillNav({ items, forceClose, togglePerformanceMode, isGy
                     <span className="text-white/80 font-medium tracking-wide text-sm">Low Performance Mode</span>
                     <button
                       onClick={togglePerformanceMode}
-                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isLowPerformanceMode ? 'bg-[#C6F10E]' : 'bg-white/20'}`}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isLowPerformanceMode ? 'bg-[var(--theme-accent)]' : 'bg-white/20'}`}
                     >
                       <span
                         className={`inline-block h-4 w-4 transform rounded-full bg-black transition-transform ${isLowPerformanceMode ? 'translate-x-6' : 'translate-x-1'}`}
