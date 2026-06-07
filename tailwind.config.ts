@@ -9,6 +9,13 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        theme: {
+          main: "var(--theme-main)",
+          accent: "var(--theme-accent)",
+          bg: {
+            gradient: "var(--theme-bg-gradient)",
+          },
+        },
         border: "var(--border)",
         input: "var(--input)",
         ring: "var(--ring)",
