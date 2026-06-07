@@ -396,18 +396,6 @@ export const organizationsData: Project[] = [
 
 export const achievements: AchievementItem[] = [
   {
-    title: "BSI Scholarship Talenta",
-    competitionType: "Scholarship",
-    organizer: "Bank Syariah Indonesia",
-    date: "2024",
-  },
-  {
-    title: "BSI Scholarship Prestasi",
-    competitionType: "Scholarship",
-    organizer: "Bank Syariah Indonesia",
-    date: "2022",
-  },
-  {
     title: "Top 10 Paper",
     competitionType: "Scientific Paper",
     organizer: "Aksinomi Sulampua, BI Sulsel",
@@ -462,3 +450,84 @@ export const achievements: AchievementItem[] = [
     date: "Dec 2022",
   }
 ];
+
+export const aboutModalData: Record<string, Project> = {
+  education: {
+    id: "about-education",
+    cardTag: "Education",
+    year: "2021-2026",
+    title: "Hasanuddin University",
+    shortDesc: "Bachelor of Actuarial Science",
+    period: "Aug 2021 - Feb 2026",
+    roleLabel: "GPA",
+    role: "3.51/4.00",
+    details: [
+      { label: "Degree", value: "Bachelor of Actuarial Science" },
+      { label: "Domain Knowledge", value: "Insurance, Investment, Supply Chain, Sharia Economic, Risk Management" }
+    ],
+    gallery: []
+  },
+  schol_prestasi: {
+    id: "schol-prestasi",
+    cardTag: "Scholarship",
+    year: "2022",
+    title: "BSI Scholarship Prestasi",
+    shortDesc: "Bank Syariah Indonesia",
+    period: "2022",
+    roleLabel: "Issuer",
+    role: "Bank Syariah Indonesia",
+    details: [
+      { label: "Awarded", value: "2022" },
+      { label: "Description", value: "Awarded for outstanding academic achievements." }
+    ],
+    gallery: []
+  },
+  schol_talenta: {
+    id: "schol-talenta",
+    cardTag: "Scholarship",
+    year: "2024",
+    title: "BSI Scholarship Talenta",
+    shortDesc: "Bank Syariah Indonesia",
+    period: "2024",
+    roleLabel: "Issuer",
+    role: "Bank Syariah Indonesia",
+    details: [
+      { label: "Awarded", value: "2024" },
+      { label: "Description", value: "Awarded for exceptional talent and leadership skills." }
+    ],
+    gallery: []
+  },
+  cert_data_analyst: {
+    id: "cert-data-analyst",
+    cardTag: "Certification",
+    year: "2024",
+    title: "Data Analyst",
+    shortDesc: "National Professional Certification Agency",
+    period: "Oct 2024",
+    roleLabel: "Issuer",
+    role: "BNSP",
+    details: [
+      { label: "Certification", value: "Data Analyst" },
+      { label: "Issuer", value: "BNSP (National Professional Certification Agency)" },
+      { label: "Date", value: "October 2024" }
+    ],
+    gallery: []
+  },
+  cert_data_science: {
+    id: "cert-data-science",
+    cardTag: "Certification",
+    year: "2024",
+    title: "Data Science & AI",
+    shortDesc: "Startup Campus Bootcamp",
+    period: "Feb 2024 - Jun 2024",
+    roleLabel: "Issuer",
+    role: "Startup Campus",
+    details: [
+      { label: "Program", value: "Data Science Bootcamp" },
+      { label: "Skills Gained", value: "Python, Scikit-learn, Machine Learning, Looker Studio" },
+      { label: "Duration", value: "Feb 2024 - Jun 2024" }
+    ],
+    gallery: []
+  }
+};
+
