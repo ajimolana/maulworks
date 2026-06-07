@@ -4,7 +4,7 @@ const nextConfig = {
   reactStrictMode: true,
   images: {
     formats: ["image/avif", "image/webp"],
-    minimumCacheTTL: 60,
+    minimumCacheTTL: 2592000,
   },
   experimental: {
     optimizePackageImports: ["lucide-react", "gsap", "motion"],
