@@ -96,6 +96,7 @@ export default function ProjectModal({ activeProject, onClose, onOpenLightbox }:
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
+          transition={{ duration: 0.15, ease: "easeInOut" }}
           className="fixed inset-0 z-40 bg-black/70 px-4 py-6 flex items-center justify-center backdrop-blur-sm"
           onClick={onClose}
         >
@@ -103,7 +104,7 @@ export default function ProjectModal({ activeProject, onClose, onOpenLightbox }:
             initial={{ y: 50, opacity: 0, scale: 0.95 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
             exit={{ y: 20, opacity: 0, scale: 0.95 }}
-            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            transition={{ duration: 0.15, ease: "easeOut" }}
             className="relative w-full max-w-3xl rounded-3xl border border-white/20 bg-[#111111] text-white shadow-2xl flex flex-col max-h-[75vh] sm:max-h-[85vh] overflow-hidden"
             onClick={(event) => event.stopPropagation()}
           >

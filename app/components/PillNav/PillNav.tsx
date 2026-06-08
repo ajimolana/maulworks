@@ -129,11 +129,11 @@ export default function PillNav({ items, forceClose, togglePerformanceMode, isGy
   return (
     <>
       <div
-        className={`fixed top-0 inset-x-0 z-[100] flex justify-center px-2 lg:px-6 pointer-events-none transition-opacity duration-300 ${forceClose ? "opacity-0" : "opacity-100"
+        className={`fixed top-0 inset-x-0 z-[100] flex justify-center px-2 lg:px-6 pointer-events-none transition-opacity duration-150 ${forceClose ? "opacity-0" : "opacity-100"
           }`}
       >
         <div
-          className={`pointer-events-auto flex items-center justify-between overflow-hidden mt-2 lg:mt-4 py-2 border transition-all duration-[800ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${isScrolled
+          className={`${forceClose ? "pointer-events-none" : "pointer-events-auto"} flex items-center justify-between overflow-hidden mt-2 lg:mt-4 py-2 border transition-all duration-[800ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${isScrolled
             ? "bg-[#111111]/80 backdrop-blur-md rounded-full border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.4)] px-4 lg:px-6 w-full lg:max-w-[1366px]"
             : "bg-transparent rounded-none border-transparent px-4 lg:px-6 w-full lg:max-w-[1680px]"
             }`}
