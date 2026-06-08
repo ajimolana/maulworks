@@ -49,7 +49,7 @@ export default function RootLayout({
     <html lang="en" className={cn("dark", "scroll-smooth", poppins.variable, "font-sans")}>
       <head>
       </head>
-      <body className={`${poppins.className} ${poppins.variable} antialiased`}>
+      <body className={`${poppins.className} ${poppins.variable} antialiased bg-[#101010] text-white`}>
         {children}
       </body>
     </html>

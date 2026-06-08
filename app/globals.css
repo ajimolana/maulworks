@@ -68,7 +68,7 @@
     --theme-main: #101010;
     --theme-accent: #57e5e1;
     --theme-bg-gradient: #101e21;
-    --background: oklch(1 0 0);
+    --background: var(--theme-main);
     --foreground: oklch(0.145 0 0);
     --card: oklch(1 0 0);
     --card-foreground: oklch(0.145 0 0);
