@@ -103,11 +103,11 @@ export const projectsData: Project[] = [
     ],
     heroImage: "/assets/projects/behindworldcup/Main Dashboard.png",
     gallery: [
-      "/assets/projects/behindworldcup/Main Dashboard.png",
-      "/assets/projects/behindworldcup/Landing Page.png",
-      "/assets/projects/behindworldcup/Methodology.png",
-      "/assets/projects/behindworldcup/Insights Page.png",
-      "/assets/projects/behindworldcup/Detailed Team Breakdown.png",
+      ["/assets/projects/behindworldcup/Main Dashboard.png", "Main Dashboard"],
+      ["/assets/projects/behindworldcup/Landing Page.png", "Landing Page"],
+      ["/assets/projects/behindworldcup/Methodology.png", "Methodology"],
+      ["/assets/projects/behindworldcup/Insights Page.png", "Insights Page"],
+      ["/assets/projects/behindworldcup/Detailed Team Breakdown.png", "Detailed Team Breakdown"],
     ],
     // link: "https://foodsecurityforecasting.streamlit.app/"
   },
@@ -136,11 +136,11 @@ export const projectsData: Project[] = [
     ],
     heroImage: "/assets/projects/intelligentcoffeeshop/login page.png",
     gallery: [
-      "/assets/projects/intelligentcoffeeshop/login page.png",
-      "/assets/projects/intelligentcoffeeshop/dashboard page.png",
-      "/assets/projects/intelligentcoffeeshop/inventory page.png",
-      "/assets/projects/intelligentcoffeeshop/reports page.png",
-      "/assets/projects/intelligentcoffeeshop/backend.png",
+      ["/assets/projects/intelligentcoffeeshop/login page.png", "Login Page"],
+      ["/assets/projects/intelligentcoffeeshop/dashboard page.png", "Dashboard Page"],
+      ["/assets/projects/intelligentcoffeeshop/inventory page.png", "Inventory Page"],
+      ["/assets/projects/intelligentcoffeeshop/reports page.png", "Reports Page"],
+      ["/assets/projects/intelligentcoffeeshop/backend.png", "Backend"],
     ],
     // link: "https://foodsecurityforecasting.streamlit.app/"
   },
