@@ -78,6 +78,40 @@ export const experiencesData: Project[] = [
 
 export const projectsData: Project[] = [
   {
+    id: "behindworldcup",
+    cardTag: "Python, NextJS",
+    year: "2026",
+    title: "Data Science for World Cup 2026 Predictions",
+    shortDesc: "Look into World Cup through Data Science lens",
+    period: "June 2026",
+    roleLabel: "Tools",
+    role: "Python, NextJS",
+    details: [
+      {
+        label: "Description",
+        value: "A statistical model for predicting FIFA World Cup 2026 match outcomes, group standings, and tournament winner probabilities. The project utilizes an ensemble of Dixon-Coles Maximum Likelihood Estimation, Poisson Generalized Linear Models, and an Elo rating system. It features a Node.js production pipeline for mathematical modeling, Python Jupyter Notebooks for methodology documentation, and a Next.js frontend for data visualization."
+      },
+      {
+        label: "Task",
+        value: [
+          "Engineered a statistical ensemble model using Dixon-Coles Maximum Likelihood Estimation and Poisson GLMs to predict international football match outcomes.",
+          "Designed an Elo rating system and executed a Monte Carlo simulation (50,000 iterations) to accurately forecast tournament winner probabilities and group standings.",
+          "Built a production pipeline to fit mathematical models and process historical data across 900+ matches",
+        ],
+        list: true
+      }
+    ],
+    heroImage: "/assets/projects/behindworldcup/Main Dashboard.png",
+    gallery: [
+      "/assets/projects/behindworldcup/Main Dashboard.png",
+      "/assets/projects/behindworldcup/Landing Page.png",
+      "/assets/projects/behindworldcup/Methodology.png",
+      "/assets/projects/behindworldcup/Insights Page.png",
+      "/assets/projects/behindworldcup/Detailed Team Breakdown.png",
+    ],
+    // link: "https://foodsecurityforecasting.streamlit.app/"
+  },
+  {
     id: "intelligentcoffeeshop",
     cardTag: "NextJS, n8n",
     year: "2025",
