@@ -81,7 +81,7 @@ export const projectsData: Project[] = [
     id: "behindworldcup",
     cardTag: "Python, NextJS",
     year: "2026",
-    title: "Data Science for World Cup 2026 Predictions",
+    title: "Data Science for World Cup 2026",
     shortDesc: "Look into World Cup through Data Science lens",
     period: "June 2026",
     roleLabel: "Tools",
