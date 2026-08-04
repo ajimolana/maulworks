@@ -562,10 +562,10 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Right: Download CV */}
+            {/* Right: Ask CV */}
             <div className="w-full md:w-1/3 flex justify-center md:justify-end">
-              <a href="/assets/cv.pdf" target="_blank" rel="noopener noreferrer" className="px-8 py-3 bg-[var(--theme-accent)] text-[var(--theme-main)] font-bold rounded-full hover:scale-105 transition-transform duration-300 whitespace-nowrap">
-                Download CV
+              <a href="mailto:maulanarajisf@gmail.com?subject=Request%20for%20CV&body=Hello%20Maulana%2C%0D%0A%0D%0AI'm%20%5BYour%20Name%5D%20from%20%5BCompany%2FOrganization%5D.%20I%20would%20like%20to%20request%20a%20copy%20of%20your%20CV.%0D%0A%0D%0AThank%20you." className="px-8 py-3 bg-[var(--theme-accent)] text-[var(--theme-main)] font-bold rounded-full hover:scale-105 transition-transform duration-300 whitespace-nowrap">
+                Ask CV
               </a>
             </div>
           </div>
