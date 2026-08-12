@@ -37,3 +37,6 @@ next-env.d.ts
 
 # AI Assistant Context
 GEMINI.md
+
+# Python
+venv/
