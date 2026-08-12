@@ -447,7 +447,7 @@ export const achievements: AchievementItem[] = [
   {
     title: "Outstanding Student",
     competitionType: "Recognition",
-    organizer: "Faculty of Math and Science Hasanuddin University",
+    organizer: "Faculty of Math & Science, Unhas",
     date: "Aug 2024",
   },
   {
