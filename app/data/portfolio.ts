@@ -40,6 +40,35 @@ export type AchievementItem = {
 
 export const experiencesData: Project[] = [
   {
+    id: "internask",
+    cardTag: "Internship",
+    year: "2026",
+    title: "Asuransi Kredit Indonesia",
+    shortDesc: "Reinsurance Data Analyst",
+    period: "10 Aug 2026 - Ongoing",
+    roleLabel: "Job Type",
+    role: "Internship",
+    details: [
+      {
+        label: "Position",
+        value: "Reinsurance Data Analyst"
+      },
+      {
+        label: "Task",
+        value: [
+          "-"
+        ],
+        list: true
+      }
+    ],
+    heroImage: "/assets/experience/internask/Profile.jpeg",
+    gallery: [
+      ["/assets/experience/internask/Profile.jpeg", "Profile"]
+    ],
+    logo: "/assets/experience/internask/Logo Askrindo.png",
+    link: null
+  },
+  {
     id: "internbi",
     cardTag: "Internship",
     year: "2025",
@@ -453,7 +482,7 @@ export const achievements: AchievementItem[] = [
   {
     title: "Outstanding Student",
     competitionType: "Recognition",
-    organizer: "Math Dept. Hasanuddin University",
+    organizer: "Math Department, Unhas",
     date: "Aug 2024",
   },
   {
@@ -465,7 +494,7 @@ export const achievements: AchievementItem[] = [
   {
     title: "Outstanding Student",
     competitionType: "Recognition",
-    organizer: "Math Dept. Hasanuddin University",
+    organizer: "Math Department, Unhas",
     date: "Aug 2023",
   },
   {
