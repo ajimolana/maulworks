@@ -16,6 +16,8 @@ const ProjectCard = dynamic(() => import("./components/ProjectCard"));
 const ProjectModal = dynamic(() => import("./components/ProjectModal"));
 const Lightbox = dynamic(() => import("./components/Lightbox"));
 const AchievementShelf = dynamic(() => import("./components/AchievementShelf/AchievementShelf"));
+const ContactModal = dynamic(() => import("./components/ContactModal"));
+import AnimatedSection from "./components/AnimatedSection";
 
 import {
   experiencesData,
@@ -37,6 +39,7 @@ export default function Home() {
   });
   const [pageReady, setPageReady] = useState(false);
   const [logoFiles, setLogoFiles] = useState<string[]>([]);
+  const [isContactOpen, setIsContactOpen] = useState(false);
 
   useEffect(() => {
     setPageReady(true);
@@ -52,6 +55,7 @@ export default function Home() {
             <img
               src={`/assets/homeLogos/${filename}`}
               alt={name}
+              height="48"
               className="h-full w-auto object-contain select-none [-webkit-user-drag:none]"
               draggable={false}
               onError={(e) => {
@@ -83,6 +87,8 @@ export default function Home() {
         setLightbox((prev) => ({ ...prev, isOpen: false }));
       } else if (activeProject) {
         setActiveProject(null);
+      } else if (isContactOpen) {
+        setIsContactOpen(false);
       }
     };
 
@@ -90,6 +96,7 @@ export default function Home() {
       if (e.key === "Escape") {
         if (lightbox.isOpen) window.history.back();
         else if (activeProject) window.history.back();
+        else if (isContactOpen) window.history.back();
       }
     };
 
@@ -99,12 +106,10 @@ export default function Home() {
       window.removeEventListener("popstate", handlePopState);
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [lightbox.isOpen, activeProject]);
-
-
+  }, [lightbox.isOpen, activeProject, isContactOpen]);
 
   // 3. SCROLL LOCK LOGIC
-  const isOverlayOpen = activeProject !== null || lightbox.isOpen;
+  const isOverlayOpen = activeProject !== null || lightbox.isOpen || isContactOpen;
 
   useEffect(() => {
     if (isOverlayOpen) {
@@ -130,6 +135,11 @@ export default function Home() {
   };
   const closeLightbox = () => window.history.back();
   const setLightboxIndex = (index: number) => setLightbox(prev => ({ ...prev, index }));
+
+  const openContactModal = () => {
+    window.history.pushState({ contactModalOpen: true }, "");
+    setIsContactOpen(true);
+  };
 
   const achievementTargetById = useCallback((id: string) =>
     researchData.find((project) => project.id === id) ||
@@ -170,19 +180,36 @@ export default function Home() {
         <div className="mx-auto max-w-[1366px] min-h-[100svh] xl:min-h-screen px-4 sm:px-6 flex items-center justify-center">
           <div className="w-full max-w-5xl relative z-10 flex flex-col items-center justify-center text-center">
 
-            {/* Headline */}
-            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-bold tracking-tight text-white leading-[1.1] mb-8 font-sans">
-              Maulana Raji Shofil Fuadi
-            </h1>
-
             {/* Badge */}
-            <div className="inline-flex items-center gap-3 p-1 pr-5 rounded-full border border-white/10 bg-[#151515]/60 backdrop-blur-md mb-12">
+            <div className="inline-flex items-center gap-3 p-1 pr-5 rounded-full border border-white/10 bg-[#151515]/60 backdrop-blur-md mb-6">
               <span className="bg-white text-black text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider">
                 Based in
               </span>
               <span className="text-[#a1a1aa] text-sm font-medium">
                 Jakarta, Indonesia
               </span>
+            </div>
+
+            {/* Headline */}
+            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-bold tracking-tight text-white leading-[1.1] mb-4 font-sans">
+              Maulana Raji Shofil Fuadi
+            </h1>
+
+            {/* Subtitle */}
+            <h2 className="text-lg sm:text-xl md:text-2xl font-medium text-[#a1a1aa] mb-10">
+              Data Analyst & AI Enthusiast
+            </h2>
+
+            {/* CTAs */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full mb-12">
+              <a href="#projects" className="relative px-8 py-3 bg-[var(--theme-accent)] text-[var(--theme-main)] font-bold rounded-full transition-all duration-300 whitespace-nowrap overflow-hidden group hover:scale-105 hover:shadow-[0_0_20px_var(--theme-accent)]">
+                <span className="relative z-10">Explore Projects</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out" />
+              </a>
+              <a href="#about" className="relative px-8 py-3 bg-white/5 text-white font-bold rounded-full border border-white/20 transition-all duration-300 whitespace-nowrap overflow-hidden group hover:border-white/40 hover:shadow-[0_0_15px_rgba(255,255,255,0.15)]">
+                <span className="relative z-10">About Me</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out" />
+              </a>
             </div>
 
 
@@ -192,7 +219,7 @@ export default function Home() {
         {/* Hero Logos */}
         <div className="absolute bottom-8 left-0 right-0 w-full z-10">
           <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
-            <p className="text-center text-white/40 text-[11px] uppercase tracking-widest font-semibold mb-6">Experiences & Affiliations</p>
+            <p className="text-center text-[#a1a1aa] text-[11px] uppercase tracking-widest font-semibold mb-6">Experiences & Affiliations</p>
             <div className="min-h-[80px]">
               <LogoLoop
                 logos={homeLogoNodes}
@@ -211,7 +238,7 @@ export default function Home() {
       </div>
 
       {/* NEW SECTION: ABOUT ME */}
-      <section id="about" className="w-full mt-20 scroll-mt-24 md:scroll-mt-28">
+      <AnimatedSection id="about" className="w-full mt-20 scroll-mt-24 md:scroll-mt-28">
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
           <h2 className="text-3xl sm:text-4xl font-semibold text-white mb-6">About Me</h2>
           <div className="bg-[#111111] border border-white/15 rounded-3xl p-6 sm:p-10 shadow-[0_20px_60px_rgba(255,255,255,0.05)]">
@@ -293,10 +320,10 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </section>
+      </AnimatedSection>
 
       {/* 1. SECTION EXPERIENCES */}
-      <section id="experiences" className="w-full mt-20 scroll-mt-24 md:scroll-mt-28">
+      <AnimatedSection id="experiences" className="w-full mt-20 scroll-mt-24 md:scroll-mt-28">
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
           <h2 className="text-3xl sm:text-4xl font-semibold text-white mb-6">Experiences</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -305,10 +332,10 @@ export default function Home() {
             ))}
           </div>
         </div>
-      </section>
+      </AnimatedSection>
 
       {/* 2. SECTION PROJECTS */}
-      <section id="projects" className="w-full mt-20 scroll-mt-24 md:scroll-mt-28">
+      <AnimatedSection id="projects" className="w-full mt-20 scroll-mt-24 md:scroll-mt-28">
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
           <h2 className="text-3xl sm:text-4xl font-semibold text-white mb-6">Projects</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -317,10 +344,10 @@ export default function Home() {
             ))}
           </div>
         </div>
-      </section>
+      </AnimatedSection>
 
       {/* 3. SECTION RESEARCH */}
-      <section id="research" className="w-full mt-20 scroll-mt-24 md:scroll-mt-28">
+      <AnimatedSection id="research" className="w-full mt-20 scroll-mt-24 md:scroll-mt-28">
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
           <h2 className="text-3xl sm:text-4xl font-semibold text-white mb-6">Research</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -329,10 +356,10 @@ export default function Home() {
             ))}
           </div>
         </div>
-      </section>
+      </AnimatedSection>
 
       {/* 4. SECTION ORGANIZATIONS */}
-      <section id="organizations" className="w-full mt-20 scroll-mt-24 md:scroll-mt-28">
+      <AnimatedSection id="organizations" className="w-full mt-20 scroll-mt-24 md:scroll-mt-28">
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
           <h2 className="text-3xl sm:text-4xl font-semibold text-white mb-6">Organizations</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -341,10 +368,10 @@ export default function Home() {
             ))}
           </div>
         </div>
-      </section>
+      </AnimatedSection>
 
       {/* 5. SECTION ACHIEVEMENTS */}
-      <section id="achievements" className="w-full mt-20 scroll-mt-24 md:scroll-mt-28">
+      <AnimatedSection id="achievements" className="w-full mt-20 scroll-mt-24 md:scroll-mt-28">
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
           <h2 className="text-3xl sm:text-4xl font-semibold text-white mb-6">Achievements</h2>
           <AchievementShelf
@@ -353,7 +380,7 @@ export default function Home() {
             onOpenModal={openProjectModal}
           />
         </div>
-      </section>
+      </AnimatedSection>
 
       {/* FOOTER */}
       <footer id="contacts" className="w-full mt-28 border-t border-white/10 pt-10 pb-6 flex flex-col scroll-mt-24 md:scroll-mt-28">
@@ -367,9 +394,9 @@ export default function Home() {
             {/* Center: Social Icons */}
             <div className="w-full md:w-1/3 flex justify-center">
               <div className="flex items-center gap-6">
-                <a href="mailto:maulanarajisf@gmail.com" target="_blank" rel="noreferrer" className="transition-opacity hover:opacity-80" aria-label="Email Maulana">
+                <button onClick={openContactModal} className="transition-opacity hover:opacity-80" aria-label="Email Maulana">
                   <Image src="/assets/footer/mail.svg" alt="Email Logo" width={28} height={28} />
-                </a>
+                </button>
                 <a href="https://github.com/ajimolana" target="_blank" rel="noreferrer" className="transition-opacity hover:opacity-80" aria-label="GitHub Profile">
                   <Image src="/assets/footer/github.svg" alt="GitHub Logo" width={28} height={28} />
                 </a>
@@ -382,11 +409,12 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Right: Request CV */}
+            {/* Right: Contact Button */}
             <div className="w-full md:w-1/3 flex justify-center md:justify-end">
-              <a href="mailto:maulanarajisf@gmail.com?subject=Request%20for%20CV&body=Hello%20Maulana%2C%0D%0A%0D%0AI'm%20%5BYour%20Name%5D%20from%20%5BCompany%2FOrganization%5D.%20I%20would%20like%20to%20request%20a%20copy%20of%20your%20CV.%0D%0A%0D%0AThank%20you." className="px-8 py-3 bg-[var(--theme-accent)] text-[var(--theme-main)] font-bold rounded-full hover:scale-105 transition-transform duration-300 whitespace-nowrap">
-                Request CV
-              </a>
+              <button onClick={openContactModal} className="relative px-8 py-3 bg-[var(--theme-accent)] text-[var(--theme-main)] font-bold rounded-full transition-all duration-300 whitespace-nowrap overflow-hidden group hover:scale-105 hover:shadow-[0_0_20px_var(--theme-accent)]">
+                <span className="relative z-10">Send a Message</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out" />
+              </button>
             </div>
           </div>
 
@@ -413,6 +441,17 @@ export default function Home() {
         index={lightbox.index}
         onClose={closeLightbox}
         setIndex={setLightboxIndex}
+      />
+
+      {/* CONTACT MODAL */}
+      <ContactModal
+        isOpen={isContactOpen}
+        onClose={() => {
+          setIsContactOpen(false);
+          if (window.history.state?.contactModalOpen) {
+            window.history.back();
+          }
+        }}
       />
     </div>
   );
