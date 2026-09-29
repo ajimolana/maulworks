@@ -31,33 +31,48 @@ const renderMultilineText = (text: string | string[]) =>
     ))
     : text;
 
-const renderDetails = (details: DetailItem[] = []) =>
-  details
-    .filter((item) => {
-      if (item.list && Array.isArray(item.value)) {
-        return item.value.some((entry) => entry.trim().length > 0);
-      }
-      if (Array.isArray(item.value)) {
-        return item.value.some((entry) => entry.trim().length > 0);
-      }
-      return typeof item.value === "string" && item.value.trim().length > 0;
-    })
-    .map((item, index) => (
-      <div key={`${item.label}-${index}`}>
-        <p className="text-sm text-white/60">{item.label}</p>
-        {item.list && Array.isArray(item.value) ? (
-          <ul className="mt-2 space-y-1 text-base text-white/80 list-disc list-outside ml-5">
-            {item.value
-              .filter((entry) => entry.trim().length > 0)
-              .map((entry, entryIndex) => (
-                <li key={entryIndex}>{entry}</li>
-              ))}
-          </ul>
-        ) : (
-          <p className="text-base text-white/80">{renderMultilineText(item.value ?? "")}</p>
-        )}
-      </div>
-    ));
+const renderDetailItem = (item: DetailItem, index: number, isHighlight = false) => {
+  if (!item.value) return null;
+  const hasContent = item.list && Array.isArray(item.value) 
+    ? item.value.some((entry) => entry.trim().length > 0)
+    : (Array.isArray(item.value) ? item.value.some((entry) => entry.trim().length > 0) : typeof item.value === "string" && item.value.trim().length > 0);
+  
+  if (!hasContent) return null;
+
+  return (
+    <div key={`${item.label}-${index}`} className={isHighlight ? "bg-[var(--theme-accent)]/10 border border-[var(--theme-accent)]/20 rounded-2xl p-5" : ""}>
+      <p className={`text-sm ${isHighlight ? "text-[var(--theme-accent)] font-semibold uppercase tracking-widest mb-2" : "text-white/60"}`}>
+        {item.label}
+      </p>
+      {item.list && Array.isArray(item.value) ? (
+        <ul className={`mt-2 space-y-1 ${isHighlight ? "text-lg text-white font-medium" : "text-base text-white/80"} list-disc list-outside ml-5`}>
+          {item.value
+            .filter((entry) => entry.trim().length > 0)
+            .map((entry, entryIndex) => (
+              <li key={entryIndex}>{entry}</li>
+            ))}
+        </ul>
+      ) : (
+        <p className={`${isHighlight ? "text-lg sm:text-xl text-white font-medium leading-relaxed" : "text-base text-white/80"}`}>
+          {renderMultilineText(item.value ?? "")}
+        </p>
+      )}
+    </div>
+  );
+};
+
+const renderDetails = (details: DetailItem[] = []) => {
+  const highlightLabels = ['result', 'impact', 'metrics', 'hasil'];
+  const highlightItems = details.filter(d => highlightLabels.includes(d.label.toLowerCase()));
+  const standardItems = details.filter(d => !highlightLabels.includes(d.label.toLowerCase()));
+
+  return (
+    <>
+      {highlightItems.map((item, index) => renderDetailItem(item, index, true))}
+      {standardItems.map((item, index) => renderDetailItem(item, index, false))}
+    </>
+  );
+};
 
 const ModalImage = ({ src, idx, onOpenLightbox, srcs, caps }: { src: string, idx: number, onOpenLightbox: any, srcs: string[], caps: string[] }) => {
   const [isLoading, setIsLoading] = React.useState(true);
@@ -101,10 +116,10 @@ export default function ProjectModal({ activeProject, onClose, onOpenLightbox }:
           onClick={onClose}
         >
           <motion.div
-            initial={{ y: 50, opacity: 0, scale: 0.95 }}
-            animate={{ y: 0, opacity: 1, scale: 1 }}
-            exit={{ y: 20, opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.15, ease: "easeOut" }}
+            initial={{ scale: 0.92, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.94, opacity: 0, y: 10 }}
+            transition={{ duration: 0.25, ease: [0.32, 0.72, 0, 1] }}
             className="relative w-full max-w-3xl rounded-3xl border border-white/20 bg-[#111111] text-white shadow-2xl flex flex-col max-h-[75vh] sm:max-h-[85vh] overflow-hidden"
             onClick={(event) => event.stopPropagation()}
           >
