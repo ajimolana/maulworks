@@ -307,7 +307,7 @@ export const LogoLoop = React.memo<LogoLoopProps>(
       () =>
         cx(
           'relative group',
-          isVertical ? 'overflow-hidden h-full inline-block' : 'overflow-hidden',
+          isVertical ? 'overflow-y-clip overflow-x-visible h-full inline-block' : 'overflow-x-clip overflow-y-visible',
           '[--logoloop-gap:32px]',
           '[--logoloop-logoHeight:28px]',
           '[--logoloop-fadeColorAuto:#ffffff]',
