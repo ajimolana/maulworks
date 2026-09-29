@@ -5,7 +5,6 @@ import Image from "next/image";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import PillNav from "./components/PillNav/PillNav";
 import dynamic from "next/dynamic";
-import { getHomeLogos } from "./actions";
 
 const Aurora = dynamic(() => import("./components/Aurora/Aurora"), {
   ssr: false,
@@ -38,12 +37,19 @@ export default function Home() {
     index: 0
   });
   const [pageReady, setPageReady] = useState(false);
-  const [logoFiles, setLogoFiles] = useState<string[]>([]);
   const [isContactOpen, setIsContactOpen] = useState(false);
+
+  const logoFiles = useMemo(() => [
+    "Apple Developer Academy.png",
+    "Bank Indonesia.png",
+    "BSI Scholarship.png",
+    "CBP Rupiah.png",
+    "PT Asuransi Kredit Indonesia.png",
+    "Startup Campus.png"
+  ], []);
 
   useEffect(() => {
     setPageReady(true);
-    getHomeLogos().then(setLogoFiles);
   }, []);
 
   const homeLogoNodes = useMemo(() => logoFiles.map((filename) => {
@@ -53,7 +59,7 @@ export default function Home() {
         <div className="flex flex-col items-center justify-center px-8 transition-all duration-300 hover:scale-105 gap-3">
           <div className="h-10 sm:h-12 flex items-center justify-center">
             <img
-              src={`/assets/homeLogos/${filename}`}
+              src={`/assets/homeLogos/${encodeURIComponent(filename)}`}
               alt={name}
               height="48"
               className="h-full w-auto object-contain select-none [-webkit-user-drag:none]"
