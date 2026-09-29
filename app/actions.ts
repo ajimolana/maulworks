@@ -1,18 +1,15 @@
 "use server";
 
-import fs from "fs";
-import path from "path";
-
 export async function getHomeLogos() {
-  try {
-    const dir = path.join(process.cwd(), "public/assets/homeLogos");
-    if (!fs.existsSync(dir)) return [];
-    
-    const files = fs.readdirSync(dir);
-    // Return only image files
-    return files.filter(f => /\.(png|jpe?g|svg|gif|webp)$/i.test(f));
-  } catch (error) {
-    console.error("Failed to read home logos directory:", error);
-    return [];
-  }
+  // In Vercel Production, fs.readdirSync on the 'public' folder doesn't work 
+  // reliably in Serverless Functions without explicit trace configurations. 
+  // Hardcoding the array is the most robust and performant solution for static assets.
+  return [
+    "Apple Developer Academy.png",
+    "Bank Indonesia.png",
+    "BSI Scholarship.png",
+    "CBP Rupiah.png",
+    "PT Asuransi Kredit Indonesia.png",
+    "Startup Campus.png"
+  ];
 }
