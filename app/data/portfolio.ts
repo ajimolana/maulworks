@@ -36,6 +36,10 @@ export type AchievementItem = {
   date: string;
   image?: string;
   href?: string;
+  /** ID matching a project in researchData, projectsData, experiencesData, or organizationsData */
+  linkedProjectId?: string;
+  /** Controls bento tile size. "wide" = col-span-2, "tall" = row-span-2, "featured" = col-span-2 row-span-2. Default = 1x1 */
+  size?: "normal" | "wide" | "tall" | "featured";
 };
 
 export const experiencesData: Project[] = [
@@ -56,7 +60,7 @@ export const experiencesData: Project[] = [
       {
         label: "Task",
         value: [
-          "-"
+          "Assigned to the Reinsurance Department within the Underwriting & Reinsurance Division."
         ],
         list: true
       }
@@ -463,64 +467,77 @@ export const organizationsData: Project[] = [
 export const achievements: AchievementItem[] = [
   {
     title: "Top 10 Paper",
-    competitionType: "Scientific Paper",
+    competitionType: "Paper",
     organizer: "Aksinomi Sulampua, BI Sulsel",
     date: "Oct 2025",
+    linkedProjectId: "sipekan",
+    size: "wide",
   },
   {
     title: "Top 10 Ambassador",
     competitionType: "Ambassador",
     organizer: "CBP Rupiah, BI Sulsel",
     date: "Jun 2025",
+    size: "normal",
   },
   {
     title: "Outstanding Student",
     competitionType: "Recognition",
     organizer: "Faculty of Math & Science, Unhas",
     date: "Aug 2024",
+    size: "normal",
   },
   {
     title: "Outstanding Student",
     competitionType: "Recognition",
     organizer: "Math Department, Unhas",
     date: "Aug 2024",
+    size: "normal",
   },
   {
     title: "1st Place Softball Men's",
     competitionType: "Sports",
     organizer: "Airlangga National Championship",
     date: "Jul 2024",
-  },
-  {
-    title: "Outstanding Student",
-    competitionType: "Recognition",
-    organizer: "Math Department, Unhas",
-    date: "Aug 2023",
-  },
-  {
-    title: "2nd Place Softball Men's",
-    competitionType: "Sports",
-    organizer: "UGM Cup",
-    date: "Jun 2023",
-  },
-  {
-    title: "2nd Place Videography",
-    competitionType: "Creative",
-    organizer: "National Environmental Expo",
-    date: "Jun 2023",
+    linkedProjectId: "org-softball",
+    size: "wide",
   },
   {
     title: "4th Runner-Up Infographic",
     competitionType: "Creative",
     organizer: "Celebes Plano Fest",
     date: "Nov 2023",
+    size: "normal",
+  },
+  {
+    title: "Outstanding Student",
+    competitionType: "Recognition",
+    organizer: "Math Department, Unhas",
+    date: "Aug 2023",
+    size: "normal",
+  },
+  {
+    title: "2nd Place Softball Men's",
+    competitionType: "Sports",
+    organizer: "UGM Cup",
+    date: "Jun 2023",
+    size: "normal",
+  },
+  {
+    title: "2nd Place Videography",
+    competitionType: "Creative",
+    organizer: "National Environmental Expo",
+    date: "Jun 2023",
+    size: "normal",
   },
   {
     title: "1st Place Paper",
-    competitionType: "Scientific Paper",
-    organizer: "Milky Way Scientific Paper Competition",
+    competitionType: "Paper",
+    organizer: "Milky Way Scientific Paper Competition, Universitas Jember",
     date: "Dec 2022",
-  }
+    linkedProjectId: "smartcelldrybox",
+    size: "featured",
+  },
 ];
 
 export const aboutModalData: Record<string, Project> = {
