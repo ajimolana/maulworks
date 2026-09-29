@@ -248,7 +248,7 @@ export default function Home() {
               {/* Bio: Left, 2/3 width */}
               <div className="space-y-6 lg:col-span-2">
                 <p className="text-white leading-relaxed text-base sm:text-lg">
-                  I turn numbers into decisions. My background is a unique blend of actuarial science, research nerd, and proven leadership. Driven by curiosity, I'm always chasing the next frontier, currently pushing into AI automation.
+                  I turn numbers into decisions. My background is a unique blend of actuarial science, research nerd, and proven leadership. Driven by curiosity, I&apos;m always chasing the next frontier, currently pushing into AI automation.
                 </p>
               </div>
 

@@ -99,7 +99,7 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
                     </svg>
                   </div>
                   <h4 className="text-xl font-bold text-white mb-2">Message Sent!</h4>
-                  <p className="text-white/60 text-sm">I'll get back to you as soon as possible.</p>
+                  <p className="text-white/60 text-sm">I&apos;ll get back to you as soon as possible.</p>
                 </motion.div>
               ) : (
                 <form onSubmit={handleSubmit} className="flex flex-col gap-4">
