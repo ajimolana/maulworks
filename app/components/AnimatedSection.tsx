@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useInView } from "framer-motion";
+import { motion, useInView, type Variants } from "framer-motion";
 import { useRef, ReactNode } from "react";
 
 interface AnimatedSectionProps {
@@ -14,14 +14,14 @@ export default function AnimatedSection({ children, className = "", id, delay = 
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-80px 0px" });
 
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: { opacity: 0, y: 30 },
     visible: { 
       opacity: 1, 
       y: 0,
       transition: {
         duration: 0.6,
-        ease: [0.32, 0.72, 0, 1],
+        ease: [0.32, 0.72, 0, 1] as [number, number, number, number],
         delay: delay,
         when: "beforeChildren",
         staggerChildren: 0.1
@@ -44,14 +44,14 @@ export default function AnimatedSection({ children, className = "", id, delay = 
 }
 
 export function AnimatedItem({ children, className = "" }: { children: ReactNode, className?: string }) {
-  const itemVariants = {
+  const itemVariants: Variants = {
     hidden: { opacity: 0, y: 20 },
     visible: { 
       opacity: 1, 
       y: 0,
       transition: {
         duration: 0.5,
-        ease: [0.32, 0.72, 0, 1]
+        ease: [0.32, 0.72, 0, 1] as [number, number, number, number]
       }
     }
   };
