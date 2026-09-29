@@ -14,17 +14,13 @@ export interface PillNavItem {
 interface PillNavProps {
   items: PillNavItem[];
   forceClose?: boolean;
-  togglePerformanceMode?: () => void;
-  isGyroEnabled?: boolean;
-  toggleGyro?: () => void;
-  isLowPerformanceMode?: boolean;
   titleOverride?: string;
   homeHref?: string;
   activeItemOverride?: string;
   disableScrollSpy?: boolean;
 }
 
-export default function PillNav({ items, forceClose, togglePerformanceMode, isGyroEnabled, toggleGyro, isLowPerformanceMode, titleOverride, homeHref, activeItemOverride, disableScrollSpy }: PillNavProps) {
+export default function PillNav({ items, forceClose, titleOverride, homeHref, activeItemOverride, disableScrollSpy }: PillNavProps) {
   const [activeItem, setActiveItem] = useState<string | null>(activeItemOverride || "profile");
   // Initialize from actual scroll position to avoid animated jump on mount
   const [isScrolled, setIsScrolled] = useState(() =>
@@ -144,7 +140,6 @@ export default function PillNav({ items, forceClose, togglePerformanceMode, isGy
           >
             <button
               onClick={() => {
-                if (togglePerformanceMode) togglePerformanceMode();
                 setMemojiClicked(true);
               }}
               onMouseEnter={() => {
@@ -157,7 +152,7 @@ export default function PillNav({ items, forceClose, togglePerformanceMode, isGy
                 setMemojiClicked(false);
               }}
               className="outline-none focus:outline-none relative"
-              aria-label="Toggle Performance Mode"
+              aria-label="Logo"
             >
               <Image
                 src="/assets/icon/memoji.png"
@@ -165,27 +160,8 @@ export default function PillNav({ items, forceClose, togglePerformanceMode, isGy
                 width={128}
                 height={128}
                 quality={100}
-                className={`w-auto h-8 object-contain transition-transform duration-300 cursor-pointer ${memojiHovered ? 'scale-125' : 'scale-100'} ${
-                  isLowPerformanceMode
-                    ? (memojiHovered && !memojiClicked ? 'rotate-0' : '-rotate-6')
-                    : (memojiHovered && !memojiClicked ? '-rotate-6' : 'rotate-0')
-                }`}
+                className={`w-auto h-8 object-contain transition-transform duration-300 cursor-pointer ${memojiHovered ? 'scale-125' : 'scale-100'} ${memojiHovered && !memojiClicked ? '-rotate-6' : 'rotate-0'}`}
               />
-              <AnimatePresence>
-                {isLowPerformanceMode && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.5 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.5 }}
-                    className="absolute -bottom-1 -right-2 flex items-center justify-center pointer-events-none"
-                    title="Low Performance Mode Active"
-                  >
-                    <svg viewBox="0 0 24 24" className="w-4 h-4 fill-[var(--theme-main)] stroke-[var(--theme-accent)] stroke-[2.5] stroke-linecap-round stroke-linejoin-round">
-                      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-                    </svg>
-                  </motion.div>
-                )}
-              </AnimatePresence>
             </button>
             <Link
               href={homeHref || "#profile"}
@@ -218,7 +194,7 @@ export default function PillNav({ items, forceClose, togglePerformanceMode, isGy
                   key={item.id}
                   href={item.href}
                   onClick={() => handleItemClick(item.id)}
-                  className={`relative px-4 py-2 text-[14px] font-medium transition-colors rounded-full whitespace-nowrap ${isActive ? (item.id === "journey" ? "text-black border border-transparent" : "text-black") : item.id === "journey" ? "bg-white/10 text-white border border-white/20 hover:bg-white/20" : "text-white/70 hover:text-white"
+                  className={`relative px-4 py-2 text-[14px] font-medium transition-colors rounded-full whitespace-nowrap ${isActive ? "text-black" : "text-white/70 hover:text-white"
                     }`}
                 >
                   {isActive && (
@@ -294,7 +270,7 @@ export default function PillNav({ items, forceClose, togglePerformanceMode, isGy
                       }}
                       className={`block text-2xl font-semibold tracking-wide transition-all ${
                         isActive ? "text-[var(--theme-accent)]" : "text-white/70 hover:text-white"
-                      } ${item.id === "journey" ? "underline underline-offset-8 decoration-[var(--theme-accent)]" : ""}`}
+                      }`}
                     >
                       {item.label}
                     </Link>
@@ -304,41 +280,6 @@ export default function PillNav({ items, forceClose, togglePerformanceMode, isGy
             </div>
 
             {/* SETTINGS — always pinned at bottom */}
-            {(toggleGyro || togglePerformanceMode) && (
-              <div className="flex flex-col items-center gap-4 w-full">
-                <div className="w-full border-t border-white/10 mb-2" />
-                {toggleGyro && (
-                  <div className={`flex items-center gap-3 justify-between w-full max-w-xs transition-opacity duration-300 ${isLowPerformanceMode ? 'opacity-40 pointer-events-none' : 'opacity-100'}`}>
-                    <div className="flex items-baseline gap-1.5">
-                      <span className="text-white/80 font-medium tracking-wide text-sm">Enable Gyro</span>
-                      <span className="text-white/30 text-xs tracking-wide">for Lanyard</span>
-                    </div>
-                    <button
-                      onClick={toggleGyro}
-                      disabled={isLowPerformanceMode}
-                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isGyroEnabled ? 'bg-[var(--theme-accent)]' : 'bg-white/20'}`}
-                    >
-                      <span
-                        className={`inline-block h-4 w-4 transform rounded-full bg-black transition-transform ${isGyroEnabled ? 'translate-x-6' : 'translate-x-1'}`}
-                      />
-                    </button>
-                  </div>
-                )}
-                {togglePerformanceMode && (
-                  <div className="flex items-center gap-3 justify-between w-full max-w-xs">
-                    <span className="text-white/80 font-medium tracking-wide text-sm">Low Performance Mode</span>
-                    <button
-                      onClick={togglePerformanceMode}
-                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isLowPerformanceMode ? 'bg-[var(--theme-accent)]' : 'bg-white/20'}`}
-                    >
-                      <span
-                        className={`inline-block h-4 w-4 transform rounded-full bg-black transition-transform ${isLowPerformanceMode ? 'translate-x-6' : 'translate-x-1'}`}
-                      />
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
           </motion.div>
         )}
       </AnimatePresence>
