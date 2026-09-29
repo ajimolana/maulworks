@@ -39,27 +39,26 @@ export default function Home() {
   const [pageReady, setPageReady] = useState(false);
   const [isContactOpen, setIsContactOpen] = useState(false);
 
-  const logoFiles = useMemo(() => [
-    "Apple Developer Academy.png",
-    "Bank Indonesia.png",
-    "BSI Scholarship.png",
-    "CBP Rupiah.png",
-    "PT Asuransi Kredit Indonesia.png",
-    "Startup Campus.png"
+  const logosData = useMemo(() => [
+    { file: "Apple Developer Academy.png", name: "Apple Developer Academy" },
+    { file: "Bank Indonesia.png", name: "Bank Indonesia" },
+    { file: "BSI Scholarship.png", name: "BSI Scholarship" },
+    { file: "CBP Rupiah.png", name: "CBP Rupiah" },
+    { file: "PT Asuransi Kredit Indonesia.png", name: "Askrindo" },
+    { file: "Startup Campus.png", name: "Startup Campus" }
   ], []);
 
   useEffect(() => {
     setPageReady(true);
   }, []);
 
-  const homeLogoNodes = useMemo(() => logoFiles.map((filename) => {
-    const name = filename.replace(/\.[^/.]+$/, ""); // Remove extension
+  const homeLogoNodes = useMemo(() => logosData.map(({ file, name }) => {
     return {
       node: (
         <div className="flex flex-col items-center justify-center px-8 transition-all duration-300 hover:scale-105 gap-3">
           <div className="h-10 sm:h-12 flex items-center justify-center">
             <img
-              src={`/assets/homeLogos/${encodeURIComponent(filename)}`}
+              src={`/assets/homeLogos/${encodeURIComponent(file)}`}
               alt={name}
               height="48"
               className="h-full w-auto object-contain select-none [-webkit-user-drag:none]"
@@ -74,7 +73,7 @@ export default function Home() {
       ),
       title: name
     };
-  }), [logoFiles]);
+  }), [logosData]);
 
   const navItems = [
     { id: "about", label: "About Me", href: "#about" },
