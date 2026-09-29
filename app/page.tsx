@@ -3,31 +3,10 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect, useCallback, useMemo } from "react";
-import RotatingText from "./components/RotatingText/RotatingText";
 import PillNav from "./components/PillNav/PillNav";
 import dynamic from "next/dynamic";
-import { usePerformanceMode } from "@/lib/usePerformanceMode";
 
-const Lanyard = dynamic(() => import("./components/Lanyard/Lanyard"), {
-  ssr: false,
-  loading: () => (
-    <div className="absolute inset-0 flex items-center justify-center z-[-1]">
-      <style>{`
-        @keyframes loading-bar {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(200%); }
-        }
-      `}</style>
-      <div className="flex flex-col gap-2 mt-40 sm:mt-48 md:mt-80 lg:mt-10 xl:mt-0">
-        <span className="text-white/50 text-sm tracking-widest font-medium text-center">Loading Lanyard</span>
-        <div className="w-full h-[2px] bg-white/10 rounded-full overflow-hidden relative">
-          <div className="absolute top-0 left-0 h-full w-1/2 bg-gray-400 rounded-full" style={{ animation: 'loading-bar 1.5s infinite ease-in-out' }} />
-        </div>
-      </div>
-    </div>
-  )
-});
-const ColorBends = dynamic(() => import("./components/ColorBends/ColorBends"), {
+const Aurora = dynamic(() => import("./components/Aurora/Aurora"), {
   ssr: false,
   loading: () => <div className="absolute inset-0 bg-gradient-to-br from-[var(--theme-main)] via-[var(--theme-bg-gradient)] to-[var(--theme-main)] opacity-80" />
 });
@@ -35,6 +14,9 @@ const LogoLoop = dynamic(() => import("./components/LogoLoop/LogoLoop"));
 const ProjectCard = dynamic(() => import("./components/ProjectCard"));
 const ProjectModal = dynamic(() => import("./components/ProjectModal"));
 const Lightbox = dynamic(() => import("./components/Lightbox"));
+const AchievementShelf = dynamic(() => import("./components/AchievementShelf/AchievementShelf"));
+const ContactModal = dynamic(() => import("./components/ContactModal"));
+import AnimatedSection from "./components/AnimatedSection";
 
 import {
   experiencesData,
@@ -54,67 +36,44 @@ export default function Home() {
     captions: [] as string[],
     index: 0
   });
-  const [lanyardOffsetY, setLanyardOffsetY] = useState(0);
-
-  // --- GYROSCOPE LANYARD STATE ---
-  const [gyroGravity, setGyroGravity] = useState<[number, number, number]>([0, -40, 0]);
-  const [isGyroEnabled, setIsGyroEnabled] = useState(false);
-
   const [pageReady, setPageReady] = useState(false);
+  const [isContactOpen, setIsContactOpen] = useState(false);
 
-  const { isLowPerformanceMode, togglePerformanceMode } = usePerformanceMode();
+  const logosData = useMemo(() => [
+    { file: "Apple Developer Academy.png", name: "Apple Developer Academy" },
+    { file: "Bank Indonesia.png", name: "Bank Indonesia" },
+    { file: "BSI Scholarship.png", name: "BSI Scholarship" },
+    { file: "CBP Rupiah.png", name: "CBP Rupiah" },
+    { file: "PT Asuransi Kredit Indonesia.png", name: "Askrindo" },
+    { file: "Startup Campus.png", name: "Startup Campus" }
+  ], []);
 
   useEffect(() => {
     setPageReady(true);
-
-    // Conditionally preload Lanyard assets if performance mode is high
-    if (!isLowPerformanceMode) {
-      const preloadAssets = [
-        { href: "/assets/lanyard/card.glb", as: "fetch", crossOrigin: "anonymous" },
-        { href: "/assets/lanyard/lanyard.png", as: "image" }
-      ];
-
-      preloadAssets.forEach(asset => {
-        if (!document.querySelector(`link[href="${asset.href}"]`)) {
-          const link = document.createElement("link");
-          link.rel = "preload";
-          link.href = asset.href;
-          link.as = asset.as;
-          if (asset.crossOrigin) link.crossOrigin = asset.crossOrigin;
-          document.head.appendChild(link);
-        }
-      });
-    }
-  }, [isLowPerformanceMode]);
-
-  useEffect(() => {
-    const mql1366 = window.matchMedia("(min-width: 1366px)");
-    const mql1024 = window.matchMedia("(min-width: 1024px) and (max-width: 1365px)");
-    const mql768 = window.matchMedia("(min-width: 768px) and (max-width: 1023px)");
-
-    const updateLanyardOffset = () => {
-      if (mql1366.matches) {
-        setLanyardOffsetY(0.4);
-      } else if (mql1024.matches) {
-        setLanyardOffsetY(0.6);
-      } else if (mql768.matches) {
-        setLanyardOffsetY(-0.8);
-      } else {
-        setLanyardOffsetY(0);
-      }
-    };
-
-    updateLanyardOffset();
-    mql1366.addEventListener("change", updateLanyardOffset);
-    mql1024.addEventListener("change", updateLanyardOffset);
-    mql768.addEventListener("change", updateLanyardOffset);
-
-    return () => {
-      mql1366.removeEventListener("change", updateLanyardOffset);
-      mql1024.removeEventListener("change", updateLanyardOffset);
-      mql768.removeEventListener("change", updateLanyardOffset);
-    };
   }, []);
+
+  const homeLogoNodes = useMemo(() => logosData.map(({ file, name }) => {
+    return {
+      node: (
+        <div className="flex flex-col items-center justify-center px-8 transition-all duration-300 hover:scale-105 gap-3">
+          <div className="h-10 sm:h-12 flex items-center justify-center">
+            <img
+              src={`/assets/homeLogos/${encodeURIComponent(file)}`}
+              alt={name}
+              height="48"
+              className="h-full w-auto object-contain select-none [-webkit-user-drag:none]"
+              draggable={false}
+              onError={(e) => {
+                (e.target as HTMLImageElement).style.display = 'none';
+              }}
+            />
+          </div>
+          <span className="text-sm font-medium text-white/80 whitespace-nowrap font-sans tracking-tight">{name}</span>
+        </div>
+      ),
+      title: name
+    };
+  }), [logosData]);
 
   const navItems = [
     { id: "about", label: "About Me", href: "#about" },
@@ -124,7 +83,6 @@ export default function Home() {
     { id: "organizations", label: "Organizations", href: "#organizations" },
     { id: "achievements", label: "Achievements", href: "#achievements" },
     { id: "contacts", label: "Get in Touch", href: "#contacts" },
-    { id: "journey", label: "Journey", href: "/journey" },
   ];
 
   // 1. BROWSER HISTORY LOGIC
@@ -134,6 +92,8 @@ export default function Home() {
         setLightbox((prev) => ({ ...prev, isOpen: false }));
       } else if (activeProject) {
         setActiveProject(null);
+      } else if (isContactOpen) {
+        setIsContactOpen(false);
       }
     };
 
@@ -141,6 +101,7 @@ export default function Home() {
       if (e.key === "Escape") {
         if (lightbox.isOpen) window.history.back();
         else if (activeProject) window.history.back();
+        else if (isContactOpen) window.history.back();
       }
     };
 
@@ -150,69 +111,10 @@ export default function Home() {
       window.removeEventListener("popstate", handlePopState);
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [lightbox.isOpen, activeProject]);
-
-  // 2. GYROSCOPE LOGIC
-  const handleOrientation = useCallback((event: DeviceOrientationEvent) => {
-    let { beta, gamma } = event;
-    if (beta === null || gamma === null) return;
-
-    beta = Math.max(-90, Math.min(90, Math.floor(beta)));
-    gamma = Math.max(-90, Math.min(90, Math.floor(gamma)));
-
-    const gx = gamma * 0.6;
-    const gz = (beta - 45) * 0.6;
-
-    setGyroGravity([gx, -40, gz]);
-  }, []);
-
-  useEffect(() => {
-    if (isGyroEnabled && typeof window !== "undefined" && window.DeviceOrientationEvent) {
-      window.addEventListener('deviceorientation', handleOrientation);
-    } else {
-      if (typeof window !== "undefined") {
-        window.removeEventListener('deviceorientation', handleOrientation);
-      }
-      setGyroGravity([0, -40, 0]);
-    }
-    return () => {
-      if (typeof window !== "undefined") {
-        window.removeEventListener('deviceorientation', handleOrientation);
-      }
-    };
-  }, [isGyroEnabled, handleOrientation]);
-
-  useEffect(() => {
-    if (typeof window !== "undefined" && window.DeviceOrientationEvent) {
-      if (typeof (DeviceOrientationEvent as any).requestPermission !== 'function') {
-        setIsGyroEnabled(true);
-      }
-    }
-  }, []);
-
-  const toggleGyro = async () => {
-    if (isGyroEnabled) {
-      setIsGyroEnabled(false);
-    } else {
-      if (typeof window !== "undefined" && window.DeviceOrientationEvent) {
-        if (typeof (DeviceOrientationEvent as any).requestPermission === 'function') {
-          try {
-            const permission = await (DeviceOrientationEvent as any).requestPermission();
-            if (permission === 'granted') {
-              setIsGyroEnabled(true);
-            }
-          } catch (e) {
-            console.error("Gyro error:", e);
-          }
-        } else {
-          setIsGyroEnabled(true);
-        }
-      }
-    }
-  };
+  }, [lightbox.isOpen, activeProject, isContactOpen]);
 
   // 3. SCROLL LOCK LOGIC
-  const isOverlayOpen = activeProject !== null || lightbox.isOpen;
+  const isOverlayOpen = activeProject !== null || lightbox.isOpen || isContactOpen;
 
   useEffect(() => {
     if (isOverlayOpen) {
@@ -239,6 +141,11 @@ export default function Home() {
   const closeLightbox = () => window.history.back();
   const setLightboxIndex = (index: number) => setLightbox(prev => ({ ...prev, index }));
 
+  const openContactModal = () => {
+    window.history.pushState({ contactModalOpen: true }, "");
+    setIsContactOpen(true);
+  };
+
   const achievementTargetById = useCallback((id: string) =>
     researchData.find((project) => project.id === id) ||
     projectsData.find((project) => project.id === id) ||
@@ -246,73 +153,10 @@ export default function Home() {
     organizationsData.find((project) => project.id === id)
     , []);
 
-  const techLogos = useMemo(() => achievements.map((item, index) => {
-    const combinedTitle = item.title.trim();
-    const isExternal = item.href?.startsWith("http");
-    const targetId = item.href?.startsWith("#") ? item.href.slice(1) : undefined;
-    const modalTarget = targetId ? achievementTargetById(targetId) : undefined;
+  // Used by AchievementShelf to resolve linkedProjectId strings
+  const findProject = useCallback((id: string) => achievementTargetById(id), [achievementTargetById]);
 
-    const card = (
-      <div className="w-[260px] sm:w-[300px] rounded-3xl border border-white/15 bg-[#111111] p-4 text-left transition-all duration-300 hover:scale-[1.02] hover:border-white my-2">
-        <div className="flex items-center justify-between">
-          <p className="text-xs uppercase tracking-wide text-white/60 truncate">{item.competitionType}</p>
-          <p className="text-xs uppercase tracking-wide text-white/60 truncate">{item.date}</p>
-        </div>
-        <h3 className="mt-1 text-base font-semibold text-white truncate">{combinedTitle}</h3>
-        <p className="mt-1 text-xs text-white/60 truncate">{item.organizer}</p>
-      </div>
-    );
 
-    if (modalTarget) {
-      return {
-        node: (
-          <button
-            type="button"
-            onClick={() => openProjectModal(modalTarget)}
-            className="block"
-            aria-label={`Open ${combinedTitle}`}
-          >
-            {card}
-          </button>
-        ),
-        title: combinedTitle
-      };
-    }
-
-    if (item.href && isExternal) {
-      return {
-        node: (
-          <a
-            href={item.href}
-            target="_blank"
-            rel="noreferrer"
-            className="block"
-            aria-label={`Open ${combinedTitle}`}
-          >
-            {card}
-          </a>
-        ),
-        title: combinedTitle
-      };
-    }
-
-    if (item.href) {
-      return {
-        node: (
-          <Link href={item.href} className="block" aria-label={`Open ${combinedTitle}`}>
-            {card}
-          </Link>
-        ),
-        title: combinedTitle
-      };
-    }
-
-    return {
-      node: <div className="block">{card}</div>,
-      title: combinedTitle,
-      ariaLabel: `Achievement ${index + 1}`
-    };
-  }), [achievementTargetById]);
 
   return (
     <div id="profile" className="min-h-screen overflow-x-hidden bg-[var(--theme-main)] relative pt-0 pb-10">
@@ -324,66 +168,82 @@ export default function Home() {
       <PillNav
         items={navItems}
         forceClose={isOverlayOpen}
-        togglePerformanceMode={togglePerformanceMode}
-        isGyroEnabled={isGyroEnabled}
-        toggleGyro={toggleGyro}
-        isLowPerformanceMode={isLowPerformanceMode}
       />
 
       {/* HEADER SECTION */}
       <div className="w-full relative overflow-visible">
         <div className="absolute inset-0 w-full h-full pointer-events-none">
           <div style={{ width: '100%', height: '100%', position: 'relative', WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%)', maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%)' }}>
-            {!isLowPerformanceMode ? (
-              <>
-                <ColorBends colors={["#10282b"]} rotation={90} speed={0.2} scale={1} frequency={1} warpStrength={1} mouseInfluence={1} noise={0.15} parallax={0.5} iterations={1} intensity={1.5} bandWidth={6} transparent autoRotate={0} />
-              </>
-            ) : (
-              <div className="absolute inset-0 bg-gradient-to-br from-[var(--theme-main)] via-[var(--theme-bg-gradient)] to-[var(--theme-main)] opacity-80" />
-            )}
+            <Aurora
+              colorStops={["#7cff67", "#B497CF", "#5227FF"]}
+              blend={0.5}
+              amplitude={1.0}
+              speed={1}
+            />
           </div>
         </div>
-        <div className={`mx-auto max-w-[1366px] min-h-[100svh] xl:min-h-screen px-4 sm:px-6 ${isLowPerformanceMode ? 'flex items-center' : 'flex items-center xl:items-stretch'}`}>
-          <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 xl:gap-0 w-full min-h-[100svh] xl:min-h-screen">
-            <div className={`col-span-1 h-full relative z-10 order-2 xl:order-1 ${!isLowPerformanceMode ? 'xl:col-span-6' : 'xl:col-span-12'}`}>
-              <div className={`flex ${!isLowPerformanceMode ? 'items-start xl:items-center' : 'items-center'} h-full w-full`}>
-                <div className={`flex flex-col gap-6 ${!isLowPerformanceMode ? '-mt-28 sm:-mt-20 md:-mt-10 lg:-mt-64 xl:mt-0' : 'w-full max-w-5xl mx-auto mt-0 sm:mt-4'}`}>
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 mt-0 sm:mt-0 md:mt-14">
-                    <p className="text-lg sm:text-2xl text-white font-bold">Open to Position as a</p>
-                    <RotatingText texts={['Data Analyst', 'Data Scientist', 'Risk Analyst', 'Management Trainee']} mainClassName="text-[var(--theme-accent)] overflow-hidden text-lg sm:text-2xl font-bold inline-flex" staggerFrom="first" initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "-120%" }} staggerDuration={0.025} splitLevelClassName="overflow-hidden" transition={{ type: "spring", damping: 30, stiffness: 400 }} rotationInterval={2000} animatePresenceMode="wait" animatePresenceInitial={false} splitBy="characters" auto loop />
-                  </div>
-                  <h1 className="flex flex-col items-start gap-4">
-                    <span className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-semibold text-start whitespace-normal lg:whitespace-nowrap text-white">I'm Maulana Raji Shofil Fuadi</span>
-                    <span className="text-xl sm:text-2xl md:text-4xl lg:text-5xl font-semibold text-start text-[var(--theme-accent)]">Actuarial Science Graduate</span>
-                  </h1>
-                  <div className="flex flex-col items-start">
-                    <p className="text-sm sm:text-base font-medium text-white/70 mb-4">Based in Makassar, South Sulawesi, Indonesia</p>
-                    <p className="text-base sm:text-lg md:text-xl mb-6 md:mb-8 text-white">I turn numbers into decisions. My background is a unique blend of actuarial science, research nerd, and proven leadership. Driven by curiosity, I'm always chasing the next frontier, currently pushing into AI automation.</p>
-                    <div className="flex flex-wrap gap-4 mt-2 mb-6 md:mb-8">
-                      <Link href="/journey" className="px-6 py-3 bg-[var(--theme-accent)] text-[var(--theme-main)] font-bold rounded-full hover:scale-105 transition-transform duration-300">
-                        See My Journey
-                      </Link>
-                      <a href="#projects" className="px-6 py-3 bg-white/10 text-white font-bold rounded-full border border-white/20 hover:bg-white/20 transition-colors duration-300">
-                        See My Work
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </div>
+        <div className="mx-auto max-w-[1366px] min-h-[100svh] xl:min-h-screen px-4 sm:px-6 flex items-center justify-center">
+          <div className="w-full max-w-5xl relative z-10 flex flex-col items-center justify-center text-center">
+
+            {/* Badge */}
+            <div className="inline-flex items-center gap-3 p-1 pr-5 rounded-full border border-white/10 bg-[#151515]/60 backdrop-blur-md mb-6">
+              <span className="bg-white text-black text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider">
+                Based in
+              </span>
+              <span className="text-[#a1a1aa] text-sm font-medium">
+                Jakarta, Indonesia
+              </span>
             </div>
-            <div className={`col-span-1 xl:col-span-6 relative z-0 overflow-visible order-1 xl:order-2 ${!isLowPerformanceMode ? '-mt-40 sm:-mt-48 md:-mt-80 lg:-mt-10 xl:-mt-0' : 'hidden'}`}>
-              <div className="relative h-[100svh] xl:h-screen w-[280%] -ml-[90%] sm:w-[300%] sm:-ml-[100%] md:w-[350%] md:-ml-[125%] lg:w-[350%] lg:-ml-[125%] xl:w-[400%] xl:-ml-[130%] 2xl:w-[450%] 2xl:-ml-[150%] flex items-center justify-center">
-                {!isLowPerformanceMode && (
-                  <Lanyard position={[0, 0, 15]} gravity={gyroGravity} lanyardOffsetY={lanyardOffsetY} />
-                )}
-              </div>
+
+            {/* Headline */}
+            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-bold tracking-tight text-white leading-[1.1] mb-4 font-sans">
+              Maulana Raji Shofil Fuadi
+            </h1>
+
+            {/* Subtitle */}
+            <h2 className="text-lg sm:text-xl md:text-2xl font-medium text-[#a1a1aa] mb-10">
+              Data Analyst & AI Enthusiast
+            </h2>
+
+            {/* CTAs */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full mb-12">
+              <a href="#projects" className="relative px-8 py-3 bg-[var(--theme-accent)] text-[var(--theme-main)] font-bold rounded-full transition-all duration-300 whitespace-nowrap overflow-hidden group hover:scale-105 hover:shadow-[0_0_20px_var(--theme-accent)]">
+                <span className="relative z-10">Explore Projects</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out" />
+              </a>
+              <a href="#about" className="relative px-8 py-3 bg-white/5 text-white font-bold rounded-full border border-white/20 transition-all duration-300 whitespace-nowrap overflow-hidden group hover:border-white/40 hover:shadow-[0_0_15px_rgba(255,255,255,0.15)]">
+                <span className="relative z-10">About Me</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out" />
+              </a>
+            </div>
+
+
+          </div>
+        </div>
+
+        {/* Hero Logos */}
+        <div className="absolute bottom-8 left-0 right-0 w-full z-10">
+          <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
+            <p className="text-center text-[#a1a1aa] text-[11px] uppercase tracking-widest font-semibold mb-6">Experiences & Affiliations</p>
+            <div className="min-h-[80px]">
+              <LogoLoop
+                logos={homeLogoNodes}
+                speed={50}
+                direction="left"
+                gap={24}
+                pauseOnHover={false}
+                enableDrag
+                fadeOut
+                fadeOutColor="var(--theme-main)"
+                ariaLabel="Home Logos"
+              />
             </div>
           </div>
         </div>
       </div>
 
       {/* NEW SECTION: ABOUT ME */}
-      <section id="about" className="w-full mt-20 scroll-mt-24 md:scroll-mt-28">
+      <AnimatedSection id="about" className="w-full mt-20 scroll-mt-24 md:scroll-mt-28">
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
           <h2 className="text-3xl sm:text-4xl font-semibold text-white mb-6">About Me</h2>
           <div className="bg-[#111111] border border-white/15 rounded-3xl p-6 sm:p-10 shadow-[0_20px_60px_rgba(255,255,255,0.05)]">
@@ -393,7 +253,7 @@ export default function Home() {
               {/* Bio: Left, 2/3 width */}
               <div className="space-y-6 lg:col-span-2">
                 <p className="text-white leading-relaxed text-base sm:text-lg">
-                  I don't fit neatly into one box. Analytically trained in actuarial science and certified in data analytics, I'm equally drawn to the creative and human side of problem solving. I research things, build things, and lead people along the way. The common thread across all of it? Curiosity, and a refusal to stop at good enough.
+                  I turn numbers into decisions. My background is a unique blend of actuarial science, research nerd, and proven leadership. Driven by curiosity, I&apos;m always chasing the next frontier, currently pushing into AI automation.
                 </p>
               </div>
 
@@ -465,10 +325,10 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </section>
+      </AnimatedSection>
 
       {/* 1. SECTION EXPERIENCES */}
-      <section id="experiences" className="w-full mt-20 scroll-mt-24 md:scroll-mt-28">
+      <AnimatedSection id="experiences" className="w-full mt-20 scroll-mt-24 md:scroll-mt-28">
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
           <h2 className="text-3xl sm:text-4xl font-semibold text-white mb-6">Experiences</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -477,10 +337,10 @@ export default function Home() {
             ))}
           </div>
         </div>
-      </section>
+      </AnimatedSection>
 
       {/* 2. SECTION PROJECTS */}
-      <section id="projects" className="w-full mt-20 scroll-mt-24 md:scroll-mt-28">
+      <AnimatedSection id="projects" className="w-full mt-20 scroll-mt-24 md:scroll-mt-28">
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
           <h2 className="text-3xl sm:text-4xl font-semibold text-white mb-6">Projects</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -489,10 +349,10 @@ export default function Home() {
             ))}
           </div>
         </div>
-      </section>
+      </AnimatedSection>
 
       {/* 3. SECTION RESEARCH */}
-      <section id="research" className="w-full mt-20 scroll-mt-24 md:scroll-mt-28">
+      <AnimatedSection id="research" className="w-full mt-20 scroll-mt-24 md:scroll-mt-28">
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
           <h2 className="text-3xl sm:text-4xl font-semibold text-white mb-6">Research</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -501,10 +361,10 @@ export default function Home() {
             ))}
           </div>
         </div>
-      </section>
+      </AnimatedSection>
 
       {/* 4. SECTION ORGANIZATIONS */}
-      <section id="organizations" className="w-full mt-20 scroll-mt-24 md:scroll-mt-28">
+      <AnimatedSection id="organizations" className="w-full mt-20 scroll-mt-24 md:scroll-mt-28">
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
           <h2 className="text-3xl sm:text-4xl font-semibold text-white mb-6">Organizations</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -513,27 +373,19 @@ export default function Home() {
             ))}
           </div>
         </div>
-      </section>
+      </AnimatedSection>
 
       {/* 5. SECTION ACHIEVEMENTS */}
-      <section id="achievements" className="w-full mt-20 scroll-mt-24 md:scroll-mt-28">
+      <AnimatedSection id="achievements" className="w-full mt-20 scroll-mt-24 md:scroll-mt-28">
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
           <h2 className="text-3xl sm:text-4xl font-semibold text-white mb-6">Achievements</h2>
-          <div className="py-2 overflow-visible">
-            <LogoLoop
-              logos={techLogos}
-              speed={60}
-              direction="left"
-              gap={12}
-              pauseOnHover
-              enableDrag
-              fadeOut
-              fadeOutColor="var(--theme-main)"
-              ariaLabel="Achievements"
-            />
-          </div>
+          <AchievementShelf
+            items={achievements}
+            findProject={findProject}
+            onOpenModal={openProjectModal}
+          />
         </div>
-      </section>
+      </AnimatedSection>
 
       {/* FOOTER */}
       <footer id="contacts" className="w-full mt-28 border-t border-white/10 pt-10 pb-6 flex flex-col scroll-mt-24 md:scroll-mt-28">
@@ -547,9 +399,9 @@ export default function Home() {
             {/* Center: Social Icons */}
             <div className="w-full md:w-1/3 flex justify-center">
               <div className="flex items-center gap-6">
-                <a href="mailto:maulanarajisf@gmail.com" target="_blank" rel="noreferrer" className="transition-opacity hover:opacity-80" aria-label="Email Maulana">
+                <button onClick={openContactModal} className="transition-opacity hover:opacity-80" aria-label="Email Maulana">
                   <Image src="/assets/footer/mail.svg" alt="Email Logo" width={28} height={28} />
-                </a>
+                </button>
                 <a href="https://github.com/ajimolana" target="_blank" rel="noreferrer" className="transition-opacity hover:opacity-80" aria-label="GitHub Profile">
                   <Image src="/assets/footer/github.svg" alt="GitHub Logo" width={28} height={28} />
                 </a>
@@ -562,17 +414,18 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Right: Request CV */}
+            {/* Right: Contact Button */}
             <div className="w-full md:w-1/3 flex justify-center md:justify-end">
-              <a href="mailto:maulanarajisf@gmail.com?subject=Request%20for%20CV&body=Hello%20Maulana%2C%0D%0A%0D%0AI'm%20%5BYour%20Name%5D%20from%20%5BCompany%2FOrganization%5D.%20I%20would%20like%20to%20request%20a%20copy%20of%20your%20CV.%0D%0A%0D%0AThank%20you." className="px-8 py-3 bg-[var(--theme-accent)] text-[var(--theme-main)] font-bold rounded-full hover:scale-105 transition-transform duration-300 whitespace-nowrap">
-                Request CV
-              </a>
+              <button onClick={openContactModal} className="relative px-8 py-3 bg-[var(--theme-accent)] text-[var(--theme-main)] font-bold rounded-full transition-all duration-300 whitespace-nowrap overflow-hidden group hover:scale-105 hover:shadow-[0_0_20px_var(--theme-accent)]">
+                <span className="relative z-10">Send a Message</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out" />
+              </button>
             </div>
           </div>
 
           <div className="mt-12 md:mt-16 w-full text-center">
             <p className="text-sm text-[#dfdfdf] px-4">
-              Copyright &copy; 2026 Maulana Raji Shofil Fuadi. All rights reserved.
+              &copy; {new Date().getFullYear()}, Maulana Raji Shofil Fuadi.
             </p>
           </div>
         </div>
@@ -593,6 +446,17 @@ export default function Home() {
         index={lightbox.index}
         onClose={closeLightbox}
         setIndex={setLightboxIndex}
+      />
+
+      {/* CONTACT MODAL */}
+      <ContactModal
+        isOpen={isContactOpen}
+        onClose={() => {
+          setIsContactOpen(false);
+          if (window.history.state?.contactModalOpen) {
+            window.history.back();
+          }
+        }}
       />
     </div>
   );
