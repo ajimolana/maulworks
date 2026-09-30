@@ -22,20 +22,21 @@ interface PillNavProps {
 
 export default function PillNav({ items, forceClose, titleOverride, homeHref, activeItemOverride, disableScrollSpy }: PillNavProps) {
   const [activeItem, setActiveItem] = useState<string | null>(activeItemOverride || "profile");
-  // Initialize from actual scroll position to avoid animated jump on mount
   const [isScrolled, setIsScrolled] = useState(() =>
     typeof window !== "undefined" ? window.scrollY > 50 : false
   );
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  // Delay layoutId activation to prevent cross-page jump on mount
   const [pillReady, setPillReady] = useState(false);
   const [memojiHovered, setMemojiHovered] = useState(false);
   const [memojiClicked, setMemojiClicked] = useState(false);
 
+  const sheetRef = useRef<HTMLDivElement>(null);
+  const dragStartY = useRef<number | null>(null);
+  const [dragOffset, setDragOffset] = useState(0);
+
   const isClickingRef = useRef(false);
   const clickTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Activate layoutId only after mount to prevent cross-page pill jump
   useEffect(() => {
     let raf1: number;
     let raf2: number;
@@ -61,7 +62,6 @@ export default function PillNav({ items, forceClose, titleOverride, homeHref, ac
 
   useEffect(() => {
     const handleScroll = () => {
-      // Toggle scrolled state
       if (window.scrollY > 50) {
         setIsScrolled(true);
       } else {
@@ -69,10 +69,8 @@ export default function PillNav({ items, forceClose, titleOverride, homeHref, ac
       }
 
       if (disableScrollSpy) return;
-
       if (isClickingRef.current) return;
 
-      // Check if user is at the bottom of the page
       const isAtBottom = Math.ceil(window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 50;
 
       if (isAtBottom && items.length > 0) {
@@ -88,7 +86,6 @@ export default function PillNav({ items, forceClose, titleOverride, homeHref, ac
           setActiveItem(items[items.length - 1].id);
         }
       } else {
-        // Update active item based on scroll position
         let currentSection: string | null = null;
         const triggerPoint = window.innerHeight * 0.5;
         for (const item of items) {
@@ -100,17 +97,15 @@ export default function PillNav({ items, forceClose, titleOverride, homeHref, ac
             }
           }
         }
-        // If we haven't scrolled down to the first section yet, set active to profile
         setActiveItem(currentSection || "profile");
       }
     };
 
     window.addEventListener("scroll", handleScroll);
-    handleScroll(); // Initial check
+    handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
   }, [items]);
 
-  // Lock body scroll when mobile menu is open
   useEffect(() => {
     if (mobileMenuOpen) {
       document.body.style.overflow = "hidden";
@@ -122,11 +117,39 @@ export default function PillNav({ items, forceClose, titleOverride, homeHref, ac
     };
   }, [mobileMenuOpen]);
 
+  useEffect(() => {
+    if (!mobileMenuOpen) {
+      setDragOffset(0);
+      dragStartY.current = null;
+    }
+  }, [mobileMenuOpen]);
+
+  const handlePointerDown = (e: React.PointerEvent) => {
+    dragStartY.current = e.clientY;
+    sheetRef.current?.setPointerCapture(e.pointerId);
+  };
+
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (dragStartY.current === null) return;
+    const delta = e.clientY - dragStartY.current;
+    if (delta > 0) {
+      setDragOffset(delta);
+    }
+  };
+
+  const handlePointerUp = () => {
+    if (dragOffset > 80) {
+      setMobileMenuOpen(false);
+    } else {
+      setDragOffset(0);
+    }
+    dragStartY.current = null;
+  };
+
   return (
     <>
       <div
-        className={`fixed top-0 inset-x-0 z-[100] flex justify-center px-2 lg:px-6 pointer-events-none transition-opacity duration-150 ${forceClose ? "opacity-0" : "opacity-100"
-          }`}
+        className={`fixed top-0 inset-x-0 z-[100] flex justify-center px-2 lg:px-6 pointer-events-none transition-opacity duration-150 ${forceClose ? "opacity-0" : "opacity-100"}`}
       >
         <div
           className={`${forceClose ? "pointer-events-none" : "pointer-events-auto"} flex items-center justify-between overflow-hidden mt-2 lg:mt-4 py-2 border transition-all duration-[800ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${isScrolled
@@ -135,15 +158,11 @@ export default function PillNav({ items, forceClose, titleOverride, homeHref, ac
             }`}
         >
           {/* LOGO / TITLE */}
-          <div
-            className="flex-shrink-0 flex items-center gap-2 font-semibold tracking-tight transition-colors text-white text-lg"
-          >
+          <div className="flex-shrink-0 flex items-center gap-2 font-semibold tracking-tight transition-colors text-white text-lg">
             <button
-              onClick={() => {
-                setMemojiClicked(true);
-              }}
+              onClick={() => { setMemojiClicked(true); }}
               onMouseEnter={() => {
-                if (typeof window !== 'undefined' && window.innerWidth >= 768) {
+                if (typeof window !== "undefined" && window.innerWidth >= 768) {
                   setMemojiHovered(true);
                 }
               }}
@@ -160,7 +179,7 @@ export default function PillNav({ items, forceClose, titleOverride, homeHref, ac
                 width={128}
                 height={128}
                 quality={100}
-                className={`w-auto h-8 object-contain transition-transform duration-300 cursor-pointer ${memojiHovered ? 'scale-125' : 'scale-100'} ${memojiHovered && !memojiClicked ? '-rotate-6' : 'rotate-0'}`}
+                className={`w-auto h-8 object-contain transition-transform duration-300 cursor-pointer ${memojiHovered ? "scale-125" : "scale-100"} ${memojiHovered && !memojiClicked ? "-rotate-6" : "rotate-0"}`}
               />
             </button>
             <Link
@@ -194,8 +213,7 @@ export default function PillNav({ items, forceClose, titleOverride, homeHref, ac
                   key={item.id}
                   href={item.href}
                   onClick={() => handleItemClick(item.id)}
-                  className={`relative px-4 py-2 text-[14px] font-medium transition-colors rounded-full whitespace-nowrap ${isActive ? "text-black" : "text-white/70 hover:text-white"
-                    }`}
+                  className={`relative px-4 py-2 text-[14px] font-medium transition-colors rounded-full whitespace-nowrap ${isActive ? "text-black" : "text-white/70 hover:text-white"}`}
                 >
                   {isActive && (
                     pillReady ? (
@@ -222,65 +240,105 @@ export default function PillNav({ items, forceClose, titleOverride, homeHref, ac
               aria-label="Toggle Mobile Menu"
             >
               <div className="relative w-5 h-4">
-                <span
-                  className={`block absolute h-0.5 w-full bg-white transition-all duration-300 ease-in-out ${mobileMenuOpen ? "top-1.5 rotate-45" : "top-0"
-                    }`}
-                />
-                <span
-                  className={`block absolute h-0.5 w-full bg-white transition-all duration-300 ease-in-out top-1.5 ${mobileMenuOpen ? "opacity-0" : "opacity-100"
-                    }`}
-                />
-                <span
-                  className={`block absolute h-0.5 w-full bg-white transition-all duration-300 ease-in-out ${mobileMenuOpen ? "top-1.5 -rotate-45" : "top-3"
-                    }`}
-                />
+                <span className={`block absolute h-0.5 w-full bg-white transition-all duration-300 ease-in-out ${mobileMenuOpen ? "top-1.5 rotate-45" : "top-0"}`} />
+                <span className={`block absolute h-0.5 w-full bg-white transition-all duration-300 ease-in-out top-1.5 ${mobileMenuOpen ? "opacity-0" : "opacity-100"}`} />
+                <span className={`block absolute h-0.5 w-full bg-white transition-all duration-300 ease-in-out ${mobileMenuOpen ? "top-1.5 -rotate-45" : "top-3"}`} />
               </div>
             </button>
           </div>
         </div>
       </div>
 
-      {/* MOBILE FULLSCREEN MENU */}
+      {/* MOBILE BOTTOM SHEET MENU */}
       <AnimatePresence>
-        {mobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-            className={`fixed inset-0 z-[99] bg-[#111111]/95 backdrop-blur-xl flex flex-col pt-20 pb-8 px-6 pointer-events-auto ${forceClose ? "hidden" : "flex"
-              }`}
-          >
-            {/* NAV LINKS — centered in their own flex-1 zone */}
-            <div className="flex-1 flex flex-col items-center justify-center gap-6">
-              {items.map((item) => {
-                const isActive = activeItem === item.id;
-                return (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
-                    key={item.id}
-                  >
-                    <Link
-                      href={item.href}
-                      onClick={() => {
-                        handleItemClick(item.id);
-                        setMobileMenuOpen(false);
-                      }}
-                      className={`block text-2xl font-semibold tracking-wide transition-all ${
-                        isActive ? "text-[var(--theme-accent)]" : "text-white/70 hover:text-white"
-                      }`}
-                    >
-                      {item.label}
-                    </Link>
-                  </motion.div>
-                );
-              })}
-            </div>
+        {mobileMenuOpen && !forceClose && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              key="backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              className="fixed inset-0 z-[98] bg-black/60 backdrop-blur-sm xl:hidden"
+              onClick={() => setMobileMenuOpen(false)}
+            />
 
-            {/* SETTINGS — always pinned at bottom */}
-          </motion.div>
+            {/* Bottom Sheet */}
+            <motion.div
+              key="bottom-sheet"
+              ref={sheetRef}
+              initial={{ y: "100%" }}
+              animate={{ y: dragOffset > 0 ? dragOffset : 0 }}
+              exit={{ y: "100%" }}
+              transition={
+                dragOffset > 0
+                  ? { type: "tween", duration: 0 }
+                  : { type: "spring", stiffness: 400, damping: 40 }
+              }
+              style={{ touchAction: "none" }}
+              className="fixed bottom-0 inset-x-0 z-[99] xl:hidden bg-[#111111] border-t border-white/10 rounded-t-3xl shadow-[0_-20px_60px_rgba(0,0,0,0.6)]"
+              onPointerDown={handlePointerDown}
+              onPointerMove={handlePointerMove}
+              onPointerUp={handlePointerUp}
+              onPointerCancel={handlePointerUp}
+            >
+              {/* Drag Handle */}
+              <div className="flex justify-center pt-3 pb-1 select-none">
+                <div className="w-10 h-1 rounded-full bg-white/20" />
+              </div>
+
+              {/* Section label */}
+              <p className="text-center text-[10px] uppercase tracking-[0.2em] text-white/30 font-semibold mt-1 mb-4 select-none">
+                Navigate
+              </p>
+
+              {/* Nav Links */}
+              <nav className="flex flex-col px-6 gap-1 pb-10">
+                {items.map((item, i) => {
+                  const isActive = activeItem === item.id;
+                  return (
+                    <motion.div
+                      key={item.id}
+                      initial={{ opacity: 0, x: -12 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -12 }}
+                      transition={{ delay: i * 0.04, duration: 0.25, ease: "easeOut" }}
+                    >
+                      <Link
+                        href={item.href}
+                        onClick={() => {
+                          handleItemClick(item.id);
+                          setMobileMenuOpen(false);
+                        }}
+                        className={`flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all duration-200 ${
+                          isActive
+                            ? "bg-white/10 border border-white/15"
+                            : "hover:bg-white/5 border border-transparent"
+                        }`}
+                      >
+                        <span
+                          className={`w-1.5 h-1.5 rounded-full flex-shrink-0 transition-all duration-300 ${
+                            isActive
+                              ? "bg-[var(--theme-accent)] shadow-[0_0_6px_var(--theme-accent)] scale-110"
+                              : "bg-white/20"
+                          }`}
+                        />
+                        <span
+                          className={`text-[17px] font-semibold tracking-wide transition-colors ${
+                            isActive ? "text-white" : "text-white/50"
+                          }`}
+                        >
+                          {item.label}
+                        </span>
+
+                      </Link>
+                    </motion.div>
+                  );
+                })}
+              </nav>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </>
