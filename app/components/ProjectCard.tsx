@@ -14,7 +14,7 @@ export default function ProjectCard({ project, onClick, variant = "default" }: P
         type="button"
         onClick={() => onClick(project)}
         aria-label={`Open details for ${project.title}`}
-        className="group relative text-left rounded-3xl border border-white/15 bg-[#111111] p-4 transition-all duration-300 hover:-translate-y-1.5 hover:border-white/70 hover:shadow-[0_20px_60px_rgba(255,255,255,0.15)] flex items-center gap-4"
+        className="group relative text-left rounded-3xl border border-white/15 bg-[#111111] p-4 transition-all duration-300 hover:-translate-y-1.5 active:scale-[0.98] hover:border-white/70 hover:shadow-[0_20px_60px_rgba(255,255,255,0.15)] flex items-center gap-4 w-full h-full"
       >
         <div className="pointer-events-none absolute inset-0 rounded-3xl opacity-0 transition-opacity duration-300 group-hover:opacity-100" style={{ boxShadow: '0 0 80px rgba(255,255,255,0.18)' }} />
 
@@ -30,7 +30,7 @@ export default function ProjectCard({ project, onClick, variant = "default" }: P
             <p className="text-xs uppercase tracking-wide text-white/60 flex-shrink-0">{project.year}</p>
           </div>
           <h3 className="mt-1 text-base sm:text-lg font-semibold text-white truncate">{project.title}</h3>
-          <p className="mt-1 text-xs text-white/60 truncate">{project.shortDesc}</p>
+          <p className="mt-1 text-xs text-white/60 line-clamp-2 sm:line-clamp-1">{project.shortDesc}</p>
         </div>
       </button>
     );
@@ -42,12 +42,12 @@ export default function ProjectCard({ project, onClick, variant = "default" }: P
       type="button"
       onClick={() => onClick(project)}
       aria-label={`Open details for ${project.title}`}
-      className="group relative text-left rounded-3xl border border-white/15 bg-[#111111] p-3 transition-all duration-300 hover:-translate-y-1.5 hover:border-white/70 hover:shadow-[0_20px_60px_rgba(255,255,255,0.15)]"
+      className="group relative text-left rounded-3xl border border-white/15 bg-[#111111] p-3 transition-all duration-300 hover:-translate-y-1.5 active:scale-[0.98] hover:border-white/70 hover:shadow-[0_20px_60px_rgba(255,255,255,0.15)] w-full h-full flex flex-col"
     >
       <div className="pointer-events-none absolute inset-0 rounded-3xl opacity-0 transition-opacity duration-300 group-hover:opacity-100" style={{ boxShadow: '0 0 80px rgba(255,255,255,0.18)' }} />
 
       {variant !== "research" && project.heroImage && (
-        <div className="relative overflow-hidden rounded-2xl h-56 w-full">
+        <div className="relative overflow-hidden rounded-2xl h-48 sm:h-56 w-full">
           <Image
             src={project.heroImage}
             alt={project.title}
@@ -58,15 +58,15 @@ export default function ProjectCard({ project, onClick, variant = "default" }: P
         </div>
       )}
 
-      <div className={`px-2 ${variant === 'research' ? 'pt-1 pb-1' : 'pt-4 pb-2'}`}>
+      <div className={`px-2 flex-1 flex flex-col ${variant === 'research' ? 'pt-1 pb-1' : 'pt-4 pb-2'}`}>
         <div className="flex items-center justify-between">
-          <p className="text-xs uppercase tracking-widest text-white/60">{project.cardTag}</p>
-          <p className="text-xs uppercase tracking-wide text-white/60">{project.year}</p>
+          <p className="text-xs uppercase tracking-wide text-white/60 truncate mr-2">{project.cardTag}</p>
+          <p className="text-xs uppercase tracking-wide text-white/60 flex-shrink-0">{project.year}</p>
         </div>
-        <h3 className={`mt-1 font-semibold text-white truncate ${variant === 'research' ? 'text-base sm:text-lg' : 'text-lg sm:text-xl lg:text-xl'}`}>
+        <h3 className={`mt-1 font-semibold text-white ${variant === 'research' ? 'line-clamp-2 md:truncate md:block text-base sm:text-lg min-h-[3rem] sm:min-h-[3.5rem] md:min-h-0' : 'truncate text-lg sm:text-xl lg:text-xl'}`}>
           {project.title}
         </h3>
-        <p className={`mt-2 text-xs text-white/60 truncate ${variant === 'research' ? 'mt-1' : 'mt-2'}`}>
+        <p className={`text-xs text-white/60 truncate ${variant === 'research' ? 'mt-1' : 'mt-2'}`}>
           {project.shortDesc}
         </p>
       </div>
