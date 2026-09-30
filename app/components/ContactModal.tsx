@@ -74,12 +74,12 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
             <div className="p-6 sm:p-8 flex-1">
               <div className="flex justify-between items-center mb-6">
                 <div>
-                  <h3 className="text-2xl font-bold text-white mb-1">Get in Touch</h3>
-                  <p className="text-white/60 text-sm">Send me a message or request a CV.</p>
+                  <h3 className="text-2xl font-bold text-white mb-1">Send a Message</h3>
+                  <p className="text-white/60 text-sm">Inquiries & CV requests welcome.</p>
                 </div>
                 <button
                   onClick={onClose}
-                  className="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 text-white/60 hover:text-white hover:bg-white/10 transition-colors"
+                  className="w-11 h-11 inline-flex items-center justify-center rounded-full bg-white/5 text-white/60 active:bg-white/10 hover:text-white hover:bg-white/10 transition-colors"
                 >
                   <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                     <path d="M1 1L13 13M1 13L13 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -114,7 +114,7 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
                       id="name"
                       required
                       autoComplete="name"
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:border-[var(--theme-accent)] transition-colors"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-base sm:text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[var(--theme-accent)] transition-colors"
                       placeholder="Andi"
                     />
                   </div>
@@ -127,7 +127,7 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
                       id="email"
                       required
                       autoComplete="email"
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:border-[var(--theme-accent)] transition-colors"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-base sm:text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[var(--theme-accent)] transition-colors"
                       placeholder="andi@example.com"
                     />
                   </div>
@@ -139,7 +139,7 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
                       id="message"
                       required
                       rows={4}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:border-[var(--theme-accent)] transition-colors resize-none"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-base sm:text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[var(--theme-accent)] transition-colors resize-none"
                       placeholder="Hello Maulana, I would like to request a copy of your CV. Thank you."
                     />
                   </div>
@@ -151,7 +151,7 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="mt-4 w-full relative px-8 py-3.5 bg-[var(--theme-accent)] text-[var(--theme-main)] font-bold rounded-xl transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed group overflow-hidden"
+                    className="mt-4 w-full relative px-8 py-3.5 bg-[var(--theme-accent)] text-[var(--theme-main)] font-bold rounded-xl transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed group overflow-hidden active:scale-[0.98]"
                   >
                     <span className="relative z-10 flex items-center justify-center gap-2">
                       {isSubmitting ? (
