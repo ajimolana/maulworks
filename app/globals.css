@@ -15,6 +15,22 @@
   .text-balance {
     text-wrap: balance;
   }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-default {
+    -ms-overflow-style: auto;
+    scrollbar-width: thin;
+  }
+  .scrollbar-default::-webkit-scrollbar {
+    display: block;
+    width: 8px;
+    height: 8px;
+  }
 }
 
 /* Styling Scrollbar untuk Chrome, Safari, dan Edge */
@@ -141,6 +157,7 @@
 
   * {
     border-color: var(--border);
+    -webkit-tap-highlight-color: transparent;
     @apply border-border outline-ring;
   }
 
