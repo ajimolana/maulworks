@@ -126,7 +126,8 @@ const useAnimationLoop = (
   hoverSpeed: number | undefined,
   isVertical: boolean,
   offsetRef: React.MutableRefObject<number>,
-  velocityRef: React.MutableRefObject<number>
+  velocityRef: React.MutableRefObject<number>,
+  dragStateRef: React.RefObject<{ active: boolean; start: number; offset: number }>
 ) => {
   const rafRef = useRef<number | null>(null);
   const lastTimestampRef = useRef<number | null>(null);
@@ -171,17 +172,21 @@ const useAnimationLoop = (
       const target = isHovered && hoverSpeed !== undefined ? hoverSpeed : targetVelocity;
 
       const easingFactor = 1 - Math.exp(-deltaTime / ANIMATION_CONFIG.SMOOTH_TAU);
-      velocityRef.current += (target - velocityRef.current) * easingFactor;
 
-      if (seqSize > 0) {
-        let nextOffset = offsetRef.current + velocityRef.current * deltaTime;
-        nextOffset = ((nextOffset % seqSize) + seqSize) % seqSize;
-        offsetRef.current = nextOffset;
+      if (dragStateRef.current?.active) {
+        velocityRef.current = 0;
+      } else {
+        velocityRef.current += (target - velocityRef.current) * easingFactor;
+        if (seqSize > 0) {
+          let nextOffset = offsetRef.current + velocityRef.current * deltaTime;
+          nextOffset = ((nextOffset % seqSize) + seqSize) % seqSize;
+          offsetRef.current = nextOffset;
 
-        const transformValue = isVertical
-          ? `translate3d(0, ${-offsetRef.current}px, 0)`
-          : `translate3d(${-offsetRef.current}px, 0, 0)`;
-        track.style.transform = transformValue;
+          const transformValue = isVertical
+            ? `translate3d(0, ${-offsetRef.current}px, 0)`
+            : `translate3d(${-offsetRef.current}px, 0, 0)`;
+          track.style.transform = transformValue;
+        }
       }
 
       rafRef.current = requestAnimationFrame(animate);
@@ -290,7 +295,8 @@ export const LogoLoop = React.memo<LogoLoopProps>(
       effectiveHoverSpeed,
       isVertical,
       offsetRef,
-      velocityRef
+      velocityRef,
+      dragStateRef
     );
 
     const cssVariables = useMemo(
@@ -351,7 +357,7 @@ export const LogoLoop = React.memo<LogoLoopProps>(
       if (dt <= 0) return 0;
       // displacement is negative when dragging left (offset increases) — flip sign
       const dpx = -(last.pos - first.pos);
-      const rawVelocity = dpx / dt;
+      const rawVelocity = (dpx / dt) * 2.5; // multiplied for extra swipe punch
       return Math.max(-MAX_FLICK_VELOCITY, Math.min(MAX_FLICK_VELOCITY, rawVelocity));
     };
 
