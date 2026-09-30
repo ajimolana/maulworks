@@ -112,7 +112,7 @@ export default function ProjectModal({ activeProject, onClose, onOpenLightbox }:
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.15, ease: "easeInOut" }}
-          className="fixed inset-0 z-40 bg-black/70 p-4 sm:p-6 flex items-center justify-center backdrop-blur-sm"
+          className="fixed inset-0 z-40 bg-black/70 p-4 sm:p-6 pb-24 sm:pb-28 flex items-center justify-center backdrop-blur-sm"
           onClick={onClose}
         >
           <motion.div
@@ -120,26 +120,18 @@ export default function ProjectModal({ activeProject, onClose, onOpenLightbox }:
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.94, opacity: 0, y: 10 }}
             transition={{ duration: 0.25, ease: [0.32, 0.72, 0, 1] }}
-            className="relative w-full max-w-3xl rounded-3xl border border-white/20 bg-[#111111] text-white shadow-2xl flex flex-col max-h-[90dvh] md:max-h-[85vh] overflow-hidden"
+            className="relative w-full max-w-3xl rounded-3xl border border-white/20 bg-[#111111] text-white shadow-2xl flex flex-col max-h-[85dvh] md:max-h-[80vh] overflow-hidden"
             onClick={(event) => event.stopPropagation()}
           >
-            <div className="flex-none flex items-center justify-between bg-[#111111] px-5 py-4 sm:px-6 sm:py-5 border-b border-white/10 z-10">
-              <div className="flex items-center gap-3">
+            <div className="flex-none flex items-center bg-[#111111] px-5 py-4 sm:px-6 sm:py-5 border-b border-white/10 z-10">
+              <div className="flex items-center gap-2.5 sm:gap-3.5">
                 {activeProject.logo && (
-                  <div className="relative w-8 h-8 flex-shrink-0">
+                  <div className="relative w-5 h-5 sm:w-7 sm:h-7 flex-shrink-0">
                     <Image src={activeProject.logo} alt={activeProject.title} fill className="object-contain" />
                   </div>
                 )}
-                <h3 className="text-sm font-semibold pr-4">{activeProject.title}</h3>
+                <h3 className="text-sm sm:text-lg font-semibold pr-4 leading-5 sm:leading-7">{activeProject.title}</h3>
               </div>
-              <button
-                type="button"
-                className="flex-shrink-0 flex h-11 w-11 sm:h-9 sm:w-9 items-center justify-center rounded-full border border-white/20 bg-black/60 text-white/80 transition hover:border-white/60 hover:text-white"
-                onClick={onClose}
-                aria-label="Close Project Modal"
-              >
-                <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 6l12 12" /><path d="M18 6l-12 12" /></svg>
-              </button>
             </div>
 
             <div className="flex-1 overflow-y-auto overscroll-y-contain px-5 py-6 sm:px-6 sm:py-6 space-y-6" style={{ WebkitOverflowScrolling: 'touch' }}>
@@ -221,6 +213,17 @@ export default function ProjectModal({ activeProject, onClose, onOpenLightbox }:
               )}
             </div>
           </motion.div>
+
+          {/* Close Button Fixed outside the box */}
+          <div className="absolute bottom-6 inset-x-0 flex justify-center z-50 px-4 pointer-events-none">
+            <button
+              onClick={(e) => { e.stopPropagation(); onClose(); }}
+              aria-label="Close Modal"
+              className="flex h-12 w-12 items-center justify-center rounded-full bg-black/60 backdrop-blur-md border border-white/10 hover:border-white/30 hover:bg-white/10 text-white transition shadow-xl pointer-events-auto"
+            >
+              <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 6l12 12" /><path d="M18 6l-12 12" /></svg>
+            </button>
+          </div>
         </motion.div>
       )}
     </AnimatePresence>
