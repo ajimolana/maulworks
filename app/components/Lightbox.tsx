@@ -38,7 +38,7 @@ export default function Lightbox({ isOpen, images, captions, index, onClose, set
     const distance = touchStart - touchEnd;
     const isLeftSwipe = distance > minSwipeDistance;
     const isRightSwipe = distance < -minSwipeDistance;
-    
+
     if (isLeftSwipe) {
       setIndex((index + 1) % images.length);
     } else if (isRightSwipe) {
@@ -94,54 +94,9 @@ export default function Lightbox({ isOpen, images, captions, index, onClose, set
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4"
+          className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4 pb-28"
           onClick={onClose}
         >
-          {/* Close Button */}
-          <button
-            className="absolute top-6 right-4 sm:top-8 sm:right-8 text-white p-3 z-[110] bg-black/60 hover:bg-black/90 rounded-full backdrop-blur-sm transition-all shadow-lg"
-            onClick={(e) => {
-              e.stopPropagation();
-              onClose();
-            }}
-            aria-label="Close Lightbox"
-          >
-            <svg viewBox="0 0 24 24" className="h-6 w-6 sm:h-8 sm:w-8" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 6l12 12" /><path d="M18 6l-12 12" /></svg>
-          </button>
-
-          {/* Navigation Buttons (Fixed to screen edges) */}
-          {images.length > 1 && (
-            <>
-              <button
-                onClick={prevImage}
-                aria-label="Previous image"
-                className="absolute left-2 sm:left-8 top-1/2 -translate-y-1/2 p-3 text-white/50 hover:text-white bg-black/40 hover:bg-black/80 rounded-full transition z-[110]"
-              >
-                <svg viewBox="0 0 24 24" className="h-6 w-6 sm:h-8 sm:w-8" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 18l-6-6 6-6" /></svg>
-              </button>
-              <button
-                onClick={nextImage}
-                aria-label="Next image"
-                className="absolute right-2 sm:right-8 top-1/2 -translate-y-1/2 p-3 text-white/50 hover:text-white bg-black/40 hover:bg-black/80 rounded-full transition z-[110]"
-              >
-                <svg viewBox="0 0 24 24" className="h-6 w-6 sm:h-8 sm:w-8" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18l6-6-6-6" /></svg>
-              </button>
-            </>
-          )}
-
-          {/* Caption (Fixed to bottom of screen) */}
-          {captions[index] && (
-            <div className="absolute bottom-8 sm:bottom-10 inset-x-0 flex justify-center z-[110] pointer-events-none">
-              <motion.p
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="text-sm text-white/70 bg-black/50 px-3 py-1 rounded-full whitespace-nowrap pointer-events-auto"
-              >
-                {captions[index]}
-              </motion.p>
-            </div>
-          )}
-
           {/* Image Container */}
           <motion.div
             initial={{ scale: 0.95, opacity: 0 }}
@@ -171,11 +126,83 @@ export default function Lightbox({ isOpen, images, captions, index, onClose, set
                 priority={true}
                 unoptimized={false}
                 onLoad={() => setIsLoading(false)}
-                className={`max-h-[80vh] max-w-[90vw] xl:max-w-[1200px] object-contain w-auto h-auto rounded-lg transition-opacity duration-500 ease-in-out ${isLoading ? 'opacity-0' : 'opacity-100'
-                  }`}
+                className={`max-h-[70vh] max-w-[90vw] xl:max-w-[1200px] object-contain w-auto h-auto rounded-lg transition-opacity duration-500 ease-in-out ${
+                  isLoading ? "opacity-0" : "opacity-100"
+                }`}
               />
             </div>
           </motion.div>
+
+          {/* Bottom Bar */}
+          <div className="absolute bottom-6 inset-x-0 flex flex-col items-center gap-3 z-[110] px-4">
+            {/* Caption */}
+            <AnimatePresence mode="wait">
+              {captions[index] && (
+                <motion.p
+                  key={index}
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 6 }}
+                  transition={{ duration: 0.2 }}
+                  className="text-xs text-white/60 text-center max-w-xs px-3 py-1 rounded-full bg-white/5 border border-white/10 pointer-events-none"
+                >
+                  {captions[index]}
+                </motion.p>
+              )}
+            </AnimatePresence>
+
+            {/* Controls */}
+            <div
+              className="flex items-center gap-2 bg-black/60 backdrop-blur-md border border-white/10 rounded-full px-2 py-2 shadow-xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Prev */}
+              <button
+                onClick={prevImage}
+                aria-label="Previous image"
+                disabled={images.length <= 1}
+                className="flex h-10 w-10 items-center justify-center rounded-full text-white/60 hover:text-white hover:bg-white/10 transition disabled:opacity-20 disabled:pointer-events-none"
+              >
+                <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M15 18l-6-6 6-6" />
+                </svg>
+              </button>
+
+              {/* Counter */}
+              {images.length > 1 && (
+                <span className="text-xs text-white/40 tabular-nums px-1 min-w-[2.5rem] text-center">
+                  {index + 1} / {images.length}
+                </span>
+              )}
+
+              {/* Close */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onClose();
+                }}
+                aria-label="Close Lightbox"
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition"
+              >
+                <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M6 6l12 12" />
+                  <path d="M18 6l-12 12" />
+                </svg>
+              </button>
+
+              {/* Next */}
+              <button
+                onClick={nextImage}
+                aria-label="Next image"
+                disabled={images.length <= 1}
+                className="flex h-10 w-10 items-center justify-center rounded-full text-white/60 hover:text-white hover:bg-white/10 transition disabled:opacity-20 disabled:pointer-events-none"
+              >
+                <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M9 18l6-6-6-6" />
+                </svg>
+              </button>
+            </div>
+          </div>
         </motion.div>
       )}
     </AnimatePresence>
