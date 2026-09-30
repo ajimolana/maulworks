@@ -19,6 +19,33 @@ export default function Lightbox({ isOpen, images, captions, index, onClose, set
   // Track image loading state
   const [isLoading, setIsLoading] = useState(true);
 
+  // Touch swipe states
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const minSwipeDistance = 50;
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+    
+    if (isLeftSwipe) {
+      setIndex((index + 1) % images.length);
+    } else if (isRightSwipe) {
+      setIndex((index - 1 + images.length) % images.length);
+    }
+  };
+
   useEffect(() => {
     const handleResize = () => setIsDesktop(window.innerWidth >= 1366);
     window.addEventListener("resize", handleResize);
@@ -123,6 +150,9 @@ export default function Lightbox({ isOpen, images, captions, index, onClose, set
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
             className="relative flex items-center justify-center max-w-[90vw] xl:max-w-[1200px] w-full h-full"
             onClick={(e) => e.stopPropagation()}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
           >
             <div className="flex flex-col items-center justify-center relative w-full h-full">
               {/* Loading Spinner */}
