@@ -77,7 +77,7 @@ export const experiencesData: Project[] = [
     cardTag: "Internship",
     year: "2025",
     title: "Bank Indonesia South Sulawesi",
-    shortDesc: "Data Entry Automation and Forecasting support",
+    shortDesc: "Economic & Finance Data Analyst",
     period: "22 Apr 2025 - 1 Aug 2025",
     roleLabel: "Job Type",
     role: "Internship",
