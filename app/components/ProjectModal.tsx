@@ -41,11 +41,11 @@ const renderDetailItem = (item: DetailItem, index: number, isHighlight = false) 
 
   return (
     <div key={`${item.label}-${index}`} className={isHighlight ? "bg-[var(--theme-accent)]/10 border border-[var(--theme-accent)]/20 rounded-2xl p-5" : ""}>
-      <p className={`text-sm ${isHighlight ? "text-[var(--theme-accent)] font-semibold uppercase tracking-widest mb-2" : "text-white/60"}`}>
+      <p className={`text-[10px] sm:text-xs uppercase ${isHighlight ? "text-[var(--theme-accent)] font-semibold tracking-widest mb-1.5" : "text-white/60 tracking-wider mb-1"}`}>
         {item.label}
       </p>
       {item.list && Array.isArray(item.value) ? (
-        <ul className={`mt-2 space-y-1 ${isHighlight ? "text-lg text-white font-medium" : "text-base text-white/80"} list-disc list-outside ml-5`}>
+        <ul className={`mt-2 space-y-1 ${isHighlight ? "text-sm sm:text-base text-white font-medium" : "text-xs sm:text-sm text-white/80"} list-disc list-outside ml-4`}>
           {item.value
             .filter((entry) => entry.trim().length > 0)
             .map((entry, entryIndex) => (
@@ -53,7 +53,7 @@ const renderDetailItem = (item: DetailItem, index: number, isHighlight = false) 
             ))}
         </ul>
       ) : (
-        <p className={`${isHighlight ? "text-lg sm:text-xl text-white font-medium leading-relaxed" : "text-base text-white/80"}`}>
+        <p className={`${isHighlight ? "text-sm sm:text-base text-white font-medium leading-relaxed" : "text-xs sm:text-sm text-white/80"}`}>
           {renderMultilineText(item.value ?? "")}
         </p>
       )}
@@ -112,7 +112,7 @@ export default function ProjectModal({ activeProject, onClose, onOpenLightbox }:
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.15, ease: "easeInOut" }}
-          className="fixed inset-0 z-40 bg-black/70 px-4 py-6 flex items-center justify-center backdrop-blur-sm"
+          className="fixed inset-0 z-40 bg-black/70 p-4 sm:p-6 flex items-center justify-center backdrop-blur-sm"
           onClick={onClose}
         >
           <motion.div
@@ -120,7 +120,7 @@ export default function ProjectModal({ activeProject, onClose, onOpenLightbox }:
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.94, opacity: 0, y: 10 }}
             transition={{ duration: 0.25, ease: [0.32, 0.72, 0, 1] }}
-            className="relative w-full max-w-3xl rounded-3xl border border-white/20 bg-[#111111] text-white shadow-2xl flex flex-col max-h-[75vh] sm:max-h-[85vh] overflow-hidden"
+            className="relative w-full max-w-3xl rounded-3xl border border-white/20 bg-[#111111] text-white shadow-2xl flex flex-col max-h-[90dvh] md:max-h-[85vh] overflow-hidden"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex-none flex items-center justify-between bg-[#111111] px-5 py-4 sm:px-6 sm:py-5 border-b border-white/10 z-10">
@@ -130,11 +130,11 @@ export default function ProjectModal({ activeProject, onClose, onOpenLightbox }:
                     <Image src={activeProject.logo} alt={activeProject.title} fill className="object-contain" />
                   </div>
                 )}
-                <h3 className="text-sm md:text-base font-semibold pr-4">{activeProject.title}</h3>
+                <h3 className="text-sm font-semibold pr-4">{activeProject.title}</h3>
               </div>
               <button
                 type="button"
-                className="flex-shrink-0 flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full border border-white/20 bg-black/60 text-white/80 transition hover:border-white/60 hover:text-white"
+                className="flex-shrink-0 flex h-11 w-11 sm:h-9 sm:w-9 items-center justify-center rounded-full border border-white/20 bg-black/60 text-white/80 transition hover:border-white/60 hover:text-white"
                 onClick={onClose}
                 aria-label="Close Project Modal"
               >
@@ -142,19 +142,19 @@ export default function ProjectModal({ activeProject, onClose, onOpenLightbox }:
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto px-5 py-6 sm:px-6 sm:py-6 space-y-6">
+            <div className="flex-1 overflow-y-auto overscroll-y-contain px-5 py-6 sm:px-6 sm:py-6 space-y-6" style={{ WebkitOverflowScrolling: 'touch' }}>
               {(activeProject.period || (activeProject.roleLabel && activeProject.role)) && (
                 <div className="grid gap-4 sm:grid-cols-2">
                   {activeProject.period && (
                     <div>
-                      <p className="text-sm text-white/60">Period</p>
-                      <p className="text-base text-white">{activeProject.period}</p>
+                      <p className="text-[10px] sm:text-xs text-white/60 uppercase tracking-wider mb-0.5">Period</p>
+                      <p className="text-xs sm:text-sm text-white">{activeProject.period}</p>
                     </div>
                   )}
                   {activeProject.roleLabel && activeProject.role && (
                     <div>
-                      <p className="text-sm text-white/60">{activeProject.roleLabel}</p>
-                      <p className="text-base text-white">{activeProject.role}</p>
+                      <p className="text-[10px] sm:text-xs text-white/60 uppercase tracking-wider mb-0.5">{activeProject.roleLabel}</p>
+                      <p className="text-xs sm:text-sm text-white">{activeProject.role}</p>
                     </div>
                   )}
                 </div>
@@ -164,9 +164,9 @@ export default function ProjectModal({ activeProject, onClose, onOpenLightbox }:
 
               {items.length > 0 && (
                 <div>
-                  <p className="text-sm text-white/60">Documentation</p>
+                  <p className="text-[10px] sm:text-xs text-white/60 uppercase tracking-wider mb-2">Documentation</p>
                   <div
-                    className="mt-3 flex overflow-x-auto gap-3 pb-4 scrollbar-thin scrollbar-thumb-white/20 hover:scrollbar-thumb-white/40"
+                    className="mt-3 flex overflow-x-auto gap-3 pb-4 snap-x snap-mandatory overscroll-x-contain scrollbar-hide md:scrollbar-default"
                     style={{ WebkitOverflowScrolling: 'touch' }}
                   >
                     {items.map((item, idx: number) => {
@@ -187,7 +187,7 @@ export default function ProjectModal({ activeProject, onClose, onOpenLightbox }:
 
               {Array.isArray(activeProject.links) && activeProject.links.length > 0 && (
                 <div>
-                  <p className="mb-2 text-sm text-white/60">Link</p>
+                  <p className="text-[10px] sm:text-xs text-white/60 uppercase tracking-wider mb-2">Link</p>
                   <div className="flex flex-wrap gap-2">
                     {activeProject.links.map((item: { label: string; href: string }, index: number) => (
                       <Link
@@ -195,7 +195,7 @@ export default function ProjectModal({ activeProject, onClose, onOpenLightbox }:
                         href={item.href}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex items-center gap-2 rounded-full border border-white/30 px-4 py-2 text-sm text-white transition hover:border-white hover:bg-white hover:text-black"
+                        className="inline-flex items-center gap-2 rounded-full border border-white/30 px-3 py-1.5 text-xs text-white transition hover:border-white hover:bg-white hover:text-black"
                       >
                         {item.label}
                         <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M7 17L17 7" /><path d="M7 7h10v10" /></svg>
@@ -207,12 +207,12 @@ export default function ProjectModal({ activeProject, onClose, onOpenLightbox }:
 
               {!activeProject.links && activeProject.link && (
                 <div>
-                  <p className="mb-2 text-sm text-white/60">Link</p>
+                  <p className="text-[10px] sm:text-xs text-white/60 uppercase tracking-wider mb-2">Link</p>
                   <Link
                     href={activeProject.link}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-2 rounded-full border border-white/30 px-4 py-2 text-sm text-white transition hover:border-white hover:bg-white hover:text-black"
+                    className="inline-flex items-center gap-2 rounded-full border border-white/30 px-3 py-1.5 text-xs text-white transition hover:border-white hover:bg-white hover:text-black"
                   >
                     {activeProject.ctaLabel ?? "Open Project"}
                     <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M7 17L17 7" /><path d="M7 7h10v10" /></svg>
