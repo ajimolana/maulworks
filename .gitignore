@@ -40,3 +40,6 @@ GEMINI.md
 
 # Python
 venv/
+
+# AI Agents
+.agents/
