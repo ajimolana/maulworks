@@ -14,9 +14,8 @@ export default function ProjectCard({ project, onClick, variant = "default" }: P
         type="button"
         onClick={() => onClick(project)}
         aria-label={`Open details for ${project.title}`}
-        className="group relative text-left rounded-3xl border border-white/15 bg-[#111111] p-4 transition-all duration-300 hover:-translate-y-1.5 active:scale-[0.98] hover:border-white/70 hover:shadow-[0_20px_60px_rgba(255,255,255,0.15)] flex items-center gap-4 w-full h-full"
+        className="group relative text-left rounded-3xl border border-white/15 bg-[#111111] p-4 transition-all duration-300 hover:-translate-y-1 active:scale-[0.98] hover:border-white/40 hover:shadow-[0_8px_32px_rgba(255,255,255,0.08),0_0_0_1px_rgba(255,255,255,0.12)] flex items-center gap-4 w-full h-full"
       >
-        <div className="pointer-events-none absolute inset-0 rounded-3xl opacity-0 transition-opacity duration-300 group-hover:opacity-100" style={{ boxShadow: '0 0 80px rgba(255,255,255,0.18)' }} />
 
         {project.logo && (
           <div className="flex-shrink-0 flex items-center justify-center w-12 h-12 relative">
@@ -42,10 +41,8 @@ export default function ProjectCard({ project, onClick, variant = "default" }: P
       type="button"
       onClick={() => onClick(project)}
       aria-label={`Open details for ${project.title}`}
-      className="group relative text-left rounded-3xl border border-white/15 bg-[#111111] p-3 transition-all duration-300 hover:-translate-y-1.5 active:scale-[0.98] hover:border-white/70 hover:shadow-[0_20px_60px_rgba(255,255,255,0.15)] w-full h-full flex flex-col"
+      className="group relative text-left rounded-3xl border border-white/15 bg-[#111111] p-3 transition-all duration-300 hover:-translate-y-1 active:scale-[0.98] hover:border-white/40 hover:shadow-[0_8px_32px_rgba(255,255,255,0.08),0_0_0_1px_rgba(255,255,255,0.12)] w-full h-full flex flex-col"
     >
-      <div className="pointer-events-none absolute inset-0 rounded-3xl opacity-0 transition-opacity duration-300 group-hover:opacity-100" style={{ boxShadow: '0 0 80px rgba(255,255,255,0.18)' }} />
-
       {variant !== "research" && project.heroImage && (
         <div className="relative overflow-hidden rounded-2xl h-48 sm:h-56 w-full">
           <Image
