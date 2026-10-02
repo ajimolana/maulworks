@@ -28,7 +28,6 @@ export default function PillNav({ items, forceClose, titleOverride, homeHref, ac
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [pillReady, setPillReady] = useState(false);
   const [memojiHovered, setMemojiHovered] = useState(false);
-  const [memojiClicked, setMemojiClicked] = useState(false);
 
   const sheetRef = useRef<HTMLDivElement>(null);
   const dragStartY = useRef<number | null>(null);
@@ -159,8 +158,7 @@ export default function PillNav({ items, forceClose, titleOverride, homeHref, ac
         >
           {/* LOGO / TITLE */}
           <div className="flex-shrink-0 flex items-center gap-2 font-semibold tracking-tight transition-colors text-white text-lg">
-            <button
-              onClick={() => { setMemojiClicked(true); }}
+            <div
               onMouseEnter={() => {
                 if (typeof window !== "undefined" && window.innerWidth >= 768) {
                   setMemojiHovered(true);
@@ -168,10 +166,8 @@ export default function PillNav({ items, forceClose, titleOverride, homeHref, ac
               }}
               onMouseLeave={() => {
                 setMemojiHovered(false);
-                setMemojiClicked(false);
               }}
-              className="outline-none focus:outline-none relative"
-              aria-label="Logo"
+              className="relative"
             >
               <Image
                 src="/assets/icon/memoji.png"
@@ -179,9 +175,9 @@ export default function PillNav({ items, forceClose, titleOverride, homeHref, ac
                 width={128}
                 height={128}
                 quality={100}
-                className={`w-auto h-8 object-contain transition-transform duration-300 cursor-pointer ${memojiHovered ? "scale-125" : "scale-100"} ${memojiHovered && !memojiClicked ? "-rotate-6" : "rotate-0"}`}
+                className={`w-auto h-8 object-contain transition-transform duration-300 ${memojiHovered ? "scale-125 -rotate-6" : "scale-100 rotate-0"}`}
               />
-            </button>
+            </div>
             <Link
               href={homeHref || "#profile"}
               onClick={() => handleItemClick("profile")}
