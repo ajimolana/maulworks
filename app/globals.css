@@ -26,46 +26,44 @@
     -ms-overflow-style: auto;
     scrollbar-width: thin;
   }
-  .scrollbar-default::-webkit-scrollbar {
-    display: block;
-    width: 8px;
-    height: 8px;
+  @media (pointer: fine) {
+    .scrollbar-default::-webkit-scrollbar {
+      display: block;
+      width: 8px;
+      height: 8px;
+    }
   }
 }
 
-/* Styling Scrollbar untuk Chrome, Safari, dan Edge */
-::-webkit-scrollbar {
-  width: 8px;
-  /* Lebar scrollbar vertikal */
-  height: 8px;
-  /* Tinggi scrollbar horizontal */
-}
+@media (pointer: fine) {
+  /* Styling Scrollbar untuk Chrome, Safari, dan Edge */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
 
-::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
-  /* Warna landasan scrollbar */
-  border-radius: 10px;
-}
+  ::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+  }
 
-::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
-  /* Warna batang scrollbar */
-  border-radius: 10px;
-  border: 2px solid transparent;
-  /* Memberikan efek padding di dalam */
-  background-clip: content-box;
-}
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
 
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.4);
-  /* Warna saat kursor di atasnya */
-  background-clip: content-box;
-}
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.4);
+    background-clip: content-box;
+  }
 
-/* Styling untuk Firefox */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.2) rgba(255, 255, 255, 0.05);
+  /* Styling untuk Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) rgba(255, 255, 255, 0.05);
+  }
 }
 
 @layer base {
