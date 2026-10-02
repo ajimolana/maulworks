@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef, RefObject } from "react";
 import PillNav from "./components/PillNav/PillNav";
 import dynamic from "next/dynamic";
 
@@ -38,6 +38,20 @@ export default function Home() {
   });
   const [pageReady, setPageReady] = useState(false);
   const [isContactOpen, setIsContactOpen] = useState(false);
+  
+  const projectsRef = useRef<HTMLDivElement>(null);
+  const researchRef = useRef<HTMLDivElement>(null);
+  const [isMouse, setIsMouse] = useState(false);
+
+  useEffect(() => {
+    setIsMouse(window.matchMedia('(pointer: fine)').matches);
+  }, []);
+
+  const scrollBy = (ref: RefObject<HTMLDivElement>, offset: number) => {
+    if (ref.current) {
+      ref.current.scrollBy({ left: offset, behavior: 'smooth' });
+    }
+  };
 
   const logosData = useMemo(() => [
     { file: "Apple Developer Academy.png", name: "Apple Developer Academy" },
@@ -345,8 +359,20 @@ export default function Home() {
       {/* 2. SECTION PROJECTS */}
       <AnimatedSection id="projects" className="w-full mt-12 md:mt-20 scroll-mt-24 md:scroll-mt-28">
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
-          <h2 className="text-3xl sm:text-4xl font-semibold text-white mb-6">Projects</h2>
-          <div className="flex overflow-x-auto snap-x snap-mandatory overscroll-x-contain gap-4 pb-6 -mx-4 px-4 sm:-mx-6 sm:px-6 md:mx-0 md:px-0 md:pb-0 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-6 scrollbar-hide md:overflow-visible">
+          <div className="flex flex-row items-center justify-between mb-6">
+            <h2 className="text-3xl sm:text-4xl font-semibold text-white">Projects</h2>
+            {isMouse && (
+              <div className="flex md:hidden items-center gap-2">
+                <button onClick={() => scrollBy(projectsRef, -300)} className="flex items-center justify-center w-8 h-8 rounded-full bg-white/5 border border-white/10 hover:bg-white/20 transition text-white">
+                  <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
+                </button>
+                <button onClick={() => scrollBy(projectsRef, 300)} className="flex items-center justify-center w-8 h-8 rounded-full bg-white/5 border border-white/10 hover:bg-white/20 transition text-white">
+                  <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
+                </button>
+              </div>
+            )}
+          </div>
+          <div ref={projectsRef} className="flex overflow-x-auto snap-x snap-mandatory overscroll-x-contain gap-4 pt-12 -mt-12 pb-12 -mb-6 -mx-4 px-4 sm:-mx-6 sm:px-6 md:mx-0 md:px-0 md:pt-0 md:mt-0 md:pb-0 md:mb-0 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-6 scrollbar-hide md:overflow-visible">
             {projectsData.map((project) => (
               <div key={project.id} className="snap-center snap-always flex-none w-[80vw] sm:w-[45vw] md:w-auto">
                 <ProjectCard project={project} onClick={openProjectModal} variant="default" />
@@ -359,8 +385,20 @@ export default function Home() {
       {/* 3. SECTION RESEARCH */}
       <AnimatedSection id="research" className="w-full mt-12 md:mt-20 scroll-mt-24 md:scroll-mt-28">
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
-          <h2 className="text-3xl sm:text-4xl font-semibold text-white mb-6">Research</h2>
-          <div className="flex overflow-x-auto snap-x snap-mandatory overscroll-x-contain gap-4 pb-6 -mx-4 px-4 sm:-mx-6 sm:px-6 md:mx-0 md:px-0 md:pb-0 md:grid md:grid-cols-3 md:gap-4 lg:gap-6 scrollbar-hide md:overflow-visible">
+          <div className="flex flex-row items-center justify-between mb-6">
+            <h2 className="text-3xl sm:text-4xl font-semibold text-white">Research</h2>
+            {isMouse && (
+              <div className="flex md:hidden items-center gap-2">
+                <button onClick={() => scrollBy(researchRef, -300)} className="flex items-center justify-center w-8 h-8 rounded-full bg-white/5 border border-white/10 hover:bg-white/20 transition text-white">
+                  <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
+                </button>
+                <button onClick={() => scrollBy(researchRef, 300)} className="flex items-center justify-center w-8 h-8 rounded-full bg-white/5 border border-white/10 hover:bg-white/20 transition text-white">
+                  <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
+                </button>
+              </div>
+            )}
+          </div>
+          <div ref={researchRef} className="flex overflow-x-auto snap-x snap-mandatory overscroll-x-contain gap-4 pt-12 -mt-12 pb-12 -mb-6 -mx-4 px-4 sm:-mx-6 sm:px-6 md:mx-0 md:px-0 md:pt-0 md:mt-0 md:pb-0 md:mb-0 md:grid md:grid-cols-3 md:gap-4 lg:gap-6 scrollbar-hide md:overflow-visible">
             {researchData.map((project) => (
               <div key={project.id} className="snap-center snap-always flex-none w-[80vw] sm:w-[45vw] md:w-auto">
                 <ProjectCard project={project} onClick={openProjectModal} variant="research" />

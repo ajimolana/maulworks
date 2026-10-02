@@ -78,7 +78,7 @@ const ModalImage = ({ src, idx, onOpenLightbox, srcs, caps }: { src: string, idx
   const [isLoading, setIsLoading] = React.useState(true);
   
   return (
-    <div className="flex-none relative h-40 w-64 bg-white/5 rounded-2xl flex items-center justify-center overflow-hidden border border-white/5">
+    <div className="snap-start flex-none relative h-40 w-64 bg-white/5 rounded-2xl flex items-center justify-center overflow-hidden border border-white/5">
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
           <div className="w-6 h-6 border-2 border-white/10 border-t-white/60 rounded-full animate-spin"></div>
@@ -92,7 +92,6 @@ const ModalImage = ({ src, idx, onOpenLightbox, srcs, caps }: { src: string, idx
         onClick={() => onOpenLightbox(srcs, caps, idx)}
         sizes="(max-width: 768px) 256px, 256px"
         quality={50}
-        priority={true}
         onLoad={() => setIsLoading(false)}
       />
     </div>
@@ -103,6 +102,19 @@ export default function ProjectModal({ activeProject, onClose, onOpenLightbox }:
   const items = React.useMemo(() => activeProject ? galleryItems(activeProject.gallery) : [], [activeProject]);
   const srcs = React.useMemo(() => items.map(i => i.src), [items]);
   const caps = React.useMemo(() => items.map(i => i.caption ?? ""), [items]);
+  
+  const scrollRef = React.useRef<HTMLDivElement>(null);
+  const [isMouse, setIsMouse] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsMouse(window.matchMedia('(pointer: fine)').matches);
+  }, []);
+
+  const scrollBy = (offset: number) => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: offset, behavior: 'smooth' });
+    }
+  };
 
   return (
     <AnimatePresence>
@@ -134,7 +146,7 @@ export default function ProjectModal({ activeProject, onClose, onOpenLightbox }:
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto overscroll-y-contain px-5 py-6 sm:px-6 sm:py-6 space-y-6" style={{ WebkitOverflowScrolling: 'touch' }}>
+            <div className="flex-1 overflow-y-auto overscroll-y-contain px-5 py-6 sm:px-6 sm:py-6 space-y-6 scrollbar-default" style={{ WebkitOverflowScrolling: 'touch' }}>
               {(activeProject.period || (activeProject.roleLabel && activeProject.role)) && (
                 <div className="grid gap-4 sm:grid-cols-2">
                   {activeProject.period && (
@@ -156,9 +168,22 @@ export default function ProjectModal({ activeProject, onClose, onOpenLightbox }:
 
               {items.length > 0 && (
                 <div>
-                  <p className="text-[10px] sm:text-xs text-white/60 uppercase tracking-wider mb-2">Documentation</p>
+                  <div className="flex flex-row items-center justify-between mb-2">
+                    <p className="text-[10px] sm:text-xs text-white/60 uppercase tracking-wider">Documentation</p>
+                    {isMouse && items.length > 2 && (
+                      <div className="flex items-center gap-2 pr-1">
+                        <button onClick={() => scrollBy(-268)} className="flex items-center justify-center w-6 h-6 rounded-full bg-white/5 border border-white/10 hover:bg-white/20 transition text-white">
+                          <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
+                        </button>
+                        <button onClick={() => scrollBy(268)} className="flex items-center justify-center w-6 h-6 rounded-full bg-white/5 border border-white/10 hover:bg-white/20 transition text-white">
+                          <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
+                        </button>
+                      </div>
+                    )}
+                  </div>
                   <div
-                    className="mt-3 flex overflow-x-auto gap-3 pb-4 snap-x snap-mandatory overscroll-x-contain scrollbar-hide md:scrollbar-default"
+                    ref={scrollRef}
+                    className="mt-3 flex overflow-x-auto gap-3 pb-2 snap-x snap-mandatory overscroll-x-contain scrollbar-hide"
                     style={{ WebkitOverflowScrolling: 'touch' }}
                   >
                     {items.map((item, idx: number) => {
