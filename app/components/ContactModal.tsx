@@ -75,7 +75,7 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
               <div className="flex justify-between items-center mb-6">
                 <div>
                   <h3 className="text-2xl font-bold text-white mb-1">Send a Message</h3>
-                  <p className="text-white/60 text-sm">Inquiries & CV requests welcome.</p>
+                  <p className="text-white/60 text-sm">Inquiries & CV Requests</p>
                 </div>
                 <button
                   onClick={onClose}
