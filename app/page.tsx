@@ -44,7 +44,7 @@ export default function Home() {
     { file: "Bank Indonesia.png", name: "Bank Indonesia" },
     { file: "BSI Scholarship.png", name: "BSI Scholarship" },
     { file: "CBP Rupiah.png", name: "CBP Rupiah" },
-    { file: "PT Asuransi Kredit Indonesia.png", name: "Askrindo" },
+    { file: "PT Asuransi Kredit Indonesia.png", name: "PT Asuransi Kredit Indonesia" },
     { file: "Startup Campus.png", name: "Startup Campus" }
   ], []);
 
