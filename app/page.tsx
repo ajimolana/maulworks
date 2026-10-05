@@ -38,7 +38,7 @@ export default function Home() {
   });
   const [pageReady, setPageReady] = useState(false);
   const [isContactOpen, setIsContactOpen] = useState(false);
-  
+
   const projectsRef = useRef<HTMLDivElement>(null);
   const researchRef = useRef<HTMLDivElement>(null);
   const [isMouse, setIsMouse] = useState(false);
@@ -89,7 +89,7 @@ export default function Home() {
     };
   }), [logosData]);
 
-  const navItems = [
+  const navItems = useMemo(() => [
     { id: "about", label: "About Me", href: "#about" },
     { id: "experiences", label: "Experiences", href: "#experiences" },
     { id: "projects", label: "Projects", href: "#projects" },
@@ -97,7 +97,7 @@ export default function Home() {
     { id: "organizations", label: "Organizations", href: "#organizations" },
     { id: "achievements", label: "Achievements", href: "#achievements" },
     { id: "contacts", label: "Get in Touch", href: "#contacts" },
-  ];
+  ], []);
 
   // 1. BROWSER HISTORY LOGIC
   useEffect(() => {
@@ -145,33 +145,31 @@ export default function Home() {
   }, [isOverlayOpen]);
 
   // CONTROLLERS
-  const openProjectModal = (project: Project) => {
+  const openProjectModal = useCallback((project: Project) => {
     window.history.pushState({ modalOpen: true }, "");
     setActiveProject(project);
-  };
-  const closeProjectModal = () => window.history.back();
+  }, []);
+  const closeProjectModal = useCallback(() => window.history.back(), []);
 
-  const openLightbox = (images: string[], captions: string[], index: number) => {
+  const openLightbox = useCallback((images: string[], captions: string[], index: number) => {
     window.history.pushState({ lightboxOpen: true }, "");
     setLightbox({ isOpen: true, images, captions, index });
-  };
-  const closeLightbox = () => window.history.back();
-  const setLightboxIndex = (index: number) => setLightbox(prev => ({ ...prev, index }));
+  }, []);
+  const closeLightbox = useCallback(() => window.history.back(), []);
+  const setLightboxIndex = useCallback((index: number) => setLightbox(prev => ({ ...prev, index })), []);
 
-  const openContactModal = () => {
+  const openContactModal = useCallback(() => {
     window.history.pushState({ contactModalOpen: true }, "");
     setIsContactOpen(true);
-  };
+  }, []);
 
-  const achievementTargetById = useCallback((id: string) =>
+  // Used by AchievementShelf to resolve linkedProjectId strings
+  const findProject = useCallback((id: string) =>
     researchData.find((project) => project.id === id) ||
     projectsData.find((project) => project.id === id) ||
     experiencesData.find((project) => project.id === id) ||
     organizationsData.find((project) => project.id === id)
-    , []);
-
-  // Used by AchievementShelf to resolve linkedProjectId strings
-  const findProject = useCallback((id: string) => achievementTargetById(id), [achievementTargetById]);
+  , []);
 
 
 
@@ -219,7 +217,7 @@ export default function Home() {
 
             {/* Subtitle */}
             <h2 className="text-base sm:text-xl md:text-2xl font-medium text-[#a1a1aa] mb-10 sm:mb-12">
-              Data Analyst & AI Enthusiast
+              Actuarial & Data Science
             </h2>
 
             {/* CTAs */}
