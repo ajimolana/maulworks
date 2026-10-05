@@ -24,10 +24,10 @@ export const metadata: Metadata = {
     default: "Maulana's Portfolio",
     template: "%s | Maulana's Portfolio",
   },
-  description: "Explore the portfolio of Maulana Raji Shofil Fuadi, a Data Analyst and Actuarial Science graduate specializing in AI automation and data-driven insights.",
+  description: "Explore the portfolio of Maulana Raji Shofil Fuadi, an Actuarial Science graduate and Data Science practitioner specializing in AI automation and data-driven insights.",
   openGraph: {
     title: "Maulana's Portfolio",
-    description: "Explore the portfolio of Maulana Raji Shofil Fuadi, a Data Analyst and Actuarial Science graduate specializing in AI automation and data-driven insights.",
+    description: "Explore the portfolio of Maulana Raji Shofil Fuadi, an Actuarial Science graduate and Data Science practitioner specializing in AI automation and data-driven insights.",
     siteName: "Maulana's Portfolio",
     type: "website",
     images: [
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Maulana's Portfolio",
-    description: "Explore the portfolio of Maulana Raji Shofil Fuadi, a Data Analyst and Actuarial Science graduate specializing in AI automation and data-driven insights.",
+    description: "Explore the portfolio of Maulana Raji Shofil Fuadi, an Actuarial Science graduate and Data Science practitioner specializing in AI automation and data-driven insights.",
     images: ['/og-image.png'],
   },
 };
