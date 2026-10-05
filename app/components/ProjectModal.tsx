@@ -74,7 +74,7 @@ const renderDetails = (details: DetailItem[] = []) => {
   );
 };
 
-const ModalImage = ({ src, idx, onOpenLightbox, srcs, caps }: { src: string, idx: number, onOpenLightbox: any, srcs: string[], caps: string[] }) => {
+const ModalImage = ({ src, idx, onOpenLightbox, srcs, caps }: { src: string, idx: number, onOpenLightbox: (images: string[], captions: string[], index: number) => void, srcs: string[], caps: string[] }) => {
   const [isLoading, setIsLoading] = React.useState(true);
   
   return (
