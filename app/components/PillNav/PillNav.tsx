@@ -103,7 +103,7 @@ export default function PillNav({ items, forceClose, titleOverride, homeHref, ac
     window.addEventListener("scroll", handleScroll);
     handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [items]);
+  }, [items, disableScrollSpy]);
 
   useEffect(() => {
     if (mobileMenuOpen) {

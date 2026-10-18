@@ -1,12 +1,12 @@
 import { MetadataRoute } from 'next'
- 
+import { siteUrl } from './siteUrl'
+
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: {
       userAgent: '*',
       allow: '/',
     },
-    // Update this with your actual domain later
-    sitemap: 'https://maulworks.vercel.app/sitemap.xml',
+    sitemap: `${siteUrl}/sitemap.xml`,
   }
 }

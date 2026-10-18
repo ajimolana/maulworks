@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
+import { siteUrl } from "./siteUrl";
 
 const poppins = Poppins({
   weight: ["400", "500", "600", "700"],
@@ -19,7 +20,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'https://maulworks.vercel.app'),
+  metadataBase: new URL(siteUrl),
   title: {
     default: "Maulana's Portfolio",
     template: "%s | Maulana's Portfolio",
@@ -32,7 +33,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: '/og-image.png', // You should place an og-image.png (1200x630) in your /public folder
+        url: '/og-image.png',
         width: 1200,
         height: 630,
         alt: "Maulana's Portfolio Preview"
@@ -53,10 +54,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={cn("dark", "scroll-smooth", poppins.variable, "font-sans")}>
-      <head>
-      </head>
-      <body className={`${poppins.className} ${poppins.variable} antialiased bg-[#101010] text-white`}>
+    <html lang="en" className={cn("dark", "scroll-smooth")}>
+      <body className={`${poppins.className} ${poppins.variable} font-sans antialiased bg-[#101010] text-white`}>
         {children}
       </body>
     </html>
