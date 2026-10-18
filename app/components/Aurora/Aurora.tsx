@@ -142,7 +142,8 @@ export default function Aurora(props: AuroraProps) {
     const renderer = new Renderer({
       alpha: true,
       premultipliedAlpha: true,
-      antialias: true
+      antialias: true,
+      dpr: Math.min(window.devicePixelRatio || 1, 1.5)
     });
     const gl = renderer.gl;
     gl.clearColor(0, 0, 0, 0);
@@ -151,6 +152,8 @@ export default function Aurora(props: AuroraProps) {
     gl.canvas.style.backgroundColor = 'transparent';
 
     let program: Program;
+    let mesh: Mesh | undefined;
+    let animateId = 0;
 
     function resize() {
       if (!ctn) return;
@@ -160,6 +163,8 @@ export default function Aurora(props: AuroraProps) {
       if (program) {
         program.uniforms.uResolution.value = [width, height];
       }
+      // Resizing clears the canvas; redraw right away while the animation loop is paused.
+      if (!animateId && mesh) renderer.render({ scene: mesh });
     }
     window.addEventListener('resize', resize);
 
@@ -168,10 +173,12 @@ export default function Aurora(props: AuroraProps) {
       delete geometry.attributes.uv;
     }
 
-    const colorStopsArray = colorStops.map(hex => {
-      const c = new Color(hex);
-      return [c.r, c.g, c.b];
-    });
+    const toRgb = (stops: string[]) =>
+      stops.map(hex => {
+        const c = new Color(hex);
+        return [c.r, c.g, c.b];
+      });
+    const colorStopsArray = toRgb(colorStops);
 
     program = new Program(gl, {
       vertex: VERT,
@@ -186,10 +193,10 @@ export default function Aurora(props: AuroraProps) {
       }
     });
 
-    const mesh = new Mesh(gl, { geometry, program });
+    mesh = new Mesh(gl, { geometry, program });
     ctn.appendChild(gl.canvas);
 
-    let animateId = 0;
+    let colorKey = colorStops.join();
     const update = (t: number) => {
       animateId = requestAnimationFrame(update);
       const { time = t * 0.01, speed = 1.0 } = propsRef.current;
@@ -198,18 +205,38 @@ export default function Aurora(props: AuroraProps) {
       program.uniforms.uBlend.value = propsRef.current.blend ?? blend;
       program.uniforms.uLightMode.value = (propsRef.current.lightMode ?? lightMode) ? 1 : 0;
       const stops = propsRef.current.colorStops ?? colorStops;
-      program.uniforms.uColorStops.value = stops.map(hex => {
-        const c = new Color(hex);
-        return [c.r, c.g, c.b];
-      });
-      renderer.render({ scene: mesh });
+      const key = stops.join();
+      if (key !== colorKey) {
+        colorKey = key;
+        program.uniforms.uColorStops.value = toRgb(stops);
+      }
+      renderer.render({ scene: mesh! });
     };
-    animateId = requestAnimationFrame(update);
+
+    const start = () => {
+      if (!animateId) animateId = requestAnimationFrame(update);
+    };
+    const stop = () => {
+      cancelAnimationFrame(animateId);
+      animateId = 0;
+    };
 
     resize();
 
+    // Render a single static frame for reduced motion; otherwise animate only while visible.
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let observer: IntersectionObserver | undefined;
+    if (reduceMotion) {
+      update(0);
+      stop();
+    } else {
+      observer = new IntersectionObserver(([entry]) => (entry.isIntersecting ? start() : stop()));
+      observer.observe(ctn);
+    }
+
     return () => {
-      cancelAnimationFrame(animateId);
+      observer?.disconnect();
+      stop();
       window.removeEventListener('resize', resize);
       if (ctn && gl.canvas.parentNode === ctn) {
         ctn.removeChild(gl.canvas);
