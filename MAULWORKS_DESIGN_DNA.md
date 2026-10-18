@@ -42,7 +42,7 @@ bg-white/5 border border-white/10 backdrop-blur-md
 /* Active Nav / Pill that has scrolled */
 bg-[#111111]/80 backdrop-blur-md border border-white/10
 ```
-Rule: Never use a flat, opaque background for floating or elevated elements.
+Rule: Floating elements (nav pill, close/lightbox controls, badges) use translucent fills with backdrop blur. In-flow content cards and modal panels use the solid `#111111` surface with a `border-white/15` hairline.
 
 ### Shape Language — High Radius
 All shapes use aggressive, generous border-radius values to feel soft, tactile, and modern:
@@ -77,7 +77,7 @@ hover:shadow-[0_0_20px_var(--theme-accent)]
 ```
 
 ### The "Top Highlight Line" Micro-Detail
-Cards and interactive containers feature a hairline animated gradient line at the top edge that reveals itself on hover:
+Achievement cards feature a hairline animated gradient line at the top edge that reveals itself on hover:
 ```tsx
 <div className="
   pointer-events-none absolute inset-x-0 top-0 h-px
@@ -99,7 +99,7 @@ group-hover:text-white/[0.05] transition-colors duration-300
 ## 2. ⚡ Interaction & Animation DNA (The Feel)
 
 ### Animation Library: Framer Motion
-All mounting/unmounting transitions, layout morphs, and gestures use **Framer Motion** (`motion`, `AnimatePresence`, `layoutId`). No choppy CSS-only hacks for overlay states.
+All mounting/unmounting transitions, layout morphs, and gestures use **Motion** (formerly Framer Motion), imported from `motion/react` (never `framer-motion`). No choppy CSS-only hacks for overlay states. The app is wrapped in `MotionProvider` (`<MotionConfig reducedMotion="user">`) so every animation respects `prefers-reduced-motion`.
 
 ### Easing — The Signature Curves
 Consistently applied easing values:
@@ -116,7 +116,7 @@ Every major section wraps its content in `<AnimatedSection>` — a reusable comp
 ```
 
 ### Tactile Feedback (Active States)
-**Every** clickable element (buttons, interactive cards, chips) must feature `active:scale-95` or `active:scale-[0.98]`. Micro-tactility simulates physical responsiveness and is non-negotiable.
+Primary clickable elements (CTAs, project/organization cards, achievement cards, contact submit) feature `active:scale-95` or `active:scale-[0.98]`. Small utility controls (carousel arrows, About info cards) may rely on hover/background feedback instead.
 
 ### Hover States — Elevation & Glow
 Hoverable cards use a consistent trio of micro-interactions:
@@ -135,7 +135,7 @@ Primary CTA buttons ("Explore Projects", "Send Message") have an animated shimme
 The button container must have `overflow-hidden` and `group` class, and inner text must have `relative z-10`.
 
 ### Image Loading — Fade-In Skeleton
-Images are never rendered raw without a loading state. Skeletons or spinners hold the layout space, and images smoothly fade in (`opacity-0 → opacity-100` via `transition-opacity duration-500 ease-in-out` on the `onLoad` event).
+Large images that load on demand (modal gallery, Lightbox) show a spinner while loading and fade in (`opacity-0 → opacity-100` via `transition-opacity duration-500 ease-in-out` on the `onLoad` event). Card thumbnails rely on `next/image` lazy loading.
 
 ---
 
@@ -167,7 +167,7 @@ On mobile devices, navigation transforms into a draggable bottom drawer:
 
 ### The Three Overlay Layers
 Maulworks maintains a strict z-index and interaction hierarchy for overlays:
-1. **ProjectModal / ContactModal** — Primary content modals (`z-40`), slide up from below with spring physics.
+1. **ProjectModal** (`z-40`) and **ContactModal** (`z-[9999]`) — Primary content modals. They scale and fade in; ContactModal uses spring physics.
 2. **Lightbox** — Full-screen media viewer (`z-[100]`), ultra-dark backdrop (`bg-black/95`).
 3. **PillNav Mobile Sheet** — Navigation bottom drawer (`z-[99]`).
 
@@ -175,12 +175,13 @@ Maulworks maintains a strict z-index and interaction hierarchy for overlays:
 Every modal follows this verified pattern:
 - Outer `<motion.div>`: Backdrop — `bg-black/60 md:bg-black/70 backdrop-blur-sm`. Clicking closes the modal.
 - Inner `<motion.div>`: Content card — `bg-[#111111] border border-white/20 rounded-3xl`. Clicking stops event propagation.
-- Close trigger: Always provided — header close button on desktop, floating trigger on mobile.
+- Close trigger: ProjectModal uses the floating close button below the card (see below); ContactModal has a header close button.
+- Dialog semantics: the panel carries `role="dialog"`, `aria-modal="true"` and `aria-labelledby` pointing at its title. `useDialogFocus` moves focus into the panel on open and restores it to the trigger on close.
 
 ### Lightbox — Advanced Capabilities
 The `<Lightbox>` component includes:
 - **Touch swipe gestures** to navigate between media items (50px swipe threshold).
-- **Full keyboard navigation** (`ArrowLeft` / `ArrowRight` to navigate; `Escape` to close).
+- **Keyboard navigation** (`ArrowLeft` / `ArrowRight` to navigate). `Escape` is handled once, centrally in `page.tsx`, via `history.back()`. Overlay components must not also handle `Escape`, or the history is popped twice.
 - Media counter (`1 / N` format) and descriptive captions.
 - Frosted floating control bar at the bottom: `bg-black/60 backdrop-blur-md border border-white/10 rounded-full`.
 
@@ -245,9 +246,10 @@ Negative outer margins (`-mx-4 px-4`) let cards bleed to screen edges while snap
 ## 6. 🏗️ Engineering & Architecture DNA (The Code)
 
 ### Tech Stack
-- **Framework:** Next.js (App Router, clean `"use client"` scoping)
+- **Framework:** Next.js 14 (App Router, clean `"use client"` scoping)
 - **Styling:** TailwindCSS + custom CSS properties in `globals.css`
-- **Animation:** Framer Motion (`motion`, `AnimatePresence`, `useInView`, `layoutId`)
+- **Animation:** Motion (`motion/react`: `motion`, `AnimatePresence`, `useInView`, `layoutId`, `MotionConfig`)
+- **WebGL:** `ogl` powers the hero Aurora backdrop. It renders only while on screen, caps DPR at 1.5, and draws a single static frame under reduced motion.
 - **Typography:** Poppins via `next/font/google`
 - **Contact Forms:** Web3Forms API (`NEXT_PUBLIC_WEB3FORMS_KEY`)
 - **Images:** `next/image` with `fill`, optimized thumbnail quality (`quality={50}`), and modal display quality (`quality={85}`).
@@ -316,6 +318,9 @@ Heavy object transformations, filtered lists, and callback handlers passed to ch
 
 - Visually hidden skip-to-content anchor: `<a href="#about" className="sr-only focus:not-sr-only ...">Skip to content</a>`.
 - Descriptive `aria-label` attributes on all icon-only buttons and modal controls.
+- Anything clickable is a real `<button>` or `<a>`, never a `<div onClick>`.
+- Modals expose `role="dialog"` + `aria-modal` and manage focus (see Overlay DNA).
+- Motion honors `prefers-reduced-motion` through `MotionProvider`.
 - Comprehensive keyboard operability: `Escape` closes active overlays; `ArrowLeft`/`ArrowRight` navigates media carousels and Lightbox.
 - Scrollable horizontal containers include `overscroll-x-contain` to prevent page scroll chaining.
 
@@ -324,7 +329,7 @@ Heavy object transformations, filtered lists, and callback handlers passed to ch
 ## 8. 🌐 SEO & Metadata DNA
 
 - `layout.tsx` exposes complete Next.js `Metadata` and `Viewport` exports.
-- Rigorous OpenGraph and Twitter card metadata configured with 1200x630 preview assets.
+- Rigorous OpenGraph and Twitter card metadata. The preview is `public/og-image.jpg` at 1200x630 and under ~300KB (some platforms crop other ratios or skip larger previews); capture the hero at 1920x1008 on desktop, then scale down. Re-export it whenever the hero design changes.
 - `metadataBase` resolves from `process.env.NEXT_PUBLIC_BASE_URL` with a reliable production fallback.
 - `viewport.themeColor` aligns with `--theme-main` (`#101010`).
 - `viewportFit: "cover"` enables edge-to-edge layout on mobile displays with notches.
@@ -345,6 +350,15 @@ Custom scrollbars are refined and restricted exclusively to pointer-fine devices
 }
 ```
 Horizontal swipe rows use the `scrollbar-hide` utility to preserve clean presentation while retaining native scroll physics.
+
+---
+
+## 10. 🧹 Maintenance Rules
+
+- **No unused dependencies or dead code.** Remove a package when its last import goes; run `npx tsc --noEmit` and `npm run lint` before committing.
+- **Size assets for their display size.** Logos are exported at ~4x their rendered size; screenshots stay under ~500KB. Public files are world-readable, so do not put private documents (e.g. the CV) in `public/`.
+- **Portfolio copy lives in `app/data/portfolio.ts`.** Keep it in English, keep `year` consistent with `period`, and never commit placeholder values such as `"-"`. A project `link` that points to a section must use an in-page action, not `target="_blank"` to a `#hash`.
+- **Don't resurrect Tailwind v4 / shadcn tooling.** The project is on Tailwind v3; the shadcn CSS imports were removed because they target v4.
 
 ---
 
