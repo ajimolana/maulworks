@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: '/og-image.png',
+        url: '/og-image.jpg',
         width: 1200,
         height: 630,
         alt: "Maulana's Portfolio Preview"
@@ -44,7 +44,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Maulana's Portfolio",
     description: "Explore the portfolio of Maulana Raji Shofil Fuadi, an Actuarial Science graduate and Data Science practitioner specializing in AI automation and data-driven insights.",
-    images: ['/og-image.png'],
+    images: ['/og-image.jpg'],
   },
 };
 
