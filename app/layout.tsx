@@ -3,6 +3,7 @@ import { Poppins } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { siteUrl } from "./siteUrl";
+import MotionProvider from "./components/MotionProvider";
 
 const poppins = Poppins({
   weight: ["400", "500", "600", "700"],
@@ -56,7 +57,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={cn("dark", "scroll-smooth")}>
       <body className={`${poppins.className} ${poppins.variable} font-sans antialiased bg-[#101010] text-white`}>
-        {children}
+        <MotionProvider>{children}</MotionProvider>
       </body>
     </html>
   );

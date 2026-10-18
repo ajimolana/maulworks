@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect, useCallback, useMemo, useRef, RefObject } from "react";
 import PillNav from "./components/PillNav/PillNav";
@@ -28,6 +27,34 @@ import {
   aboutModalData
 } from "./data/portfolio";
 
+const infoCardClass = "cursor-pointer group w-full text-left bg-white/5 p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-white/10 space-y-1 transition-all duration-300 hover:border-white/30 hover:bg-white/10";
+
+function InfoCard({ title, meta, subtitle, onClick }: { title: string; meta: string; subtitle: string; onClick: () => void }) {
+  return (
+    <button type="button" className={infoCardClass} onClick={onClick} aria-label={`Open details for ${title}`}>
+      <div className="flex flex-row justify-between items-center gap-2">
+        <p className="font-medium text-white text-xs sm:text-sm truncate">{title}</p>
+        <p className="text-white/60 text-[10px] sm:text-xs whitespace-nowrap shrink-0">{meta}</p>
+      </div>
+      <p className="text-white/80 text-[10px] sm:text-xs truncate">{subtitle}</p>
+    </button>
+  );
+}
+
+function ScrollArrows({ onScroll }: { onScroll: (offset: number) => void }) {
+  const buttonClass = "flex items-center justify-center w-8 h-8 rounded-full bg-white/5 border border-white/10 hover:bg-white/20 transition text-white";
+  return (
+    <div className="flex md:hidden items-center gap-2">
+      <button onClick={() => onScroll(-300)} aria-label="Scroll left" className={buttonClass}>
+        <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
+      </button>
+      <button onClick={() => onScroll(300)} aria-label="Scroll right" className={buttonClass}>
+        <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
+      </button>
+    </div>
+  );
+}
+
 export default function Home() {
   const [activeProject, setActiveProject] = useState<Project | null>(null);
   const [lightbox, setLightbox] = useState({
@@ -36,7 +63,6 @@ export default function Home() {
     captions: [] as string[],
     index: 0
   });
-  const [pageReady, setPageReady] = useState(false);
   const [isContactOpen, setIsContactOpen] = useState(false);
 
   const projectsRef = useRef<HTMLDivElement>(null);
@@ -61,10 +87,6 @@ export default function Home() {
     { file: "PT Asuransi Kredit Indonesia.png", name: "PT Asuransi Kredit Indonesia" },
     { file: "Startup Campus.png", name: "Startup Campus" }
   ], []);
-
-  useEffect(() => {
-    setPageReady(true);
-  }, []);
 
   const homeLogoNodes = useMemo(() => logosData.map(({ file, name }) => {
     return {
@@ -172,8 +194,6 @@ export default function Home() {
     organizationsData.find((project) => project.id === id)
   , []);
 
-
-
   return (
     <div id="profile" className="min-h-screen overflow-x-hidden bg-[var(--theme-main)] relative pt-0 pb-10">
       <a href="#about" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-[var(--theme-accent)] text-[var(--theme-main)] px-4 py-2 z-[1000] rounded-md font-bold">
@@ -212,7 +232,7 @@ export default function Home() {
             </div>
 
             {/* Headline */}
-            <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-[5.5rem] font-bold tracking-tight text-white leading-[1.1] mb-2 sm:mb-4 font-sans whitespace-nowrap">
+            <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-[5.5rem] font-bold tracking-tight text-white leading-[1.1] mb-2 sm:mb-4 font-sans text-balance lg:whitespace-nowrap">
               Maulana Raji Shofil Fuadi
             </h1>
 
@@ -276,13 +296,7 @@ export default function Home() {
               {/* Education: Right, 1/3 width */}
               <div className="space-y-2 sm:space-y-3 lg:col-span-1">
                 <h3 className="text-[var(--theme-accent)] font-semibold text-lg sm:text-xl">Education</h3>
-                <div className="cursor-pointer group bg-white/5 p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-white/10 space-y-1 transition-all duration-300 hover:border-white/30 hover:bg-white/10" onClick={() => openProjectModal(aboutModalData.education)}>
-                  <div className="flex flex-row justify-between items-center gap-2">
-                    <p className="font-medium text-white text-xs sm:text-sm truncate">Hasanuddin University</p>
-                    <p className="text-white/60 text-[10px] sm:text-xs whitespace-nowrap shrink-0">Aug 2021 – Feb 2026</p>
-                  </div>
-                  <p className="text-white/80 text-[10px] sm:text-xs truncate">Bachelor of Actuarial Science</p>
-                </div>
+                <InfoCard title="Hasanuddin University" meta="Aug 2021 – Feb 2026" subtitle="Bachelor of Actuarial Science" onClick={() => openProjectModal(aboutModalData.education)} />
               </div>
 
               {/* ROW 2: Tech Stack, Certifications, Scholarships */}
@@ -302,20 +316,8 @@ export default function Home() {
               <div className="space-y-2 sm:space-y-3 lg:col-span-1">
                 <h3 className="text-[var(--theme-accent)] font-semibold text-lg sm:text-xl">Certifications</h3>
                 <div className="space-y-2.5 sm:space-y-3">
-                  <div className="cursor-pointer group bg-white/5 p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-white/10 space-y-1 transition-all duration-300 hover:border-white/30 hover:bg-white/10" onClick={() => openProjectModal(aboutModalData.cert_data_analyst)}>
-                    <div className="flex flex-row justify-between items-center gap-2">
-                      <p className="font-medium text-white text-xs sm:text-sm truncate">Data Analyst</p>
-                      <p className="text-white/60 text-[10px] sm:text-xs whitespace-nowrap shrink-0">Oct 2024</p>
-                    </div>
-                    <p className="text-white/80 text-[10px] sm:text-xs truncate">National Professional Certification Agency</p>
-                  </div>
-                  <div className="cursor-pointer group bg-white/5 p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-white/10 space-y-1 transition-all duration-300 hover:border-white/30 hover:bg-white/10" onClick={() => openProjectModal(aboutModalData.cert_data_science)}>
-                    <div className="flex flex-row justify-between items-center gap-2">
-                      <p className="font-medium text-white text-xs sm:text-sm truncate">Data Science & AI</p>
-                      <p className="text-white/60 text-[10px] sm:text-xs whitespace-nowrap shrink-0">Feb – Jun 2024</p>
-                    </div>
-                    <p className="text-white/80 text-[10px] sm:text-xs truncate">Startup Campus</p>
-                  </div>
+                  <InfoCard title="Data Analyst" meta="Oct 2024" subtitle="National Professional Certification Agency" onClick={() => openProjectModal(aboutModalData.cert_data_analyst)} />
+                  <InfoCard title="Data Science & AI" meta="Feb – Jun 2024" subtitle="Startup Campus" onClick={() => openProjectModal(aboutModalData.cert_data_science)} />
                 </div>
               </div>
 
@@ -327,13 +329,7 @@ export default function Home() {
                     { name: 'BSI Scholarship Prestasi', year: '2022', desc: 'Bank Syariah Indonesia', modalData: aboutModalData.schol_prestasi },
                     { name: 'BSI Scholarship Talenta', year: '2024', desc: 'Bank Syariah Indonesia', modalData: aboutModalData.schol_talenta },
                   ].map((s) => (
-                    <div key={s.name} className="cursor-pointer group bg-white/5 p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-white/10 space-y-1 transition-all duration-300 hover:border-white/30 hover:bg-white/10" onClick={() => openProjectModal(s.modalData)}>
-                      <div className="flex flex-row justify-between items-center gap-2">
-                        <p className="font-medium text-white text-xs sm:text-sm truncate">{s.name}</p>
-                        <p className="text-white/60 text-[10px] sm:text-xs whitespace-nowrap shrink-0">{s.year}</p>
-                      </div>
-                      <p className="text-white/80 text-[10px] sm:text-xs truncate">{s.desc}</p>
-                    </div>
+                    <InfoCard key={s.name} title={s.name} meta={s.year} subtitle={s.desc} onClick={() => openProjectModal(s.modalData)} />
                   ))}
                 </div>
               </div>
@@ -360,16 +356,7 @@ export default function Home() {
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
           <div className="flex flex-row items-center justify-between mb-6">
             <h2 className="text-3xl sm:text-4xl font-semibold text-white">Projects</h2>
-            {isMouse && (
-              <div className="flex md:hidden items-center gap-2">
-                <button onClick={() => scrollBy(projectsRef, -300)} className="flex items-center justify-center w-8 h-8 rounded-full bg-white/5 border border-white/10 hover:bg-white/20 transition text-white">
-                  <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
-                </button>
-                <button onClick={() => scrollBy(projectsRef, 300)} className="flex items-center justify-center w-8 h-8 rounded-full bg-white/5 border border-white/10 hover:bg-white/20 transition text-white">
-                  <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
-                </button>
-              </div>
-            )}
+            {isMouse && <ScrollArrows onScroll={(offset) => scrollBy(projectsRef, offset)} />}
           </div>
           <div ref={projectsRef} className="flex overflow-x-auto snap-x snap-mandatory overscroll-x-contain gap-4 pt-12 -mt-12 pb-12 -mb-6 -mx-4 px-4 sm:-mx-6 sm:px-6 md:mx-0 md:px-0 md:pt-0 md:mt-0 md:pb-0 md:mb-0 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-6 scrollbar-hide md:overflow-visible">
             {projectsData.map((project) => (
@@ -386,16 +373,7 @@ export default function Home() {
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
           <div className="flex flex-row items-center justify-between mb-6">
             <h2 className="text-3xl sm:text-4xl font-semibold text-white">Research</h2>
-            {isMouse && (
-              <div className="flex md:hidden items-center gap-2">
-                <button onClick={() => scrollBy(researchRef, -300)} className="flex items-center justify-center w-8 h-8 rounded-full bg-white/5 border border-white/10 hover:bg-white/20 transition text-white">
-                  <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
-                </button>
-                <button onClick={() => scrollBy(researchRef, 300)} className="flex items-center justify-center w-8 h-8 rounded-full bg-white/5 border border-white/10 hover:bg-white/20 transition text-white">
-                  <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
-                </button>
-              </div>
-            )}
+            {isMouse && <ScrollArrows onScroll={(offset) => scrollBy(researchRef, offset)} />}
           </div>
           <div ref={researchRef} className="flex overflow-x-auto snap-x snap-mandatory overscroll-x-contain gap-4 pt-12 -mt-12 pb-12 -mb-6 -mx-4 px-4 sm:-mx-6 sm:px-6 md:mx-0 md:px-0 md:pt-0 md:mt-0 md:pb-0 md:mb-0 md:grid md:grid-cols-3 md:gap-4 lg:gap-6 scrollbar-hide md:overflow-visible">
             {researchData.map((project) => (

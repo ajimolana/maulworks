@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "motion/react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -14,14 +14,10 @@ export interface PillNavItem {
 interface PillNavProps {
   items: PillNavItem[];
   forceClose?: boolean;
-  titleOverride?: string;
-  homeHref?: string;
-  activeItemOverride?: string;
-  disableScrollSpy?: boolean;
 }
 
-export default function PillNav({ items, forceClose, titleOverride, homeHref, activeItemOverride, disableScrollSpy }: PillNavProps) {
-  const [activeItem, setActiveItem] = useState<string | null>(activeItemOverride || "profile");
+export default function PillNav({ items, forceClose }: PillNavProps) {
+  const [activeItem, setActiveItem] = useState<string | null>("profile");
   const [isScrolled, setIsScrolled] = useState(() =>
     typeof window !== "undefined" ? window.scrollY > 50 : false
   );
@@ -67,7 +63,6 @@ export default function PillNav({ items, forceClose, titleOverride, homeHref, ac
         setIsScrolled(false);
       }
 
-      if (disableScrollSpy) return;
       if (isClickingRef.current) return;
 
       const isAtBottom = Math.ceil(window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 50;
@@ -103,7 +98,7 @@ export default function PillNav({ items, forceClose, titleOverride, homeHref, ac
     window.addEventListener("scroll", handleScroll);
     handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [items, disableScrollSpy]);
+  }, [items]);
 
   useEffect(() => {
     if (mobileMenuOpen) {
@@ -179,7 +174,7 @@ export default function PillNav({ items, forceClose, titleOverride, homeHref, ac
               />
             </div>
             <Link
-              href={homeHref || "#profile"}
+              href="#profile"
               onClick={() => handleItemClick("profile")}
               className={`relative px-4 py-2 flex items-center transition-colors rounded-full ${activeItem === "profile" ? "text-white xl:text-black" : "hover:text-white/80"}`}
             >
@@ -195,7 +190,7 @@ export default function PillNav({ items, forceClose, titleOverride, homeHref, ac
                 )
               )}
               <span className="relative z-10 flex items-center">
-                {titleOverride || "Maulana's Portfolio"}
+                Maulana&apos;s Portfolio
               </span>
             </Link>
           </div>
