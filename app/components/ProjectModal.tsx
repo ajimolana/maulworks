@@ -1,8 +1,9 @@
 import React from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
 import { Project, DetailItem, GalleryItem } from "../data/portfolio";
+import { useDialogFocus } from "./useDialogFocus";
 
 interface ProjectModalProps {
   activeProject: Project | null;
@@ -103,6 +104,7 @@ export default function ProjectModal({ activeProject, onClose, onOpenLightbox }:
   const srcs = React.useMemo(() => items.map(i => i.src), [items]);
   const caps = React.useMemo(() => items.map(i => i.caption ?? ""), [items]);
   
+  const dialogRef = useDialogFocus<HTMLDivElement>(activeProject !== null);
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const [isMouse, setIsMouse] = React.useState(false);
 
@@ -132,7 +134,12 @@ export default function ProjectModal({ activeProject, onClose, onOpenLightbox }:
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.94, opacity: 0, y: 10 }}
             transition={{ duration: 0.25, ease: [0.32, 0.72, 0, 1] }}
-            className="relative w-full max-w-3xl rounded-3xl border border-white/20 bg-[#111111] text-white shadow-2xl flex flex-col max-h-[85dvh] md:max-h-[80vh] overflow-hidden"
+            ref={dialogRef}
+            tabIndex={-1}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="project-modal-title"
+            className="relative w-full max-w-3xl rounded-3xl border border-white/20 bg-[#111111] text-white shadow-2xl flex flex-col max-h-[85dvh] md:max-h-[80vh] overflow-hidden outline-none"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex-none flex items-center bg-[#111111] px-5 py-4 sm:px-6 sm:py-5 border-b border-white/10 z-10">
@@ -142,7 +149,7 @@ export default function ProjectModal({ activeProject, onClose, onOpenLightbox }:
                     <Image src={activeProject.logo} alt={activeProject.title} fill className="object-contain" />
                   </div>
                 )}
-                <h3 className="text-sm sm:text-lg font-semibold pr-4 leading-5 sm:leading-7">{activeProject.title}</h3>
+                <h3 id="project-modal-title" className="text-sm sm:text-lg font-semibold pr-4 leading-5 sm:leading-7">{activeProject.title}</h3>
               </div>
             </div>
 

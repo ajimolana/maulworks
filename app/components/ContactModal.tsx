@@ -1,14 +1,18 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "motion/react";
 import { useState, useEffect } from "react";
+import { useDialogFocus } from "./useDialogFocus";
 
 interface ContactModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
+const accessKey = process.env.NEXT_PUBLIC_WEB3FORMS_KEY;
+
 export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
+  const dialogRef = useDialogFocus<HTMLDivElement>(isOpen);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
 
@@ -20,12 +24,16 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!accessKey) {
+      console.warn("NEXT_PUBLIC_WEB3FORMS_KEY is not set; contact form cannot submit.");
+      setSubmitStatus("error");
+      return;
+    }
     setIsSubmitting(true);
     setSubmitStatus("idle");
 
     const formData = new FormData(e.currentTarget);
-    // Tambahkan access key dari .env (jika ada) atau letakkan langsung di sini
-    formData.append("access_key", process.env.NEXT_PUBLIC_WEB3FORMS_KEY || "PASTE_YOUR_ACCESS_KEY_HERE");
+    formData.append("access_key", accessKey);
 
     try {
       const response = await fetch("https://api.web3forms.com/submit", {
@@ -44,7 +52,7 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
       } else {
         setSubmitStatus("error");
       }
-    } catch (error) {
+    } catch {
       setSubmitStatus("error");
     } finally {
       setIsSubmitting(false);
@@ -68,17 +76,24 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="relative w-full max-w-lg bg-[#151515] border border-white/10 rounded-3xl overflow-hidden shadow-2xl flex flex-col"
+            ref={dialogRef}
+            tabIndex={-1}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="contact-modal-title"
+            className="relative w-full max-w-lg bg-[#151515] border border-white/10 rounded-3xl overflow-hidden shadow-2xl flex flex-col outline-none"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-6 sm:p-8 flex-1">
               <div className="flex justify-between items-center mb-6">
                 <div>
-                  <h3 className="text-2xl font-bold text-white mb-1">Send a Message</h3>
+                  <h3 id="contact-modal-title" className="text-2xl font-bold text-white mb-1">Send a Message</h3>
                   <p className="text-white/60 text-sm">Inquiries & CV Requests</p>
                 </div>
                 <button
+                  type="button"
                   onClick={onClose}
+                  aria-label="Close"
                   className="w-11 h-11 inline-flex items-center justify-center rounded-full bg-white/5 text-white/60 active:bg-white/10 hover:text-white hover:bg-white/10 transition-colors"
                 >
                   <svg width="14" height="14" viewBox="0 0 14 14" fill="none">

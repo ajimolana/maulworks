@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "motion/react";
 import Image from "next/image";
 
 interface LightboxProps {
@@ -12,10 +12,6 @@ interface LightboxProps {
 }
 
 export default function Lightbox({ isOpen, images, captions, index, onClose, setIndex }: LightboxProps) {
-  const [isDesktop, setIsDesktop] = useState(() =>
-    typeof window !== 'undefined' ? window.innerWidth >= 1366 : true
-  );
-
   // Track image loading state
   const [isLoading, setIsLoading] = useState(true);
 
@@ -46,12 +42,6 @@ export default function Lightbox({ isOpen, images, captions, index, onClose, set
     }
   };
 
-  useEffect(() => {
-    const handleResize = () => setIsDesktop(window.innerWidth >= 1366);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
   // Reset loading state when the image index changes or lightbox opens
   useEffect(() => {
     setIsLoading(true);
@@ -67,15 +57,12 @@ export default function Lightbox({ isOpen, images, captions, index, onClose, set
       } else if (e.key === "ArrowLeft") {
         e.preventDefault();
         setIndex((index - 1 + images.length) % images.length);
-      } else if (e.key === "Escape") {
-        e.preventDefault();
-        onClose();
       }
     };
 
     window.addEventListener("keydown", handleLightboxKey);
     return () => window.removeEventListener("keydown", handleLightboxKey);
-  }, [isOpen, index, images.length, onClose, setIndex]);
+  }, [isOpen, index, images.length, setIndex]);
 
   const nextImage = (e: React.MouseEvent) => {
     e.stopPropagation();
