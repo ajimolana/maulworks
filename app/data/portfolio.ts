@@ -34,12 +34,8 @@ export type AchievementItem = {
   competitionType: string;
   organizer: string;
   date: string;
-  image?: string;
-  href?: string;
   /** ID matching a project in researchData, projectsData, experiencesData, or organizationsData */
   linkedProjectId?: string;
-  /** Controls bento tile size. "wide" = col-span-2, "tall" = row-span-2, "featured" = col-span-2 row-span-2. Default = 1x1 */
-  size?: "normal" | "wide" | "tall" | "featured";
 };
 
 export const experiencesData: Project[] = [
@@ -142,7 +138,6 @@ export const projectsData: Project[] = [
       ["/assets/projects/behindworldcup/Insights Page.png", "Insights Page"],
       ["/assets/projects/behindworldcup/Detailed Team Breakdown.png", "Detailed Team Breakdown"],
     ],
-    // link: "https://foodsecurityforecasting.streamlit.app/"
   },
   {
     id: "intelligentcoffeeshop",
@@ -150,19 +145,20 @@ export const projectsData: Project[] = [
     year: "2025",
     title: "Intelligent Coffee Shop Automation",
     shortDesc: "AI Generated Insights for Coffee Shop Businesses",
-    period: "May 2026",
+    period: "May 2025",
     roleLabel: "Tools",
     role: "NextJS, n8n",
     details: [
       {
         label: "Description",
-        value: "Intelligent Coffee Shop Automation merupakan project full-stack yang saya kerjakan bersama teman. Berawal dari keresahan terhadap naiknya harga menu dari coffee shop favorit saya, memunculkan ide untuk membuat aplikasi ini. Juga mengingat banyaknya Coffee Shop di kota saya, Makassar dan menempati peringkat 1 Coffee Shop terbanyak di Indonesia. Kami membuat sistem cerdas untuk memaksimalkan kinerja operasional melalui AI Agent. Dasbor bisa menghasilkan laporan layaknya data analyst dan business intelligence kepada owner, sehingga memudahkan decision making. Sistem dibekali dengan intelligence stock untuk mencatat segala bahan keluar secara otomatis, menampilkan sisa menu available, dan early warning. Selain itu, sistem bisa memberikan rekomendasi upselling yang langsung muncul di layar kasir menggunakan algoritma taste-profile seperti Netflix."
+        value: "Intelligent Coffee Shop Automation is a full-stack project I built together with a friend. The idea came from frustration over rising menu prices at my favorite coffee shop, and from the fact that my hometown, Makassar, has one of the highest concentrations of coffee shops in Indonesia. We built an intelligent system that maximizes operational performance through an AI Agent. The dashboard generates reports like a data analyst and business intelligence team would, helping owners make decisions. The system includes intelligent stock management that automatically records ingredient usage, shows which menu items are still available, and raises early warnings. It also gives upselling recommendations directly on the cashier screen using a Netflix-style taste-profile algorithm."
       },
       {
         label: "Task",
         value: [
-          "-",
-          "-"
+          "Built a full-stack operations system with an AI Agent to streamline coffee shop management, including a Business Intelligence dashboard to support the owner's decision making.",
+          "Designed an Intelligent Stock feature that automatically deducts ingredients on every transaction, tracks menu availability in real time, and sends early warnings when stock runs low.",
+          "Implemented a taste-profile algorithm integrated with the cashier screen to deliver smart product upselling recommendations."
         ],
         list: true
       }
@@ -175,7 +171,6 @@ export const projectsData: Project[] = [
       ["/assets/projects/intelligentcoffeeshop/reports page.png", "Reports Page"],
       ["/assets/projects/intelligentcoffeeshop/backend.png", "Backend"],
     ],
-    // link: "https://foodsecurityforecasting.streamlit.app/"
   },
   {
     id: "foodsecurity",
@@ -252,7 +247,7 @@ export const projectsData: Project[] = [
     cardTag: "Colab, Looker",
     year: "2024",
     title: "Cultivated Highland Agriculture",
-    shortDesc: "Best time for plant and crop forecaster.",
+    shortDesc: "Forecasts the best planting times for crops.",
     period: "Jan 2024 - Apr 2024",
     roleLabel: "Tools",
     role: "Google Colab, Looker Studio",
@@ -298,7 +293,7 @@ export const researchData: Project[] = [
     year: "2022",
     title: "Smart Cell Dry Box: Practical Seaweed Processing",
     shortDesc: "Winning Paper at Milky Way Scientific Paper Competition",
-    period: "Aug 2024 - Oct 2024",
+    period: "Aug 2022 - Oct 2022",
     roleLabel: "Category",
     role: "Scientific Paper Competition",
     details: [
@@ -352,12 +347,7 @@ export const researchData: Project[] = [
     ],
     heroImage: "",
     gallery: [],
-    links: [
-      {
-        label: "Open Notebook",
-        href: "#foodsecurity"
-      },
-    ]
+    link: null
   },
   {
     id: "ecobluevillage",
@@ -365,7 +355,7 @@ export const researchData: Project[] = [
     year: "2024",
     title: "Eco Blue Village: Seaweed Biofuel Innovation",
     shortDesc: "Submission for Aksinomi Sulampua",
-    period: "September 2025",
+    period: "September 2024",
     roleLabel: "Category",
     role: "Scientific Paper Competition",
     details: [
@@ -471,28 +461,24 @@ export const achievements: AchievementItem[] = [
     organizer: "Aksinomi Sulampua, BI Sulsel",
     date: "Oct 2025",
     linkedProjectId: "sipekan",
-    size: "wide",
   },
   {
     title: "Top 10 Ambassador",
     competitionType: "Ambassador",
     organizer: "CBP Rupiah, BI Sulsel",
     date: "Jun 2025",
-    size: "normal",
   },
   {
     title: "Outstanding Student",
     competitionType: "Recognition",
     organizer: "Faculty of Math & Science, Unhas",
     date: "Aug 2024",
-    size: "normal",
   },
   {
     title: "Outstanding Student",
     competitionType: "Recognition",
     organizer: "Math Department, Unhas",
     date: "Aug 2024",
-    size: "normal",
   },
   {
     title: "1st Place Softball Men's",
@@ -500,35 +486,30 @@ export const achievements: AchievementItem[] = [
     organizer: "Airlangga National Championship",
     date: "Jul 2024",
     linkedProjectId: "org-softball",
-    size: "wide",
   },
   {
     title: "4th Runner-Up Infographic",
     competitionType: "Creative",
     organizer: "Celebes Plano Fest",
     date: "Nov 2023",
-    size: "normal",
   },
   {
     title: "Outstanding Student",
     competitionType: "Recognition",
     organizer: "Math Department, Unhas",
     date: "Aug 2023",
-    size: "normal",
   },
   {
     title: "2nd Place Softball Men's",
     competitionType: "Sports",
     organizer: "UGM Cup",
     date: "Jun 2023",
-    size: "normal",
   },
   {
     title: "2nd Place Videography",
     competitionType: "Creative",
     organizer: "National Environmental Expo",
     date: "Jun 2023",
-    size: "normal",
   },
   {
     title: "1st Place Paper",
@@ -536,7 +517,6 @@ export const achievements: AchievementItem[] = [
     organizer: "Milky Way Scientific Paper Competition, Universitas Jember",
     date: "Dec 2022",
     linkedProjectId: "smartcelldrybox",
-    size: "featured",
   },
 ];
 
