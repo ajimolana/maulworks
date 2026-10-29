@@ -260,7 +260,7 @@ export default function Home() {
         {/* Hero Logos */}
         <div className="absolute bottom-4 sm:bottom-8 left-0 right-0 w-full z-10">
           <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
-            <p className="text-center text-[#a1a1aa] text-[9px] sm:text-[11px] uppercase tracking-widest font-semibold mb-5 sm:mb-6">Experiences & Affiliations</p>
+            <p className="text-center text-[#a1a1aa] text-[10px] sm:text-[11px] uppercase tracking-widest font-semibold mb-5 sm:mb-6">Experiences & Affiliations</p>
             <div className="min-h-[80px]">
               <LogoLoop
                 logos={homeLogoNodes}
@@ -296,7 +296,7 @@ export default function Home() {
               {/* Education: Right, 1/3 width */}
               <div className="space-y-2 sm:space-y-3 lg:col-span-1">
                 <h3 className="text-[var(--theme-accent)] font-semibold text-lg sm:text-xl">Education</h3>
-                <InfoCard title="Hasanuddin University" meta="Aug 2021 â€“ Feb 2026" subtitle="Bachelor of Actuarial Science" onClick={() => openProjectModal(aboutModalData.education)} />
+                <InfoCard title="Hasanuddin University" meta="Aug 2021 – Feb 2026" subtitle="Bachelor of Actuarial Science" onClick={() => openProjectModal(aboutModalData.education)} />
               </div>
 
               {/* ROW 2: Tech Stack, Certifications, Scholarships */}
@@ -317,7 +317,7 @@ export default function Home() {
                 <h3 className="text-[var(--theme-accent)] font-semibold text-lg sm:text-xl">Certifications</h3>
                 <div className="space-y-2.5 sm:space-y-3">
                   <InfoCard title="Data Analyst" meta="Oct 2024" subtitle="National Professional Certification Agency" onClick={() => openProjectModal(aboutModalData.cert_data_analyst)} />
-                  <InfoCard title="Data Science & AI" meta="Feb â€“ Jun 2024" subtitle="Startup Campus" onClick={() => openProjectModal(aboutModalData.cert_data_science)} />
+                  <InfoCard title="Data Science & AI" meta="Feb – Jun 2024" subtitle="Startup Campus" onClick={() => openProjectModal(aboutModalData.cert_data_science)} />
                 </div>
               </div>
 

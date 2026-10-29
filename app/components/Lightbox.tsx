@@ -157,7 +157,7 @@ export default function Lightbox({ isOpen, images, captions, index, onClose, set
 
               {/* Counter */}
               {images.length > 1 && (
-                <span className="text-xs text-white/40 tabular-nums px-1 min-w-[2.5rem] text-center">
+                <span className="text-xs text-white/60 tabular-nums px-1 min-w-[2.5rem] text-center">
                   {index + 1} / {images.length}
                 </span>
               )}

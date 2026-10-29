@@ -280,7 +280,7 @@ export default function PillNav({ items, forceClose }: PillNavProps) {
               </div>
 
               {/* Section label */}
-              <p className="text-center text-[10px] uppercase tracking-[0.2em] text-white/30 font-semibold mt-1 mb-4 select-none">
+              <p className="text-center text-[10px] uppercase tracking-[0.2em] text-white/50 font-semibold mt-1 mb-4 select-none">
                 Navigate
               </p>
 
