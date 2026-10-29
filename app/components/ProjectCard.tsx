@@ -19,6 +19,7 @@ export default function ProjectCard({ project, onClick, variant = "default", lin
         type="button"
         onClick={() => onClick(project)}
         aria-label={`Open details for ${project.title}`}
+        data-card-id={project.id}
         className="group relative text-left rounded-3xl border border-white/15 bg-[#111111] p-4 transition-all duration-300 active:scale-[0.98] hover:border-white/40 hover:shadow-[0_8px_32px_rgba(255,255,255,0.08),0_0_0_1px_rgba(255,255,255,0.12)] focus-visible:outline-none focus-visible:border-white/40 focus-visible:shadow-[0_8px_32px_rgba(255,255,255,0.08),0_0_0_1px_rgba(255,255,255,0.12)] flex items-center gap-4 w-full h-full"
       >
 
@@ -46,16 +47,22 @@ export default function ProjectCard({ project, onClick, variant = "default", lin
       type="button"
       onClick={() => onClick(project)}
       aria-label={`Open details for ${project.title}`}
+      data-card-id={project.id}
       className="group relative text-left rounded-3xl border border-white/15 bg-[#111111] p-3 transition-all duration-300 active:scale-[0.98] hover:border-white/40 hover:shadow-[0_8px_32px_rgba(255,255,255,0.08),0_0_0_1px_rgba(255,255,255,0.12)] focus-visible:outline-none focus-visible:border-white/40 focus-visible:shadow-[0_8px_32px_rgba(255,255,255,0.08),0_0_0_1px_rgba(255,255,255,0.12)] w-full h-full flex flex-col"
     >
+      {/* 16:9 like every project screenshot (1920x1080), so the full shot shows at any card width; a fixed height cropped the sides */}
       {variant !== "research" && project.heroImage && (
-        <div className="relative overflow-hidden rounded-2xl h-48 sm:h-56 w-full">
+        <div className="relative overflow-hidden rounded-2xl aspect-video w-full">
           <Image
             src={project.heroImage}
             alt={project.title}
             fill
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
-            quality={50}
+            // Hover brightens instead of zooming: a zoom crops the 16:9 shot again and softens its small text
+            className="object-cover transition-[filter] duration-300 group-hover:brightness-[1.08] group-focus-visible:brightness-[1.08]"
+            // Screenshots are full of small text and thin borders: 50 smeared them; 85 costs only ~2-6 KB more than 75 per image.
+            // sizes matches the rendered card width, so the browser no longer pulls a full-viewport image
+            sizes="(max-width: 640px) 80vw, (max-width: 1024px) 50vw, 420px"
+            quality={85}
           />
         </div>
       )}

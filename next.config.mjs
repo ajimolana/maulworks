@@ -3,7 +3,8 @@ const nextConfig = {
   compress: true,
   reactStrictMode: true,
   images: {
-    formats: ["image/avif", "image/webp"],
+    // WebP only: the images are UI screenshots, and AVIF visibly softens their small text and thin borders even at quality 85
+    formats: ["image/webp"],
     minimumCacheTTL: 2592000,
   },
   experimental: {

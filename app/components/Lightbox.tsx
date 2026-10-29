@@ -11,9 +11,19 @@ interface LightboxProps {
   setIndex: (index: number) => void;
 }
 
+// The Lightbox is where people inspect a shot: WebP at 85 looks like the original but is 5-20x lighter than the raw
+// PNGs (the site serves WebP only, see next.config). sizes matches the on-screen width, so a 1x laptop gets ~1200px and
+// retina screens and phones get the full 1920px. Same props everywhere so the hidden neighbour preloads request
+// exactly the URL the visible image will use.
+const imageProps = { fill: true, quality: 85, sizes: "(max-width: 1280px) 90vw, 1200px" } as const;
+const imageBoxClass = "absolute w-[90vw] max-w-[1200px] h-[70vh]";
+
 export default function Lightbox({ isOpen, images, captions, index, onClose, setIndex }: LightboxProps) {
-  // Track image loading state
-  const [isLoading, setIsLoading] = useState(true);
+  // The image on screen only changes once the requested one has loaded, so switching never flashes an empty frame
+  const [shown, setShown] = useState<number | null>(null);
+  // Spinner only when a load is actually slow, not on every switch
+  const [slow, setSlow] = useState(false);
+  const waiting = shown !== index;
 
   // Touch swipe states
   const [touchStart, setTouchStart] = useState<number | null>(null);
@@ -42,10 +52,17 @@ export default function Lightbox({ isOpen, images, captions, index, onClose, set
     }
   };
 
-  // Reset loading state when the image index changes or lightbox opens
+  // A fresh open (or a different gallery) starts blank instead of showing the previous gallery's photo
   useEffect(() => {
-    setIsLoading(true);
-  }, [index, isOpen]);
+    if (!isOpen) setShown(null);
+  }, [isOpen, images]);
+
+  useEffect(() => {
+    setSlow(false);
+    if (!waiting) return;
+    const timer = setTimeout(() => setSlow(true), 200);
+    return () => clearTimeout(timer);
+  }, [waiting, index]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -98,25 +115,48 @@ export default function Lightbox({ isOpen, images, captions, index, onClose, set
           >
             <div className="flex flex-col items-center justify-center relative w-full h-full">
               {/* Loading Spinner */}
-              {isLoading && (
+              {waiting && slow && (
                 <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[110]">
                   <div className="w-10 h-10 border-4 border-white/10 border-t-white/60 rounded-full animate-spin"></div>
                 </div>
               )}
 
-              <Image
-                src={images[index]}
-                alt={captions[index] || "Preview image"}
-                width={1200}
-                height={800}
-                quality={85}
-                priority={true}
-                unoptimized={false}
-                onLoad={() => setIsLoading(false)}
-                className={`max-h-[70vh] max-w-[90vw] xl:max-w-[1200px] object-contain w-auto h-auto rounded-lg transition-opacity duration-500 ease-in-out ${
-                  isLoading ? "opacity-0" : "opacity-100"
-                }`}
-              />
+              {/* On-screen image; the outgoing one fades out while the next fades in on top of it */}
+              <AnimatePresence initial={false}>
+                {shown !== null && (
+                  <motion.div
+                    key={shown}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2, ease: "easeOut" }}
+                    className="absolute inset-0 flex items-center justify-center"
+                  >
+                    {/* The box sets the size and the photo is contained in it: with a responsive srcset the image's
+                        own intrinsic size shrinks on retina screens, so w-auto/h-auto rendered it at half size */}
+                    <div className={imageBoxClass}>
+                      <Image src={images[shown]} alt={captions[shown] || "Preview image"} {...imageProps} className="object-contain" />
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Requested image loads invisibly, then takes over the screen */}
+              {waiting && (
+                <div className={`${imageBoxClass} opacity-0 pointer-events-none`} aria-hidden="true">
+                  <Image key={index} src={images[index]} alt="" {...imageProps} priority onLoad={() => setShown(index)} className="object-contain" />
+                </div>
+              )}
+
+              {/* Neighbours load in the background, so the arrow keys and swipes feel instant */}
+              <div className="hidden" aria-hidden="true">
+                {/* A Set because with two photos "next" and "previous" are the same one */}
+                {images.length > 1 && Array.from(new Set([(index + 1) % images.length, (index - 1 + images.length) % images.length])).map((i) => (
+                  <div key={i} className={imageBoxClass}>
+                    <Image src={images[i]} alt="" {...imageProps} loading="eager" />
+                  </div>
+                ))}
+              </div>
             </div>
           </motion.div>
 
