@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Project, DetailItem, GalleryItem } from "../data/portfolio";
 import { useDialogFocus } from "./useDialogFocus";
+import ScrollDots from "./ScrollDots";
 
 interface ProjectModalProps {
   activeProject: Project | null;
@@ -32,7 +33,7 @@ const renderMultilineText = (text: string | string[]) =>
     ))
     : text;
 
-const renderDetailItem = (item: DetailItem, index: number, isHighlight = false) => {
+const renderDetailItem = (item: DetailItem, index: number) => {
   if (!item.value) return null;
   const hasContent = item.list && Array.isArray(item.value) 
     ? item.value.some((entry) => entry.trim().length > 0)
@@ -41,12 +42,12 @@ const renderDetailItem = (item: DetailItem, index: number, isHighlight = false) 
   if (!hasContent) return null;
 
   return (
-    <div key={`${item.label}-${index}`} className={isHighlight ? "bg-[var(--theme-accent)]/10 border border-[var(--theme-accent)]/20 rounded-2xl p-5" : ""}>
-      <p className={`text-[10px] sm:text-xs uppercase ${isHighlight ? "text-[var(--theme-accent)] font-semibold tracking-widest mb-1.5" : "text-white/60 tracking-wider mb-1"}`}>
+    <div key={`${item.label}-${index}`}>
+      <p className="text-[11px] sm:text-xs uppercase text-white/60 tracking-wider mb-1">
         {item.label}
       </p>
       {item.list && Array.isArray(item.value) ? (
-        <ul className={`mt-2 space-y-1 ${isHighlight ? "text-sm sm:text-base text-white font-medium" : "text-xs sm:text-sm text-white/80"} list-disc list-outside ml-4`}>
+        <ul className="mt-2 space-y-1 text-[13px] sm:text-sm leading-relaxed text-white/80 list-disc list-outside ml-4">
           {item.value
             .filter((entry) => entry.trim().length > 0)
             .map((entry, entryIndex) => (
@@ -54,7 +55,7 @@ const renderDetailItem = (item: DetailItem, index: number, isHighlight = false) 
             ))}
         </ul>
       ) : (
-        <p className={`${isHighlight ? "text-sm sm:text-base text-white font-medium leading-relaxed" : "text-xs sm:text-sm text-white/80"}`}>
+        <p className="text-[13px] sm:text-sm leading-relaxed text-white/80">
           {renderMultilineText(item.value ?? "")}
         </p>
       )}
@@ -62,24 +63,16 @@ const renderDetailItem = (item: DetailItem, index: number, isHighlight = false) 
   );
 };
 
-const renderDetails = (details: DetailItem[] = []) => {
-  const highlightLabels = ['result', 'impact', 'metrics', 'hasil'];
-  const highlightItems = details.filter(d => highlightLabels.includes(d.label.toLowerCase()));
-  const standardItems = details.filter(d => !highlightLabels.includes(d.label.toLowerCase()));
-
-  return (
-    <>
-      {highlightItems.map((item, index) => renderDetailItem(item, index, true))}
-      {standardItems.map((item, index) => renderDetailItem(item, index, false))}
-    </>
-  );
-};
+// Details render in their data order (e.g. Problem → My Role → Method → Result), all styled alike
+const renderDetails = (details: DetailItem[] = []) => (
+  <>{details.map((item, index) => renderDetailItem(item, index))}</>
+);
 
 const ModalImage = ({ src, idx, onOpenLightbox, srcs, caps }: { src: string, idx: number, onOpenLightbox: (images: string[], captions: string[], index: number) => void, srcs: string[], caps: string[] }) => {
   const [isLoading, setIsLoading] = React.useState(true);
   
   return (
-    <div className="snap-start flex-none relative h-40 w-64 bg-white/5 rounded-2xl flex items-center justify-center overflow-hidden border border-white/5">
+    <div className="snap-center snap-always flex-none relative h-40 w-64 bg-white/5 rounded-2xl flex items-center justify-center overflow-hidden border border-white/5">
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
           <div className="w-6 h-6 border-2 border-white/10 border-t-white/60 rounded-full animate-spin"></div>
@@ -149,7 +142,7 @@ export default function ProjectModal({ activeProject, onClose, onOpenLightbox }:
                     <Image src={activeProject.logo} alt={activeProject.title} fill className="object-contain" />
                   </div>
                 )}
-                <h3 id="project-modal-title" className="text-sm sm:text-lg font-semibold pr-4 leading-5 sm:leading-7">{activeProject.title}</h3>
+                <h3 id="project-modal-title" className="text-base sm:text-lg font-semibold pr-4 leading-6 sm:leading-7">{activeProject.title}</h3>
               </div>
             </div>
 
@@ -158,14 +151,14 @@ export default function ProjectModal({ activeProject, onClose, onOpenLightbox }:
                 <div className="grid gap-4 sm:grid-cols-2">
                   {activeProject.period && (
                     <div>
-                      <p className="text-[10px] sm:text-xs text-white/60 uppercase tracking-wider mb-0.5">Period</p>
-                      <p className="text-xs sm:text-sm text-white">{activeProject.period}</p>
+                      <p className="text-[11px] sm:text-xs text-white/60 uppercase tracking-wider mb-0.5">Period</p>
+                      <p className="text-[13px] sm:text-sm text-white">{activeProject.period}</p>
                     </div>
                   )}
                   {activeProject.roleLabel && activeProject.role && (
                     <div>
-                      <p className="text-[10px] sm:text-xs text-white/60 uppercase tracking-wider mb-0.5">{activeProject.roleLabel}</p>
-                      <p className="text-xs sm:text-sm text-white">{activeProject.role}</p>
+                      <p className="text-[11px] sm:text-xs text-white/60 uppercase tracking-wider mb-0.5">{activeProject.roleLabel}</p>
+                      <p className="text-[13px] sm:text-sm text-white">{activeProject.role}</p>
                     </div>
                   )}
                 </div>
@@ -176,13 +169,13 @@ export default function ProjectModal({ activeProject, onClose, onOpenLightbox }:
               {items.length > 0 && (
                 <div>
                   <div className="flex flex-row items-center justify-between mb-2">
-                    <p className="text-[10px] sm:text-xs text-white/60 uppercase tracking-wider">Documentation</p>
+                    <p className="text-[11px] sm:text-xs text-white/60 uppercase tracking-wider">Documentation</p>
                     {isMouse && items.length > 2 && (
                       <div className="flex items-center gap-2 pr-1">
-                        <button onClick={() => scrollBy(-268)} className="flex items-center justify-center w-6 h-6 rounded-full bg-white/5 border border-white/10 hover:bg-white/20 transition text-white">
+                        <button onClick={() => scrollBy(-268)} aria-label="Scroll documentation left" className="flex items-center justify-center w-8 h-8 rounded-full bg-white/5 border border-white/10 hover:bg-white/20 transition text-white">
                           <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
                         </button>
-                        <button onClick={() => scrollBy(268)} className="flex items-center justify-center w-6 h-6 rounded-full bg-white/5 border border-white/10 hover:bg-white/20 transition text-white">
+                        <button onClick={() => scrollBy(268)} aria-label="Scroll documentation right" className="flex items-center justify-center w-8 h-8 rounded-full bg-white/5 border border-white/10 hover:bg-white/20 transition text-white">
                           <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
                         </button>
                       </div>
@@ -206,12 +199,13 @@ export default function ProjectModal({ activeProject, onClose, onOpenLightbox }:
                       );
                     })}
                   </div>
+                  <ScrollDots scrollRef={scrollRef} count={items.length} />
                 </div>
               )}
 
               {Array.isArray(activeProject.links) && activeProject.links.length > 0 && (
                 <div>
-                  <p className="text-[10px] sm:text-xs text-white/60 uppercase tracking-wider mb-2">Link</p>
+                  <p className="text-[11px] sm:text-xs text-white/60 uppercase tracking-wider mb-2">Link</p>
                   <div className="flex flex-wrap gap-2">
                     {activeProject.links.map((item: { label: string; href: string }, index: number) => (
                       <Link
@@ -231,7 +225,7 @@ export default function ProjectModal({ activeProject, onClose, onOpenLightbox }:
 
               {!activeProject.links && activeProject.link && (
                 <div>
-                  <p className="text-[10px] sm:text-xs text-white/60 uppercase tracking-wider mb-2">Link</p>
+                  <p className="text-[11px] sm:text-xs text-white/60 uppercase tracking-wider mb-2">Link</p>
                   <Link
                     href={activeProject.link}
                     target="_blank"
