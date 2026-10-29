@@ -61,6 +61,7 @@ All shapes use aggressive, generous border-radius values to feel soft, tactile, 
   - Hero headline: `text-5xl md:text-6xl lg:text-[5.5rem] font-bold tracking-tight`
   - Body text: `text-sm md:text-base text-white` (readable, well-spaced)
   - **Labels / metadata / tags:** `text-[10px] uppercase tracking-wider text-white/60` — strict pattern applied across category labels, metadata rows, and pill tags.
+  - **Card titles:** `text-base sm:text-lg font-semibold` on every card (Project, Research, Experience, Organization), the same as the modal title. Project cards already stand out through their hero image; a bigger title on top of that reads as a headline.
   - **Project modal (reading surface):** labels `text-[11px] sm:text-xs`, body `text-[13px] sm:text-sm leading-relaxed`, title `text-base sm:text-lg`. Compact, but people read here longest, so nothing below 11px.
   - Subtle text: `text-white/50` minimum (`/40` only for purely decorative glyphs) for secondary metadata, dates, and item counters, at `text-[11px]` or larger. Lower opacities fail WCAG AA contrast on `#111`.
 
@@ -87,8 +88,13 @@ Achievement cards feature a hairline animated gradient line at the top edge that
 " />
 ```
 
-### Category Icons
-Achievement categories show a small line icon (`w-3 h-3`) inside the category pill on desktop and at the start of each row on mobile. No oversized watermark icons: at low opacity they vanish on most screens and repeat the label.
+### Achievements List
+Achievements are a quiet list, not cards: they are secondary to Projects/Research and should not compete with them. One row pattern everywhere (icon · title over "organizer · date" · arrow on clickable rows). Mobile pages through 5 rows with Prev/Next; from `md` all rows show in two columns that fill top-to-bottom (`grid-flow-col`), so date order reads down. Not one full-width column: at desktop width the arrow drifts far from the text. Every row has the same `-mx-3 px-3` so dividers line up whether or not the row is clickable.
+
+Each row shows a small decorative line icon (`w-4 h-4 text-white/50`). No category label or pill: without a filter it only repeats what the title already says. The data field is `icon`, typed as `AchievementIcon`. No oversized watermark icons: at low opacity they vanish on most screens.
+
+### Uniform Line Counts
+Card texts that sit side by side share one line count: two lines only when every one of them needs two, otherwise one line for all, truncated with an ellipsis. Mixed counts leave empty gaps in the shorter cards. It needs measuring, so it lives in `useUniformLines` (mark texts with `data-uniform-lines="<key>"`); Project and Research cards use it for title and description, measured per section (all cards in the grid or carousel, not per visual row). Apply it to any new side-by-side card text instead of a fixed `line-clamp-2` or `min-h` reservation.
 
 ### Tactile Feedback (Active States)
 Primary clickable elements (CTAs, project/organization cards, achievement cards, contact submit) feature `active:scale-95` or `active:scale-[0.98]`. Small utility controls (carousel arrows, About info cards) may rely on hover/background feedback instead.
