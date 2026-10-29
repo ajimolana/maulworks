@@ -117,17 +117,26 @@ export const projectsData: Project[] = [
     role: "Python, NextJS",
     details: [
       {
-        label: "Description",
-        value: "A statistical model for predicting FIFA World Cup 2026 match outcomes, group standings, and tournament winner probabilities. The project utilizes an ensemble of Dixon-Coles Maximum Likelihood Estimation, Poisson Generalized Linear Models, and an Elo rating system. It features a Node.js production pipeline for mathematical modeling, Python Jupyter Notebooks for methodology documentation, and a Next.js frontend for data visualization."
+        label: "Problem",
+        value: "Football predictions often rest on pundits' opinions rather than rigorous statistics. Coming from actuarial risk modelling, I built a platform that lets everyday fans explore World Cup 2026 projections through a data scientist's lens."
       },
       {
-        label: "Task",
+        label: "Role",
+        value: "Data Scientist · Solo project"
+      },
+      {
+        label: "Method",
         value: [
-          "Engineered a statistical ensemble model using Dixon-Coles Maximum Likelihood Estimation and Poisson GLMs to predict international football match outcomes.",
-          "Designed an Elo rating system and executed a Monte Carlo simulation (50,000 iterations) to accurately forecast tournament winner probabilities and group standings.",
-          "Built a production pipeline to fit mathematical models and process historical data across 900+ matches",
+          "Built a statistical pipeline over 900+ historical international matches.",
+          "Combined Dixon-Coles MLE, a Poisson GLM, and an EWMA form tracker into one ensemble. A Dixon-Coles dependence parameter, fitted with Newton-Raphson, fixes standard Poisson's blind spot for low-scoring draws.",
+          "Simulated the whole tournament 50,000 times with Monte Carlo and dynamic Elo ratings.",
+          "Built a Next.js web app to visualize probability matrices and the tournament bracket."
         ],
         list: true
+      },
+      {
+        label: "Result",
+        value: "Correctly predicted Spain as the 2026 champion (21.5% title odds) and Argentina as the other grand finalist."
       }
     ],
     heroImage: "/assets/projects/behindworldcup/Main Dashboard.png",
@@ -142,25 +151,34 @@ export const projectsData: Project[] = [
   {
     id: "intelligentcoffeeshop",
     cardTag: "NextJS, n8n",
-    year: "2025",
+    year: "2026",
     title: "Intelligent Coffee Shop Automation",
     shortDesc: "AI Generated Insights for Coffee Shop Businesses",
-    period: "May 2025",
+    period: "May 2026",
     roleLabel: "Tools",
     role: "NextJS, n8n",
     details: [
       {
-        label: "Description",
-        value: "Intelligent Coffee Shop Automation is a full-stack project I built together with a friend. The idea came from frustration over rising menu prices at my favorite coffee shop, and from the fact that my hometown, Makassar, has one of the highest concentrations of coffee shops in Indonesia. We built an intelligent system that maximizes operational performance through an AI Agent. The dashboard generates reports like a data analyst and business intelligence team would, helping owners make decisions. The system includes intelligent stock management that automatically records ingredient usage, shows which menu items are still available, and raises early warnings. It also gives upselling recommendations directly on the cashier screen using a Netflix-style taste-profile algorithm."
+        label: "Problem",
+        value: "Prices kept rising at my favourite local coffee shops, and Makassar has more coffee shops than any other city in Indonesia. TettaPOS (‘Tetta’ means father in Makassarese) aims to be a trusted guide that helps owners watch operations and make smarter decisions."
       },
       {
-        label: "Task",
+        label: "Role",
+        value: "AI Engineer · Duo project"
+      },
+      {
+        label: "Method",
         value: [
-          "Built a full-stack operations system with an AI Agent to streamline coffee shop management, including a Business Intelligence dashboard to support the owner's decision making.",
-          "Designed an Intelligent Stock feature that automatically deducts ingredients on every transaction, tracks menu availability in real time, and sends early warnings when stock runs low.",
-          "Implemented a taste-profile algorithm integrated with the cashier screen to deliver smart product upselling recommendations."
+          "Built an AI Agent that works like an automated data analyst, writing periodic reports for the owner.",
+          "Tested a backend locally that sends scheduled daily analytics messages straight to the owner.",
+          "Integrated smart stock: ingredients are deducted on every sale, remaining menu stock is shown, and low inventory triggers early warnings.",
+          "Added cashier upselling from a taste-profile algorithm on sales history, plus auto-COGS from detailed recipes."
         ],
         list: true
+      },
+      {
+        label: "Result",
+        value: "Hosting the live backend was too costly, so we shipped a fully interactive front-end prototype that demonstrates the whole system, from the cashier screen to daily reports."
       }
     ],
     heroImage: "/assets/projects/intelligentcoffeeshop/login page.png",
@@ -184,19 +202,24 @@ export const projectsData: Project[] = [
     details: [
       {
         label: "Problem",
-        value: "Local governments in the Sulampua region needed a reliable method to predict food security statuses to formulate effective agricultural and economic policies."
+        value: "Sulampua (Sulawesi, Maluku, and Papua) faces complex food security challenges: uneven logistics, high poverty, and severe stunting. Government responses are often reactive, so our team built an early warning system that maps regional risk before a crisis spreads."
       },
       {
-        label: "My Role",
-        value: "Machine Learning Modeler & Data Analyst"
+        label: "Role",
+        value: "Developer & Machine Learning Engineer · Team of three"
       },
       {
         label: "Method",
-        value: "Developed predictive models using Python, utilizing variables from the National Food Agency's Atlas across 127 data points. Deployed the interactive dashboard via Streamlit."
+        value: [
+          "Processed 2018–2024 data from the National Food Agency (Bapanas) for 127 regencies and cities across 9 provinces.",
+          "Trained a Random Forest model with time series cross-validation, keeping predictions stable over time and avoiding overfitting on highly correlated socio-economic variables.",
+          "Built simulations of four fiscal policy scenarios and 2025 vulnerability projections, with real-time risk tiering into 6 priority classes."
+        ],
+        list: true
       },
       {
         label: "Result",
-        value: "Achieved an R² score of 0.801 and RMSE of 0.887, enabling policymakers to simulate and visualize food security risks dynamically."
+        value: "R² of 0.801 and RMSE of 0.887. Feature importance showed poverty (35.4%) and clean water access (21.5%) as the main drivers of food vulnerability."
       }
     ],
     heroImage: "/assets/projects/foodsecurity/foodsecurity1.png",
@@ -219,19 +242,25 @@ export const projectsData: Project[] = [
     details: [
       {
         label: "Problem",
-        value: "Calculating pension fund premium costs is mathematically complex and often opaque for participants. There was a need for an accessible tool to simulate different scenarios."
+        value: "Indonesia's pension fund sector has very low literacy (27.79%) and inclusion (5.37%), according to SNLKI 2025. As my final year project, I turned complex actuarial calculations into a visual workflow so anyone can compare pension funding methods."
       },
       {
-        label: "My Role",
-        value: "Actuarial Developer"
+        label: "Role",
+        value: "Data Scientist · Solo final year project"
       },
       {
         label: "Method",
-        value: "Translated complex actuarial formulas (Entry Age Normal, Attained Age Normal, Projected Unit Credit) into Python algorithms and built a user-friendly interface with Streamlit."
+        value: [
+          "Translated advanced actuarial formulas into Python: Entry Age Normal, Attained Age Normal, and Projected Unit Credit.",
+          "Built on the official Indonesian Mortality Table (TMI IV / TMI 2023).",
+          "Used Python's decimal library to remove floating-point rounding errors, and caching to keep large commutation tables fast.",
+          "Built a Streamlit interface where users enter participant parameters and see premiums and actuarial liabilities in real time."
+        ],
+        list: true
       },
       {
         label: "Result",
-        value: "Delivered a transparent and interactive simulator that allows users to instantly calculate and visualize their required premiums based on adjustable life parameters."
+        value: "A live calculator that compares normal cost and actuarial liability across all three methods side by side, with the commutation formulas (Dx, Nx, Cx, Mx, Rx) laid out for learning."
       }
     ],
     heroImage: "/assets/projects/pensionfund/pensionfund1.png",
@@ -246,27 +275,33 @@ export const projectsData: Project[] = [
     id: "cultivatedhighland",
     cardTag: "Colab, Looker",
     year: "2024",
-    title: "Cultivated Highland Agriculture",
+    title: "Smart Highland Agriculture",
     shortDesc: "Forecasts the best planting times for crops.",
-    period: "Jan 2024 - Apr 2024",
+    period: "Apr 2024 - Jun 2024",
     roleLabel: "Tools",
     role: "Google Colab, Looker Studio",
     details: [
       {
         label: "Problem",
-        value: "Highland farmers struggle with unpredictable environmental changes, making it difficult to determine the optimal planting periods for various crops."
+        value: "Climate change brings extreme weather that raises crop failure risk in highland farming. For our Startup Campus Data Science & AI Bootcamp capstone, we set out to give farmers predictive weather insights and concrete planting advice instead of raw weather data."
       },
       {
-        label: "My Role",
-        value: "Data Engineer & Modeler"
+        label: "Role",
+        value: "Data Scientist · Team of six"
       },
       {
         label: "Method",
-        value: "Managed data pipelines and performed hyperparameter tuning in Google Colab to optimize forecasting models. Visualized the predictions using Looker Studio."
+        value: [
+          "Cleaned raw climatology data into daily aggregates and handled outliers with the IQR method.",
+          "Forecast weather with Facebook Prophet, compared against other regression models on MAE.",
+          "Used correlations between climate parameters to build pest warning rules and crop recommendations.",
+          "Kept the stable baseline configuration after over-tuning dropped validation accuracy from 99% to 98%."
+        ],
+        list: true
       },
       {
         label: "Result",
-        value: "Created an AI-based agriculture dashboard that provides actionable planting recommendations, identifying new business opportunities for highland agriculture."
+        value: "A Looker Studio dashboard with pesticide spraying schedules, planting and harvest season forecasts, and crop recommendations, plus a pitch deck turning the model into subscription and consulting plans."
       }
     ],
     heroImage: "/assets/projects/cultivatedhighland/cultivatedhighland1.png",
@@ -483,14 +518,14 @@ export const achievements: AchievementItem[] = [
   {
     title: "1st Place Softball Men's",
     competitionType: "Sports",
-    organizer: "Airlangga National Championship",
+    organizer: "Airlangga National Championship, Unair",
     date: "Jul 2024",
     linkedProjectId: "org-softball",
   },
   {
     title: "4th Runner-Up Infographic",
     competitionType: "Creative",
-    organizer: "Celebes Plano Fest",
+    organizer: "Celebes Plano Fest, UINAM",
     date: "Nov 2023",
   },
   {
@@ -502,19 +537,19 @@ export const achievements: AchievementItem[] = [
   {
     title: "2nd Place Softball Men's",
     competitionType: "Sports",
-    organizer: "UGM Cup",
+    organizer: "UGM Cup, UGM",
     date: "Jun 2023",
   },
   {
     title: "2nd Place Videography",
     competitionType: "Creative",
-    organizer: "National Environmental Expo",
+    organizer: "National Environmental Expo, Unhas",
     date: "Jun 2023",
   },
   {
     title: "1st Place Paper",
     competitionType: "Paper",
-    organizer: "Milky Way Scientific Paper Competition, Universitas Jember",
+    organizer: "Milky Way Scientific Paper Competition, UNEJ",
     date: "Dec 2022",
     linkedProjectId: "smartcelldrybox",
   },
@@ -572,7 +607,7 @@ export const aboutModalData: Record<string, Project> = {
     year: "2024",
     title: "Data Analyst",
     shortDesc: "National Professional Certification Agency",
-    period: "Oct 2024",
+    period: "Oct 2025",
     roleLabel: "Issuer",
     role: "BNSP",
     details: [
@@ -600,3 +635,13 @@ export const aboutModalData: Record<string, Project> = {
   }
 };
 
+export const techStack: { group: string; items: string[] }[] = [
+  { group: "Data & Analysis", items: ["Python", "SQL", "R", "Excel", "Google Sheets"] },
+  { group: "BI & Dashboard", items: ["Power BI", "Tableau", "Looker Studio"] },
+  { group: "Automation", items: ["n8n"] },
+];
+
+export const scholarships: { name: string; year: string; desc: string; modalKey: string }[] = [
+  { name: "BSI Scholarship Prestasi", year: "2022", desc: "Bank Syariah Indonesia", modalKey: "schol_prestasi" },
+  { name: "BSI Scholarship Talenta", year: "2024", desc: "Bank Syariah Indonesia", modalKey: "schol_talenta" },
+];
