@@ -125,7 +125,7 @@ export const projectsData: Project[] = [
       },
       {
         label: "Role",
-        value: "Data Scientist · Solo project"
+        value: "Data Scientist"
       },
       {
         label: "Method",
@@ -167,7 +167,7 @@ export const projectsData: Project[] = [
       },
       {
         label: "Role",
-        value: "AI Engineer · Duo project"
+        value: "AI Engineer"
       },
       {
         label: "Method",
@@ -209,7 +209,7 @@ export const projectsData: Project[] = [
       },
       {
         label: "Role",
-        value: "Developer & Machine Learning Engineer · Team of three"
+        value: "Developer & Machine Learning Engineer"
       },
       {
         label: "Method",
@@ -249,7 +249,7 @@ export const projectsData: Project[] = [
       },
       {
         label: "Role",
-        value: "Data Scientist · Solo final year project"
+        value: "Data Scientist"
       },
       {
         label: "Method",
@@ -290,7 +290,7 @@ export const projectsData: Project[] = [
       },
       {
         label: "Role",
-        value: "Data Scientist · Team of six"
+        value: "Data Scientist"
       },
       {
         label: "Method",
@@ -325,37 +325,6 @@ export const projectsData: Project[] = [
 ];
 
 export const researchData: Project[] = [
-  {
-    id: "smartcelldrybox",
-    cardTag: "Scientific Paper Competition",
-    year: "2022",
-    title: "Smart Cell Dry Box: Practical Seaweed Processing",
-    shortDesc: "Winning Paper at Milky Way Scientific Paper Competition",
-    period: "Aug 2022 - Oct 2022",
-    roleLabel: "Category",
-    role: "Scientific Paper Competition",
-    details: [
-      {
-        label: "Full Title",
-        value: "Smart Cell Dry Box: Pengolahan Praktis Rumput Laut di Desa Laikang, Kabupaten Takalar, Sulawesi Selatan"
-      },
-      {
-        label: "Recognition",
-        value: "Winner of Milky Way Scientific Paper Competition by Universitas Jember."
-      },
-      {
-        label: "Description",
-        value: "Seaweed farmers in Laikang Village faced significant challenges with post-harvest processing, often resulting in degraded quality due to unpredictable weather and inefficient drying methods."
-      },
-      {
-        label: "Mechanism & Impact",
-        value: "We designed the 'Smart Cell Dry Box'—an innovative, practical drying solution that accelerates the drying process while preserving the quality of the seaweed. This practical tool helps farmers stabilize their income by ensuring a consistent, high-quality yield regardless of weather conditions."
-      }
-    ],
-    heroImage: "",
-    gallery: [],
-    link: ""
-  },
   {
     id: "sipekan",
     cardTag: "Scientific Paper Competition",
@@ -407,11 +376,42 @@ export const researchData: Project[] = [
       },
       {
         label: "Description",
-        value: "A proposal to empower the rural economy in Takalar through the innovative conversion of seaweed into biofuel, managed by local Village-Owned Enterprises (BUMDes)."
+        value: "A proposal to strengthen the rural economy in Takalar by turning seaweed into biofuel, run by local Village-Owned Enterprises (BUMDes)."
       },
       {
         label: "Concept & Impact",
         value: "The 'Eco Blue Village' concept outlines a scalable biofuel extraction process from abundant local seaweed. By integrating this innovation into the BUMDes framework, the project projects a circular economy model that provides a new renewable energy source while simultaneously boosting local income."
+      }
+    ],
+    heroImage: "",
+    gallery: [],
+    link: ""
+  },
+  {
+    id: "smartcelldrybox",
+    cardTag: "Scientific Paper Competition",
+    year: "2022",
+    title: "Smart Cell Dry Box: Practical Seaweed Processing",
+    shortDesc: "Winning Paper at Milky Way Scientific Paper Competition",
+    period: "Aug 2022 - Oct 2022",
+    roleLabel: "Category",
+    role: "Scientific Paper Competition",
+    details: [
+      {
+        label: "Full Title",
+        value: "Smart Cell Dry Box: Pengolahan Praktis Rumput Laut di Desa Laikang, Kabupaten Takalar, Sulawesi Selatan"
+      },
+      {
+        label: "Recognition",
+        value: "Winner of Milky Way Scientific Paper Competition by Universitas Jember."
+      },
+      {
+        label: "Description",
+        value: "Seaweed farmers in Laikang Village faced significant challenges with post-harvest processing, often resulting in degraded quality due to unpredictable weather and inefficient drying methods."
+      },
+      {
+        label: "Mechanism & Impact",
+        value: "We designed the Smart Cell Dry Box, a drying tool that dries seaweed faster while keeping its quality. With a consistent yield in any weather, farmers can keep their income steady."
       }
     ],
     heroImage: "",
@@ -445,7 +445,7 @@ export const organizationsData: Project[] = [
       },
       {
         label: "Reflection",
-        value: "Leading this organization taught me that true leadership is about aligning individual motivations toward a collective goal. Winning the national championship wasn't just about athletic skill—it was the result of building a culture of trust, discipline, and shared vision over an entire year."
+        value: "Leading this club taught me to line up each member's own motivation with one shared goal. The national title came from a year of building trust and discipline as a team, on top of our skill on the field."
       }
     ],
     heroImage: "",
