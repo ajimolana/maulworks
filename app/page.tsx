@@ -16,6 +16,7 @@ const Lightbox = dynamic(() => import("./components/Lightbox"));
 const AchievementShelf = dynamic(() => import("./components/AchievementShelf/AchievementShelf"));
 const ContactModal = dynamic(() => import("./components/ContactModal"));
 import AnimatedSection from "./components/AnimatedSection";
+import ScrollDots from "./components/ScrollDots";
 
 import {
   experiencesData,
@@ -367,6 +368,7 @@ export default function Home() {
               </div>
             ))}
           </div>
+          <ScrollDots scrollRef={projectsRef} count={projectsData.length} className="md:hidden" />
         </div>
       </AnimatedSection>
 
@@ -384,6 +386,7 @@ export default function Home() {
               </div>
             ))}
           </div>
+          <ScrollDots scrollRef={researchRef} count={researchData.length} className="md:hidden" />
         </div>
       </AnimatedSection>
 
