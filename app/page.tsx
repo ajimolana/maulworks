@@ -9,12 +9,13 @@ const Aurora = dynamic(() => import("./components/Aurora/Aurora"), {
   loading: () => <div className="absolute inset-0 bg-gradient-to-br from-[var(--theme-main)] via-[var(--theme-bg-gradient)] to-[var(--theme-main)] opacity-80" />
 });
 const LogoLoop = dynamic(() => import("./components/LogoLoop/LogoLoop"));
-const ProjectCard = dynamic(() => import("./components/ProjectCard"));
 const ProjectModal = dynamic(() => import("./components/ProjectModal"));
 const Lightbox = dynamic(() => import("./components/Lightbox"));
-const AchievementShelf = dynamic(() => import("./components/AchievementShelf/AchievementShelf"));
 const ContactModal = dynamic(() => import("./components/ContactModal"));
 import AnimatedSection from "./components/AnimatedSection";
+import ProjectCard from "./components/ProjectCard";
+import AchievementShelf from "./components/AchievementShelf/AchievementShelf";
+import AboutSection from "./components/AboutSection";
 import Footer from "./components/Footer";
 import ScrollDots from "./components/ScrollDots";
 
@@ -25,22 +26,7 @@ import {
   organizationsData,
   achievements,
   Project,
-  aboutModalData
 } from "./data/portfolio";
-
-const infoCardClass = "cursor-pointer group w-full text-left bg-white/5 p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-white/10 space-y-1 transition-all duration-300 hover:border-white/30 hover:bg-white/10";
-
-function InfoCard({ title, meta, subtitle, onClick }: { title: string; meta: string; subtitle: string; onClick: () => void }) {
-  return (
-    <button type="button" className={infoCardClass} onClick={onClick} aria-label={`Open details for ${title}`}>
-      <div className="flex flex-row justify-between items-center gap-2">
-        <p className="font-medium text-white text-xs sm:text-sm truncate">{title}</p>
-        <p className="text-white/60 text-[10px] sm:text-xs whitespace-nowrap shrink-0">{meta}</p>
-      </div>
-      <p className="text-white/80 text-[10px] sm:text-xs truncate">{subtitle}</p>
-    </button>
-  );
-}
 
 function ScrollArrows({ onScroll }: { onScroll: (offset: number) => void }) {
   const buttonClass = "flex items-center justify-center w-8 h-8 rounded-full bg-white/5 border border-white/10 hover:bg-white/20 transition text-white";
@@ -281,66 +267,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* NEW SECTION: ABOUT ME */}
-      <AnimatedSection id="about" className="w-full mt-12 md:mt-20 scroll-mt-24 md:scroll-mt-28">
-        <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
-          <h2 className="text-3xl sm:text-4xl font-semibold text-white mb-6">About Me</h2>
-          <div className="bg-[#111111] border border-white/15 rounded-3xl p-5 sm:p-10 shadow-[0_20px_60px_rgba(255,255,255,0.05)]">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-10 lg:gap-10">
-
-              {/* ROW 1: Bio + Education */}
-              {/* Bio: Left, 2/3 width */}
-              <div className="space-y-6 lg:col-span-2">
-                <p className="text-white leading-relaxed text-xs sm:text-sm md:text-base lg:text-lg text-justify">
-                  I turn numbers into decisions. My background is a unique blend of actuarial science, research nerd, and proven leadership. Driven by curiosity, I&apos;m always chasing the next frontier, currently pushing into AI automation.
-                </p>
-              </div>
-
-              {/* Education: Right, 1/3 width */}
-              <div className="space-y-2 sm:space-y-3 lg:col-span-1">
-                <h3 className="text-[var(--theme-accent)] font-semibold text-lg sm:text-xl">Education</h3>
-                <InfoCard title="Hasanuddin University" meta="Aug 2021 – Feb 2026" subtitle="Bachelor of Actuarial Science" onClick={() => openProjectModal(aboutModalData.education)} />
-              </div>
-
-              {/* ROW 2: Tech Stack, Certifications, Scholarships */}
-              {/* Tech Stack */}
-              <div className="hidden sm:block space-y-3 lg:col-span-1">
-                <h3 className="text-[var(--theme-accent)] font-semibold text-lg sm:text-xl">Technical Stack</h3>
-                <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                  {['Machine Learning', 'Predictive Modelling', 'n8n', 'SQL', 'R', 'Power BI', 'Looker Studio', 'Tableau', 'Excel', 'Canva'].map((skill) => (
-                    <span key={skill} className="px-2 py-1 sm:px-3 sm:py-1.5 bg-white/5 border border-white/10 rounded-full text-[10px] sm:text-sm text-white/90">
-                      {skill}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              {/* Certifications */}
-              <div className="space-y-2 sm:space-y-3 lg:col-span-1">
-                <h3 className="text-[var(--theme-accent)] font-semibold text-lg sm:text-xl">Certifications</h3>
-                <div className="space-y-2.5 sm:space-y-3">
-                  <InfoCard title="Data Analyst" meta="Oct 2024" subtitle="National Professional Certification Agency" onClick={() => openProjectModal(aboutModalData.cert_data_analyst)} />
-                  <InfoCard title="Data Science & AI" meta="Feb – Jun 2024" subtitle="Startup Campus" onClick={() => openProjectModal(aboutModalData.cert_data_science)} />
-                </div>
-              </div>
-
-              {/* Scholarships */}
-              <div className="space-y-2 sm:space-y-3 lg:col-span-1">
-                <h3 className="text-[var(--theme-accent)] font-semibold text-lg sm:text-xl">Scholarships</h3>
-                <div className="space-y-2.5 sm:space-y-3">
-                  {[
-                    { name: 'BSI Scholarship Prestasi', year: '2022', desc: 'Bank Syariah Indonesia', modalData: aboutModalData.schol_prestasi },
-                    { name: 'BSI Scholarship Talenta', year: '2024', desc: 'Bank Syariah Indonesia', modalData: aboutModalData.schol_talenta },
-                  ].map((s) => (
-                    <InfoCard key={s.name} title={s.name} meta={s.year} subtitle={s.desc} onClick={() => openProjectModal(s.modalData)} />
-                  ))}
-                </div>
-              </div>
-
-            </div>
-          </div>
-        </div>
-      </AnimatedSection>
+      <AboutSection onOpenProject={openProjectModal} />
 
       {/* 1. SECTION EXPERIENCES */}
       <AnimatedSection id="experiences" className="w-full mt-12 md:mt-20 scroll-mt-24 md:scroll-mt-28">
