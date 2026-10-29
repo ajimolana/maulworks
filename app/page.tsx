@@ -19,6 +19,7 @@ import AboutSection from "./components/AboutSection";
 import Footer from "./components/Footer";
 import ScrollDots from "./components/ScrollDots";
 import { useUniformLines } from "./components/useUniformLines";
+import { pageCarousel, useScrollEdges } from "./components/carousel";
 
 import {
   experiencesData,
@@ -31,14 +32,16 @@ import {
 
 const CARD_LINE_KEYS = ["title", "desc"] as const;
 
-function ScrollArrows({ onScroll }: { onScroll: (offset: number) => void }) {
-  const buttonClass = "flex items-center justify-center w-8 h-8 rounded-full bg-white/5 border border-white/10 hover:bg-white/20 transition text-white";
+// Mouse-only arrows for the phone/tablet carousels; they page like the modal gallery and dim at either end
+function ScrollArrows({ scrollRef }: { scrollRef: RefObject<HTMLDivElement> }) {
+  const edges = useScrollEdges(scrollRef);
+  const buttonClass = "flex items-center justify-center w-8 h-8 rounded-full bg-white/5 border border-white/10 hover:bg-white/20 transition text-white disabled:opacity-30 disabled:hover:bg-white/5 disabled:cursor-default";
   return (
     <div className="flex md:hidden items-center gap-2">
-      <button onClick={() => onScroll(-300)} aria-label="Scroll left" className={buttonClass}>
+      <button onClick={() => pageCarousel(scrollRef.current, -1)} disabled={edges.atStart} aria-label="Scroll left" className={buttonClass}>
         <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
       </button>
-      <button onClick={() => onScroll(300)} aria-label="Scroll right" className={buttonClass}>
+      <button onClick={() => pageCarousel(scrollRef.current, 1)} disabled={edges.atEnd} aria-label="Scroll right" className={buttonClass}>
         <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
       </button>
     </div>
@@ -64,12 +67,6 @@ export default function Home() {
   useEffect(() => {
     setIsMouse(window.matchMedia('(pointer: fine)').matches);
   }, []);
-
-  const scrollBy = (ref: RefObject<HTMLDivElement>, offset: number) => {
-    if (ref.current) {
-      ref.current.scrollBy({ left: offset, behavior: 'smooth' });
-    }
-  };
 
   const logosData = useMemo(() => [
     { file: "Apple Developer Academy.png", name: "Apple Developer Academy" },
@@ -160,10 +157,14 @@ export default function Home() {
   }, [isOverlayOpen]);
 
   // CONTROLLERS
-  const openProjectModal = useCallback((project: Project) => {
+  // fromAchievement: opened from an Achievement row, so the modal offers a jump to the card it belongs to
+  const [modalFromAchievement, setModalFromAchievement] = useState(false);
+  const openProjectModal = useCallback((project: Project, fromAchievement = false) => {
     window.history.pushState({ modalOpen: true }, "");
+    setModalFromAchievement(fromAchievement);
     setActiveProject(project);
   }, []);
+  const openFromAchievement = useCallback((project: Project) => openProjectModal(project, true), [openProjectModal]);
   const closeProjectModal = useCallback(() => window.history.back(), []);
 
   const openLightbox = useCallback((images: string[], captions: string[], index: number) => {
@@ -177,6 +178,40 @@ export default function Home() {
     window.history.pushState({ contactModalOpen: true }, "");
     setIsContactOpen(true);
   }, []);
+
+  // "View in Research" etc.: close the modal, bring the card into view (sliding a phone carousel to it) and pulse it
+  const viewInSection = useMemo(() => {
+    if (!activeProject || !modalFromAchievement) return undefined;
+    const id = activeProject.id;
+    const label =
+      researchData.some((p) => p.id === id) ? "Research" :
+      projectsData.some((p) => p.id === id) ? "Projects" :
+      organizationsData.some((p) => p.id === id) ? "Organizations" :
+      experiencesData.some((p) => p.id === id) ? "Experiences" : null;
+    if (!label) return undefined;
+    return {
+      label,
+      onClick: () => {
+        window.history.back();
+        // Wait for the modal to close and release the scroll lock
+        setTimeout(() => {
+          const card = document.querySelector<HTMLElement>(`[data-card-id="${id}"]`);
+          if (!card) return;
+          const carousel = card.closest<HTMLElement>(".snap-x");
+          if (carousel && carousel.scrollWidth > carousel.clientWidth) {
+            const c = carousel.getBoundingClientRect(), r = card.getBoundingClientRect();
+            carousel.scrollTo({ left: carousel.scrollLeft + r.left - c.left - (c.width - r.width) / 2, behavior: "smooth" });
+          }
+          const r = card.getBoundingClientRect();
+          window.scrollTo({ top: window.scrollY + r.top - (window.innerHeight - r.height) / 2, behavior: "smooth" });
+          setTimeout(() => card.animate(
+            [{ boxShadow: "0 0 0 2px rgba(255,255,255,0.7)" }, { boxShadow: "0 0 0 2px rgba(255,255,255,0)" }],
+            { duration: 1600, easing: "ease-out" }
+          ), 500);
+        }, 350);
+      },
+    };
+  }, [activeProject, modalFromAchievement]);
 
   // Used by AchievementShelf to resolve linkedProjectId strings
   const findProject = useCallback((id: string) =>
@@ -236,7 +271,7 @@ export default function Home() {
 
             {/* CTAs */}
             <div className="flex flex-row flex-wrap items-center justify-center gap-3 sm:gap-4 w-full mb-16 px-4">
-              <a href="#projects" className="relative px-4 py-2 sm:px-8 sm:py-3 text-xs sm:text-base bg-[var(--theme-accent)] text-[var(--theme-main)] font-bold rounded-full transition-all duration-300 whitespace-nowrap overflow-hidden group hover:scale-105 hover:shadow-[0_0_20px_var(--theme-accent)] active:scale-95">
+              <a href="#projects" className="relative px-4 py-2 sm:px-8 sm:py-3 text-xs sm:text-base bg-[var(--theme-accent)] text-[var(--theme-main)] font-bold rounded-full transition-all duration-300 whitespace-nowrap overflow-hidden group hover:shadow-[0_0_20px_var(--theme-accent)] active:scale-95">
                 <span className="relative z-10">Explore Projects</span>
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out" />
               </a>
@@ -291,11 +326,11 @@ export default function Home() {
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
           <div className="flex flex-row items-center justify-between mb-6">
             <h2 className="text-3xl sm:text-4xl font-semibold text-white">Projects</h2>
-            {isMouse && <ScrollArrows onScroll={(offset) => scrollBy(projectsRef, offset)} />}
+            {isMouse && <ScrollArrows scrollRef={projectsRef} />}
           </div>
-          <div ref={projectsRef} className="flex overflow-x-auto snap-x snap-mandatory overscroll-x-contain gap-4 pt-12 -mt-12 pb-12 -mb-6 -mx-4 px-4 sm:-mx-6 sm:px-6 md:mx-0 md:px-0 md:pt-0 md:mt-0 md:pb-0 md:mb-0 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-6 scrollbar-hide md:overflow-visible">
+          <div ref={projectsRef} className="flex overflow-x-auto snap-x snap-mandatory scroll-px-4 sm:scroll-px-6 overscroll-x-contain gap-4 pt-12 -mt-12 pb-12 -mb-6 -mx-4 px-4 sm:-mx-6 sm:px-6 md:mx-0 md:px-0 md:pt-0 md:mt-0 md:pb-0 md:mb-0 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-6 scrollbar-hide md:overflow-visible">
             {projectsData.map((project) => (
-              <div key={project.id} className="snap-center snap-always flex-none w-[80vw] sm:w-[45vw] md:w-auto">
+              <div key={project.id} className={`${isMouse ? "snap-start" : "snap-center"} snap-always flex-none w-[80vw] sm:w-[45vw] md:w-auto`}>
                 <ProjectCard project={project} onClick={openProjectModal} variant="default" lines={projectLines} />
               </div>
             ))}
@@ -309,11 +344,11 @@ export default function Home() {
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
           <div className="flex flex-row items-center justify-between mb-6">
             <h2 className="text-3xl sm:text-4xl font-semibold text-white">Research</h2>
-            {isMouse && <ScrollArrows onScroll={(offset) => scrollBy(researchRef, offset)} />}
+            {isMouse && <ScrollArrows scrollRef={researchRef} />}
           </div>
-          <div ref={researchRef} className="flex overflow-x-auto snap-x snap-mandatory overscroll-x-contain gap-4 pt-12 -mt-12 pb-12 -mb-6 -mx-4 px-4 sm:-mx-6 sm:px-6 md:mx-0 md:px-0 md:pt-0 md:mt-0 md:pb-0 md:mb-0 md:grid md:grid-cols-3 md:gap-4 lg:gap-6 scrollbar-hide md:overflow-visible">
+          <div ref={researchRef} className="flex overflow-x-auto snap-x snap-mandatory scroll-px-4 sm:scroll-px-6 overscroll-x-contain gap-4 pt-12 -mt-12 pb-12 -mb-6 -mx-4 px-4 sm:-mx-6 sm:px-6 md:mx-0 md:px-0 md:pt-0 md:mt-0 md:pb-0 md:mb-0 md:grid md:grid-cols-3 md:gap-4 lg:gap-6 scrollbar-hide md:overflow-visible">
             {researchData.map((project) => (
-              <div key={project.id} className="snap-center snap-always flex-none w-[80vw] sm:w-[45vw] md:w-auto">
+              <div key={project.id} className={`${isMouse ? "snap-start" : "snap-center"} snap-always flex-none w-[80vw] sm:w-[45vw] md:w-auto`}>
                 <ProjectCard project={project} onClick={openProjectModal} variant="research" lines={researchLines} />
               </div>
             ))}
@@ -341,7 +376,7 @@ export default function Home() {
           <AchievementShelf
             items={achievements}
             findProject={findProject}
-            onOpenModal={openProjectModal}
+            onOpenModal={openFromAchievement}
           />
         </div>
       </AnimatedSection>
@@ -352,6 +387,7 @@ export default function Home() {
       <ProjectModal
         activeProject={activeProject}
         onClose={closeProjectModal}
+        viewInSection={viewInSection}
         onOpenLightbox={openLightbox}
       />
 

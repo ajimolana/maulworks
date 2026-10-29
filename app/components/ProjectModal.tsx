@@ -5,12 +5,17 @@ import Link from "next/link";
 import { Project, DetailItem, GalleryItem } from "../data/portfolio";
 import { useDialogFocus } from "./useDialogFocus";
 import ScrollDots from "./ScrollDots";
+import { pageCarousel, usePageCount, useScrollEdges } from "./carousel";
 
 interface ProjectModalProps {
   activeProject: Project | null;
   onClose: () => void;
   onOpenLightbox: (images: string[], captions: string[], index: number) => void;
+  /** Set when the modal was opened from somewhere other than its own card (an Achievement row) */
+  viewInSection?: { label: string; onClick: () => void };
 }
+
+const linkPillClass = "inline-flex items-center gap-2 rounded-full border border-white/30 px-3 py-1.5 text-xs text-white transition hover:border-white hover:bg-white hover:text-black";
 
 const galleryItems = (gallery: GalleryItem[] = []) =>
   gallery
@@ -47,11 +52,13 @@ const renderDetailItem = (item: DetailItem, index: number) => {
         {item.label}
       </p>
       {item.list && Array.isArray(item.value) ? (
-        <ul className="mt-2 space-y-1 text-[13px] sm:text-sm leading-relaxed text-white/80 list-disc list-outside ml-4">
+        // Drawn bullet instead of list-disc: the browser marker sat far left of the text with no way to tighten the gap.
+        // The dot is centred on the first line (half of leading-relaxed's 1.625em, minus half the dot)
+        <ul className="mt-2 space-y-1 text-[13px] sm:text-sm leading-relaxed text-white/80">
           {item.value
             .filter((entry) => entry.trim().length > 0)
             .map((entry, entryIndex) => (
-              <li key={entryIndex}>{entry}</li>
+              <li key={entryIndex} className="relative pl-4 before:content-[''] before:absolute before:left-1 before:top-[calc(0.8125em-2px)] before:w-1 before:h-1 before:rounded-full before:bg-white/60">{entry}</li>
             ))}
         </ul>
       ) : (
@@ -68,11 +75,20 @@ const renderDetails = (details: DetailItem[] = []) => (
   <>{details.map((item, index) => renderDetailItem(item, index))}</>
 );
 
+// Whole cards per view, narrowing with the screen: 1 on phones, 2 from 480px (at sm a lone card was ~550px wide), 3 from md. A card is never cut, so with
+// 5 photos and 3 per view the pages are 1-3 then 3-5. 16:9 like the project screenshots, so nothing is cropped.
 const ModalImage = ({ src, idx, onOpenLightbox, srcs, caps }: { src: string, idx: number, onOpenLightbox: (images: string[], captions: string[], index: number) => void, srcs: string[], caps: string[] }) => {
   const [isLoading, setIsLoading] = React.useState(true);
-  
+
+  // A button, so the photos are reachable with Tab and open with Enter like every other card.
+  // Hover brightens (same as the Project card hero) instead of dimming to 70%.
   return (
-    <div className="snap-center snap-always flex-none relative h-40 w-64 bg-white/5 rounded-2xl flex items-center justify-center overflow-hidden border border-white/5">
+    <button
+      type="button"
+      onClick={() => onOpenLightbox(srcs, caps, idx)}
+      aria-label={`Open ${caps[idx] || `documentation ${idx + 1}`} full size`}
+      className="group snap-start snap-always flex-none relative aspect-video w-full min-[480px]:w-[calc((100%-0.75rem)/2)] md:w-[calc((100%-1.5rem)/3)] bg-white/5 rounded-2xl flex items-center justify-center overflow-hidden border border-white/5 transition-colors duration-300 hover:border-white/30 focus-visible:outline-none focus-visible:border-white/40"
+    >
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
           <div className="w-6 h-6 border-2 border-white/10 border-t-white/60 rounded-full animate-spin"></div>
@@ -82,18 +98,22 @@ const ModalImage = ({ src, idx, onOpenLightbox, srcs, caps }: { src: string, idx
         src={src}
         alt={`Documentation ${idx + 1}`}
         fill
-        className={`rounded-2xl object-cover cursor-pointer hover:opacity-70 transition-opacity duration-500 ease-in-out ${isLoading ? 'opacity-0' : 'opacity-100'}`}
-        onClick={() => onOpenLightbox(srcs, caps, idx)}
-        sizes="(max-width: 768px) 256px, 256px"
-        quality={50}
+        className={`rounded-2xl object-cover transition-[opacity,filter] duration-500 ease-in-out group-hover:brightness-[1.08] group-focus-visible:brightness-[1.08] ${isLoading ? 'opacity-0' : 'opacity-100'}`}
+        // Matches the card width at 1, 2 and 3 per view; 85 keeps small text and borders crisp
+        sizes="(max-width: 480px) 90vw, (max-width: 768px) 45vw, 240px"
+        quality={85}
         onLoad={() => setIsLoading(false)}
       />
-    </div>
+    </button>
   );
 };
 
-export default function ProjectModal({ activeProject, onClose, onOpenLightbox }: ProjectModalProps) {
+export default function ProjectModal({ activeProject, onClose, onOpenLightbox, viewInSection }: ProjectModalProps) {
   const items = React.useMemo(() => activeProject ? galleryItems(activeProject.gallery) : [], [activeProject]);
+  // `links` wins; a single legacy `link` becomes one entry with its ctaLabel
+  const externalLinks = activeProject?.links?.length
+    ? activeProject.links
+    : activeProject?.link ? [{ label: activeProject.ctaLabel ?? "Open Project", href: activeProject.link }] : [];
   const srcs = React.useMemo(() => items.map(i => i.src), [items]);
   const caps = React.useMemo(() => items.map(i => i.caption ?? ""), [items]);
   
@@ -105,11 +125,9 @@ export default function ProjectModal({ activeProject, onClose, onOpenLightbox }:
     setIsMouse(window.matchMedia('(pointer: fine)').matches);
   }, []);
 
-  const scrollBy = (offset: number) => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollBy({ left: offset, behavior: 'smooth' });
-    }
-  };
+  const page = (direction: 1 | -1) => pageCarousel(scrollRef.current, direction);
+  const edges = useScrollEdges(scrollRef, [items]);
+  const pages = usePageCount(scrollRef, items.length, [items]);
 
   return (
     <AnimatePresence>
@@ -170,12 +188,12 @@ export default function ProjectModal({ activeProject, onClose, onOpenLightbox }:
                 <div>
                   <div className="flex flex-row items-center justify-between mb-2">
                     <p className="text-[11px] sm:text-xs text-white/60 uppercase tracking-wider">Documentation</p>
-                    {isMouse && items.length > 2 && (
+                    {isMouse && pages > 1 && (
                       <div className="flex items-center gap-2 pr-1">
-                        <button onClick={() => scrollBy(-268)} aria-label="Scroll documentation left" className="flex items-center justify-center w-8 h-8 rounded-full bg-white/5 border border-white/10 hover:bg-white/20 transition text-white">
+                        <button onClick={() => page(-1)} disabled={edges.atStart} aria-label="Scroll documentation left" className="flex items-center justify-center w-8 h-8 rounded-full bg-white/5 border border-white/10 hover:bg-white/20 transition text-white disabled:opacity-30 disabled:hover:bg-white/5 disabled:cursor-default">
                           <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
                         </button>
-                        <button onClick={() => scrollBy(268)} aria-label="Scroll documentation right" className="flex items-center justify-center w-8 h-8 rounded-full bg-white/5 border border-white/10 hover:bg-white/20 transition text-white">
+                        <button onClick={() => page(1)} disabled={edges.atEnd} aria-label="Scroll documentation right" className="flex items-center justify-center w-8 h-8 rounded-full bg-white/5 border border-white/10 hover:bg-white/20 transition text-white disabled:opacity-30 disabled:hover:bg-white/5 disabled:cursor-default">
                           <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
                         </button>
                       </div>
@@ -199,42 +217,36 @@ export default function ProjectModal({ activeProject, onClose, onOpenLightbox }:
                       );
                     })}
                   </div>
-                  <ScrollDots scrollRef={scrollRef} count={items.length} />
+                  {/* One dot per page (1, 2 or 3 photos depending on width), not per photo */}
+                  <ScrollDots scrollRef={scrollRef} count={pages} />
                 </div>
               )}
 
-              {Array.isArray(activeProject.links) && activeProject.links.length > 0 && (
+              {(externalLinks.length > 0 || viewInSection) && (
                 <div>
                   <p className="text-[11px] sm:text-xs text-white/60 uppercase tracking-wider mb-2">Link</p>
                   <div className="flex flex-wrap gap-2">
-                    {activeProject.links.map((item: { label: string; href: string }, index: number) => (
+                    {externalLinks.map((item, index) => (
                       <Link
                         key={`${item.href}-${index}`}
                         href={item.href}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex items-center gap-2 rounded-full border border-white/30 px-3 py-1.5 text-xs text-white transition hover:border-white hover:bg-white hover:text-black"
+                        className={linkPillClass}
                       >
                         {item.label}
                         <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M7 17L17 7" /><path d="M7 7h10v10" /></svg>
                       </Link>
                     ))}
+                    {/* In-page jump to the card this modal belongs to. Up arrow, not the external ↗: it is only offered
+                        from Achievements, and every section it can lead to sits above Achievements */}
+                    {viewInSection && (
+                      <button type="button" onClick={viewInSection.onClick} className={linkPillClass}>
+                        View in {viewInSection.label}
+                        <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 19V5" /><path d="M5 12l7-7 7 7" /></svg>
+                      </button>
+                    )}
                   </div>
-                </div>
-              )}
-
-              {!activeProject.links && activeProject.link && (
-                <div>
-                  <p className="text-[11px] sm:text-xs text-white/60 uppercase tracking-wider mb-2">Link</p>
-                  <Link
-                    href={activeProject.link}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-2 rounded-full border border-white/30 px-3 py-1.5 text-xs text-white transition hover:border-white hover:bg-white hover:text-black"
-                  >
-                    {activeProject.ctaLabel ?? "Open Project"}
-                    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M7 17L17 7" /><path d="M7 7h10v10" /></svg>
-                  </Link>
                 </div>
               )}
             </div>
