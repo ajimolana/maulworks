@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useState, useEffect, useCallback, useMemo, useRef, RefObject } from "react";
 import PillNav from "./components/PillNav/PillNav";
 import dynamic from "next/dynamic";
@@ -16,6 +15,7 @@ const Lightbox = dynamic(() => import("./components/Lightbox"));
 const AchievementShelf = dynamic(() => import("./components/AchievementShelf/AchievementShelf"));
 const ContactModal = dynamic(() => import("./components/ContactModal"));
 import AnimatedSection from "./components/AnimatedSection";
+import Footer from "./components/Footer";
 import ScrollDots from "./components/ScrollDots";
 
 import {
@@ -414,41 +414,7 @@ export default function Home() {
         </div>
       </AnimatedSection>
 
-      {/* FOOTER */}
-      <footer id="contacts" className="w-full mt-16 md:mt-28 border-t border-white/10 pt-8 md:pt-10 pb-6 flex flex-col scroll-mt-24 md:scroll-mt-28">
-        <div className="mx-auto max-w-[1366px] w-full px-4 sm:px-6">
-          <div className="flex flex-row items-center justify-between w-full">
-            {/* Left: Get in Touch */}
-            <div className="flex justify-start">
-              <h2 className="text-xl sm:text-3xl font-semibold text-white">Get in Touch</h2>
-            </div>
-
-            {/* Right: Social Icons */}
-            <div className="flex justify-end">
-              <div className="flex items-center gap-3 sm:gap-6 scale-[0.85] sm:scale-100 origin-right">
-                <button onClick={openContactModal} className="transition-opacity hover:opacity-80" aria-label="Email Maulana">
-                  <Image src="/assets/footer/mail.svg" alt="Email Logo" width={28} height={28} />
-                </button>
-                <a href="https://github.com/ajimolana" target="_blank" rel="noreferrer" className="transition-opacity hover:opacity-80" aria-label="GitHub Profile">
-                  <Image src="/assets/footer/github.svg" alt="GitHub Logo" width={28} height={28} />
-                </a>
-                <a href="https://linkedin.com/in/maulanaraji/" target="_blank" rel="noreferrer" className="transition-opacity hover:opacity-80" aria-label="LinkedIn Profile">
-                  <Image src="/assets/footer/linkedin.svg" alt="LinkedIn Logo" width={28} height={28} />
-                </a>
-                <a href="https://instagram.com/ajimolana/" target="_blank" rel="noreferrer" className="transition-opacity hover:opacity-80" aria-label="Instagram Profile">
-                  <Image src="/assets/footer/instagram.svg" alt="Instagram Logo" width={28} height={28} />
-                </a>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-8 md:mt-16 w-full text-center">
-            <p className="text-xs sm:text-sm text-[#dfdfdf] px-4 whitespace-nowrap">
-              &copy; {new Date().getFullYear()}, Maulana Raji Shofil Fuadi.
-            </p>
-          </div>
-        </div>
-      </footer>
+      <Footer onContact={openContactModal} />
 
       {/* GLOBAL PROJECT MODAL */}
       <ProjectModal
