@@ -18,6 +18,7 @@ import AchievementShelf from "./components/AchievementShelf/AchievementShelf";
 import AboutSection from "./components/AboutSection";
 import Footer from "./components/Footer";
 import ScrollDots from "./components/ScrollDots";
+import { useUniformLines } from "./components/useUniformLines";
 
 import {
   experiencesData,
@@ -27,6 +28,8 @@ import {
   achievements,
   Project,
 } from "./data/portfolio";
+
+const CARD_LINE_KEYS = ["title", "desc"] as const;
 
 function ScrollArrows({ onScroll }: { onScroll: (offset: number) => void }) {
   const buttonClass = "flex items-center justify-center w-8 h-8 rounded-full bg-white/5 border border-white/10 hover:bg-white/20 transition text-white";
@@ -54,6 +57,8 @@ export default function Home() {
 
   const projectsRef = useRef<HTMLDivElement>(null);
   const researchRef = useRef<HTMLDivElement>(null);
+  const projectLines = useUniformLines(projectsRef, CARD_LINE_KEYS);
+  const researchLines = useUniformLines(researchRef, CARD_LINE_KEYS);
   const [isMouse, setIsMouse] = useState(false);
 
   useEffect(() => {
@@ -291,7 +296,7 @@ export default function Home() {
           <div ref={projectsRef} className="flex overflow-x-auto snap-x snap-mandatory overscroll-x-contain gap-4 pt-12 -mt-12 pb-12 -mb-6 -mx-4 px-4 sm:-mx-6 sm:px-6 md:mx-0 md:px-0 md:pt-0 md:mt-0 md:pb-0 md:mb-0 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-6 scrollbar-hide md:overflow-visible">
             {projectsData.map((project) => (
               <div key={project.id} className="snap-center snap-always flex-none w-[80vw] sm:w-[45vw] md:w-auto">
-                <ProjectCard project={project} onClick={openProjectModal} variant="default" />
+                <ProjectCard project={project} onClick={openProjectModal} variant="default" lines={projectLines} />
               </div>
             ))}
           </div>
@@ -309,7 +314,7 @@ export default function Home() {
           <div ref={researchRef} className="flex overflow-x-auto snap-x snap-mandatory overscroll-x-contain gap-4 pt-12 -mt-12 pb-12 -mb-6 -mx-4 px-4 sm:-mx-6 sm:px-6 md:mx-0 md:px-0 md:pt-0 md:mt-0 md:pb-0 md:mb-0 md:grid md:grid-cols-3 md:gap-4 lg:gap-6 scrollbar-hide md:overflow-visible">
             {researchData.map((project) => (
               <div key={project.id} className="snap-center snap-always flex-none w-[80vw] sm:w-[45vw] md:w-auto">
-                <ProjectCard project={project} onClick={openProjectModal} variant="research" />
+                <ProjectCard project={project} onClick={openProjectModal} variant="research" lines={researchLines} />
               </div>
             ))}
           </div>

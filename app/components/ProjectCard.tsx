@@ -1,13 +1,18 @@
 import Image from "next/image";
 import { Project } from "../data/portfolio";
+import { LineCount } from "./useUniformLines";
 
 interface ProjectCardProps {
   project: Project;
   onClick: (project: Project) => void;
   variant?: "default" | "research" | "organization";
+  /** Default and research: shared line counts from useUniformLines, so every card in the section matches */
+  lines?: { title: LineCount; desc: LineCount };
 }
 
-export default function ProjectCard({ project, onClick, variant = "default" }: ProjectCardProps) {
+const clampClass = (n: LineCount) => (n === 2 ? "line-clamp-2" : "truncate");
+
+export default function ProjectCard({ project, onClick, variant = "default", lines = { title: 1, desc: 1 } }: ProjectCardProps) {
   if (variant === "organization") {
     return (
       <button
@@ -60,10 +65,16 @@ export default function ProjectCard({ project, onClick, variant = "default" }: P
           <p className="text-xs uppercase tracking-wide text-white/60 truncate mr-2">{project.cardTag}</p>
           <p className="text-xs uppercase tracking-wide text-white/60 flex-shrink-0">{project.year}</p>
         </div>
-        <h3 className={`mt-1 font-semibold text-white ${variant === 'research' ? 'line-clamp-2 md:truncate md:block text-base sm:text-lg min-h-[3rem] sm:min-h-[3.5rem] md:min-h-0' : 'truncate text-lg sm:text-xl lg:text-xl'}`}>
+        <h3
+          data-uniform-lines="title"
+          className={`mt-1 font-semibold text-white text-base sm:text-lg ${clampClass(lines.title)}`}
+        >
           {project.title}
         </h3>
-        <p className={`text-xs text-white/60 line-clamp-2 ${variant === 'research' ? 'mt-1' : 'mt-2'}`}>
+        <p
+          data-uniform-lines="desc"
+          className={`text-xs text-white/60 ${clampClass(lines.desc)} ${variant === 'research' ? 'mt-1' : 'mt-2'}`}
+        >
           {project.shortDesc}
         </p>
       </div>
