@@ -89,7 +89,7 @@ Achievement cards feature a hairline animated gradient line at the top edge that
 ```
 
 ### Achievements List
-Achievements are a quiet list, not cards: they are secondary to Projects/Research and should not compete with them. One row pattern everywhere (icon · title over "organizer · date" · arrow on clickable rows). Mobile pages through 5 rows with Prev/Next; from `md` all rows show in two columns that fill top-to-bottom (`grid-flow-col`), so date order reads down. Not one full-width column: at desktop width the arrow drifts far from the text. Every row has the same `-mx-3 px-3` so dividers line up whether or not the row is clickable.
+Achievements are a quiet list, not cards: they are secondary to Projects/Research and should not compete with them. One row pattern everywhere (icon · title over "organizer · date" · arrow on clickable rows). Mobile pages through 5 rows with Prev/Next; from `md` all rows show in two columns that fill top-to-bottom (`grid-flow-col`), so date order reads down. Not one full-width column: at desktop width the arrow drifts far from the text. Every row has the same `-mx-3 px-3` so text lines up whether or not the row is clickable. The divider sits on a square wrapper around the row, never on the rounded row itself: a `border-b` on a `rounded-xl` element curls up at both ends.
 
 Each row shows a small decorative line icon (`w-4 h-4 text-white/50`). No category label or pill: without a filter it only repeats what the title already says. The data field is `icon`, typed as `AchievementIcon`. No oversized watermark icons: at low opacity they vanish on most screens.
 
@@ -118,10 +118,14 @@ Primary CTA buttons ("Explore Projects", "Send Message") have an animated shimme
 ```tsx
 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out" />
 ```
-The button container must have `overflow-hidden` and `group` class, and inner text must have `relative z-10`.
+The button container must have `overflow-hidden` and `group` class, and inner text must have `relative z-10`. Hover is glow + shimmer only, no `hover:scale-*`: three effects at once read as overdone (same no-zoom rule as the Project card hero). `active:scale-95` stays as press feedback.
 
 ### Image Loading — Fade-In Skeleton
-Large images that load on demand (modal gallery, Lightbox) show a spinner while loading and fade in (`opacity-0 → opacity-100` via `transition-opacity duration-500 ease-in-out` on the `onLoad` event). Card thumbnails rely on `next/image` lazy loading.
+Image quality: card hero images and modal gallery thumbnails use `quality={85}`. They are UI screenshots full of small text and thin borders: at 50 AVIF smears them visibly, and 85 costs only ~2-6 KB more per image than 75. The site serves WebP only (`next.config.mjs`): AVIF visibly softens small text and thin borders even at 85, while WebP at 85 looks like the original. The Lightbox also uses `quality={85}` through the optimizer, not the raw files: originals are 141 KB to 1.4 MB, WebP is 5-20x lighter for screenshots. It sizes the photo with a fixed box (`w-[90vw] max-w-[1200px] h-[70vh]`, `fill` + `object-contain`), because with a responsive srcset the image's intrinsic size shrinks on retina screens and `w-auto h-auto` rendered it at half size. Always pass a `sizes` that matches the rendered width (remember `object-cover` can render wider than the box): without it `fill` images default to `100vw` and download a full-viewport file. The Project card hero box is `aspect-video` (16:9, like every project screenshot), not a fixed height: a fixed height changes the box ratio with card width and crops the sides on phones and tablets. New project screenshots should be 16:9. On hover the hero brightens slightly (`brightness-[1.08]`) instead of zooming: a zoom crops the shot again and softens its small text.
+
+Modal gallery thumbnails show a spinner while loading and fade in (`opacity-0 → opacity-100` via `transition-opacity duration-500 ease-in-out` on the `onLoad` event). Card thumbnails rely on `next/image` lazy loading.
+
+The Lightbox never blanks between photos: the on-screen photo stays until the requested one has loaded (it loads invisibly), then they crossfade (0.2s). The previous and next photos preload in a hidden block with the same image props, so they hit the same URL and switching is instant. The spinner appears only when a load takes longer than 200ms.
 
 ---
 
@@ -143,9 +147,12 @@ The nav dynamically detects which section occupies the viewport via scroll liste
 ### Mobile — Draggable Bottom Sheet
 On mobile devices, navigation transforms into a draggable bottom drawer:
 - Slides up from the bottom with a spring animation.
+- Closes on Escape, a backdrop tap or a drag down; the menu button carries `aria-expanded`.
 - Features a **drag handle** at the top (rounded white pill).
 - Dismissible by **dragging down >80px** (powered by the Pointer Events API — works seamlessly across both touch and mouse drag).
 - Drawer items animate in with staggered entrance delays (`delay: i * 0.04`).
+- Items are plain text rows: the active one gets `bg-white/10` + a border and white text. No bullets and no "Navigate" label; the handle heads the sheet.
+- It rises from the bottom although the button is at the top on purpose: the items land in thumb reach, the same as the system share sheet.
 
 ---
 
@@ -205,8 +212,8 @@ Strictly cleaned up in the `useEffect` unmount callback.
 ### Input Method Detection — `pointer: fine`
 Uses `window.matchMedia('(pointer: fine)').matches` to distinguish mouse users from touch users:
 - Horizontal carousel scroll arrows are displayed **only** to mouse users.
-- Horizontal carousels snap items to the center (`snap-center snap-always`) and show `ScrollDots` (`app/components/ScrollDots.tsx`, decorative, `aria-hidden`): the active dot stretches to `w-4 bg-white/80`, the rest are `w-1.5 bg-white/25`. Page carousels show them below `md`; the modal Documentation gallery shows them at every size. Dots hide themselves when nothing overflows.
-- Touch targets are at least 44px (`w-11 h-11`), even when the visible icon is smaller (footer social icons). The larger hit area stays invisible: footer icons keep their `hover:opacity-80` feedback, no background.
+- Horizontal carousels snap items to the center (`snap-center snap-always`) for touch. For mouse users, who get arrow buttons, they snap to the start (`snap-start`, with `scroll-px-*` matching the side padding) and the arrows page through `pageCarousel` in `app/components/carousel.ts`: each click moves by every fully visible card and only clamps at the ends, so every card is shown whole at some point; `useScrollEdges` dims an arrow at its end. Never step by a fixed pixel offset: with center snapping that gave a first click of ~37px and cards cut on both sides. Carousels show `ScrollDots` (`app/components/ScrollDots.tsx`, decorative, `aria-hidden`): the active dot stretches to `w-4 bg-white/80`, the rest are `w-1.5 bg-white/25`. Page carousels show them below `md`; the modal Documentation gallery shows them at every size. Dots hide themselves when nothing overflows. Exception: the modal Documentation gallery, for touch and mouse alike. Fixed 256px cards left it showing ~2.7 photos, so some photo was always cut and could never be seen whole. Instead a whole number of 16:9 (`aspect-video`) cards fills the gallery, narrowing with the screen: 1 per view on phones (`w-full`), 2 from 480px (`min-[480px]:`; at `sm` a lone card was ~550px wide), 3 from `md` (`w-[calc((100%-1.5rem)/3)]`), all `snap-start`. Each arrow click pages by that count and the last page aligns to the end (5 photos at 3 per view: 1-3, then 3-5). No card is ever cut. `usePageCount` gives the page count at the current width: dots count pages, and the mouse arrows only appear with more than one page. Each photo is a `<button>` (Tab + Enter open the Lightbox) and on hover or focus it brightens with a lighter border, like the Project card; it never dims.
+- Touch targets are at least 44px (`w-11 h-11`), even when the visible icon is smaller (footer social icons, the mobile menu button with `-mr-1` so the icon stays put). The larger hit area stays invisible: footer icons keep their `hover:opacity-80` feedback, no background.
 - Touch users interact via natural touch swipe.
 - Custom scrollbar styling is scoped to mouse environments (`@media (pointer: fine)`).
 
@@ -295,7 +302,12 @@ Single components handle diverse presentation variants via a clean `variant` pro
 ```
 
 ### Detail Content — Data Order, One Style
-Modal details render in the order they appear in `portfolio.ts` (e.g. Problem → My Role → Method → Result), all with the same label + body style. No label gets a callout box or is pulled to the top: a boxed Result above the Problem reads backwards.
+Modal details render in the order they appear in `portfolio.ts` (e.g. Problem → My Role → Method → Result), all with the same label + body style. No label gets a callout box or is pulled to the top: a boxed Result above the Problem reads backwards. List details use a drawn 4px dot (`before:` on the `li`, `pl-4`, dot at `left-1`, centred on the first line), not `list-disc`: the browser marker sat far left of the text with a gap that can't be tightened. Wrapped lines align with the text, not the dot.
+
+The Link group holds the external links (`links`, or a single `link` + `ctaLabel`) and, when the modal was opened from an Achievement row, a "View in Research/Projects/Organizations/Experiences" pill with an up arrow (in-page, not the external ↗; every section it can lead to sits above Achievements, so if it is ever offered from elsewhere the arrow must follow the real direction). It closes the modal, scrolls the card to the middle of the screen (sliding a phone carousel to it) and pulses a white ring around it. Opened from the card itself, the pill is not shown. Cards carry `data-card-id={project.id}` for this.
+
+### Copy — Written by a Person
+Portfolio text must not read as AI-written. No em dashes (`—`) in visible copy: use a comma, a period or a new sentence. En dashes stay only in ranges (`2021 – 2026`, `2018–2024`). Avoid the tells: "not just X, it was Y", "true leadership is about", and brochure words like "innovative", "cutting-edge", "seamless". Plain, concrete sentences, like the Method bullets. Team size is not stated in project roles.
 
 ### useMemo & useCallback — Performance Hygiene
 Heavy object transformations, filtered lists, and callback handlers passed to children are systematically wrapped in `useMemo` and `useCallback` to prevent redundant re-renders.
