@@ -218,7 +218,8 @@ export default function Home() {
             />
           </div>
         </div>
-        <div className="mx-auto max-w-[1366px] min-h-[100svh] xl:min-h-screen px-4 sm:px-6 flex items-center justify-center">
+        <div className="min-h-[100svh] xl:min-h-screen flex flex-col">
+        <div className="mx-auto max-w-[1366px] w-full flex-1 px-4 sm:px-6 pt-24 flex items-center justify-center">
           <div className="w-full max-w-5xl relative z-10 flex flex-col items-center justify-center text-center">
 
             {/* Badge */}
@@ -258,7 +259,7 @@ export default function Home() {
         </div>
 
         {/* Hero Logos */}
-        <div className="absolute bottom-4 sm:bottom-8 left-0 right-0 w-full z-10">
+        <div className="relative w-full z-10 pb-4 sm:pb-8">
           <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
             <p className="text-center text-[#a1a1aa] text-[10px] sm:text-[11px] uppercase tracking-widest font-semibold mb-5 sm:mb-6">Experiences & Affiliations</p>
             <div className="min-h-[80px]">
@@ -275,6 +276,7 @@ export default function Home() {
               />
             </div>
           </div>
+        </div>
         </div>
       </div>
 
