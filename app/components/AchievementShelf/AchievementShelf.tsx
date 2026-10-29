@@ -82,7 +82,6 @@ function AchievementRow({ item, onClick }: RowProps) {
     <div
       className={`
         flex items-center gap-3 py-3 -mx-3 px-3 rounded-xl
-        border-b border-white/[0.06]
         transition-all duration-200
         group
         ${isClickable ? "cursor-pointer hover:bg-white/[0.025] group-focus-visible/row:bg-white/[0.05]" : "cursor-default"}
@@ -114,14 +113,16 @@ function AchievementRow({ item, onClick }: RowProps) {
     </div>
   );
 
-  if (isClickable) {
-    return (
-      <button type="button" onClick={onClick} className="group/row w-full text-left rounded-xl focus-visible:outline-none" aria-label={`View details for ${item.title}`}>
-        {inner}
-      </button>
-    );
-  }
-  return <div>{inner}</div>;
+  // The divider lives on this square wrapper: on the rounded row it curled up at both ends
+  return (
+    <div className="border-b border-white/[0.06]">
+      {isClickable ? (
+        <button type="button" onClick={onClick} className="group/row w-full text-left rounded-xl focus-visible:outline-none" aria-label={`View details for ${item.title}`}>
+          {inner}
+        </button>
+      ) : inner}
+    </div>
+  );
 }
 
 // ─── Main Component ────────────────────────────────────────────────────────────

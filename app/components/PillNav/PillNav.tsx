@@ -118,6 +118,16 @@ export default function PillNav({ items, forceClose }: PillNavProps) {
     }
   }, [mobileMenuOpen]);
 
+  // Escape closes the sheet, like the modal and the Lightbox
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMobileMenuOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [mobileMenuOpen]);
+
   const handlePointerDown = (e: React.PointerEvent) => {
     dragStartY.current = e.clientY;
     sheetRef.current?.setPointerCapture(e.pointerId);
@@ -176,7 +186,8 @@ export default function PillNav({ items, forceClose }: PillNavProps) {
             <Link
               href="#profile"
               onClick={() => handleItemClick("profile")}
-              className={`relative px-4 py-2 flex items-center transition-colors rounded-full ${activeItem === "profile" ? "text-white xl:text-black" : "hover:text-white/80"}`}
+              // The px-4 only frames the white active pill, which shows from xl; below that it just pushed the title away from the memoji
+              className={`relative px-1 xl:px-4 py-2 flex items-center transition-colors rounded-full ${activeItem === "profile" ? "text-white xl:text-black" : "hover:text-white/80"}`}
             >
               {activeItem === "profile" && (
                 pillReady ? (
@@ -225,10 +236,12 @@ export default function PillNav({ items, forceClose }: PillNavProps) {
 
           {/* MOBILE BURGER */}
           <div className="xl:hidden flex items-center transition-all duration-[800ms] ease-[cubic-bezier(0.16,1,0.3,1)]">
+            {/* 44px hit area (was 36x32); -mr-1 keeps the icon where it was */}
             <button
-              className="text-white p-2 focus:outline-none"
+              className="flex items-center justify-center w-11 h-11 -mr-1 text-white focus:outline-none"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label="Toggle Mobile Menu"
+              aria-expanded={mobileMenuOpen}
             >
               <div className="relative w-5 h-4">
                 <span className={`block absolute h-0.5 w-full bg-white transition-all duration-300 ease-in-out ${mobileMenuOpen ? "top-1.5 rotate-45" : "top-0"}`} />
@@ -279,13 +292,8 @@ export default function PillNav({ items, forceClose }: PillNavProps) {
                 <div className="w-10 h-1 rounded-full bg-white/20" />
               </div>
 
-              {/* Section label */}
-              <p className="text-center text-[10px] uppercase tracking-[0.2em] text-white/50 font-semibold mt-1 mb-4 select-none">
-                Navigate
-              </p>
-
-              {/* Nav Links */}
-              <nav className="flex flex-col px-6 gap-1 pb-10">
+              {/* Nav Links. No "Navigate" label: the handle already heads the sheet */}
+              <nav className="flex flex-col px-6 gap-1 pt-3 pb-10">
                 {items.map((item, i) => {
                   const isActive = activeItem === item.id;
                   return (
@@ -302,19 +310,13 @@ export default function PillNav({ items, forceClose }: PillNavProps) {
                           handleItemClick(item.id);
                           setMobileMenuOpen(false);
                         }}
-                        className={`flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all duration-200 ${
+                        // Active = brighter row + white text; no bullets, the inactive ones only added noise
+                        className={`flex items-center px-4 py-3.5 rounded-2xl transition-all duration-200 ${
                           isActive
                             ? "bg-white/10 border border-white/15"
                             : "hover:bg-white/5 border border-transparent"
                         }`}
                       >
-                        <span
-                          className={`w-1.5 h-1.5 rounded-full flex-shrink-0 transition-all duration-300 ${
-                            isActive
-                              ? "bg-[var(--theme-accent)] shadow-[0_0_6px_var(--theme-accent)] scale-110"
-                              : "bg-white/20"
-                          }`}
-                        />
                         <span
                           className={`text-[17px] font-semibold tracking-wide transition-colors ${
                             isActive ? "text-white" : "text-white/50"
