@@ -68,32 +68,34 @@ export default function AboutSection({ onOpenProject }: { onOpenProject: (projec
         <div className="bg-[#111111] border border-white/15 rounded-3xl p-5 sm:p-8 shadow-[0_20px_60px_rgba(255,255,255,0.05)]">
           {/* Profile header (portrait + name + field), bio full width below */}
           <div className="flex items-center gap-3 sm:gap-4">
-            {/* Transparent studio cutout: a solid light backdrop reads as a real headshot, a translucent one looks muddy */}
+            {/* Head-and-shoulders crop of the LinkedIn photo (opaque cream backdrop); the light fill only shows while it loads */}
             <div className="relative flex-none w-12 h-12 sm:w-16 sm:h-16 rounded-full overflow-hidden bg-neutral-200">
               <Image src="/assets/about/portrait.png" alt="Maulana Raji Shofil Fuadi" fill sizes="64px" quality={90} className="object-cover" />
             </div>
             <div className="min-w-0">
-              <p className="font-semibold text-white text-base sm:text-xl leading-tight truncate">Maulana Raji</p>
-              <p className="text-white/60 text-xs sm:text-sm mt-0.5 sm:mt-1 truncate">Actuarial &amp; Data Science</p>
+              <p className="font-semibold text-white text-base sm:text-xl leading-tight truncate">Maulana Raji Shofil Fuadi</p>
+              {/* Current role only, the first part of the LinkedIn headline: Apple Developer Academy is in Education right below and the field is in the hero */}
+              <p className="text-white/60 text-xs sm:text-sm mt-0.5 sm:mt-1 truncate">Reinsurance Data Analyst Intern @Askrindo</p>
             </div>
           </div>
-          {/* Phone shows only the opening line with an inline "more", social-caption style; tapping the open text collapses it. sm+ always shows the full bio */}
-          <p id="about-bio" onClick={() => bioOpen && setBioOpen(false)} className="mt-3 sm:mt-5 text-white leading-relaxed text-sm sm:text-lg text-pretty">
-            I turn numbers into decisions.
-            {/* Two extra dots turn the period into "..." while collapsed */}
-            <span className={bioOpen ? "hidden" : "sm:hidden"}>..</span>
-            <span className={bioOpen ? "inline" : "hidden sm:inline"}> Actuarial science graduate from Hasanuddin University focused on data analytics, building projects from forecasting to automation, with a proven record in leadership, organizations, and competitions.</span>{" "}
+          {/* Opening quote is the one tagline; the bio below is plain facts. Same text and order as the LinkedIn About */}
+          {/* Phone shows only the quote with an inline "more", social-caption style; tapping the open bio collapses it. sm+ always shows the full bio */}
+          <p className="mt-3 sm:mt-5 text-white/80 italic leading-relaxed text-sm sm:text-lg">
+            &ldquo;I turn numbers into decisions.&rdquo;{" "}
             {!bioOpen && (
               <button
                 type="button"
                 onClick={() => setBioOpen(true)}
                 aria-expanded={false}
                 aria-controls="about-bio"
-                className="sm:hidden font-medium text-white/50 hover:text-white transition-colors"
+                className="sm:hidden not-italic font-medium text-white/50 hover:text-white transition-colors"
               >
                 more
               </button>
             )}
+          </p>
+          <p id="about-bio" onClick={() => setBioOpen(false)} className={`${bioOpen ? "block" : "hidden sm:block"} mt-2 sm:mt-3 text-white leading-relaxed text-sm sm:text-lg text-pretty`}>
+            Actuarial Science graduate from Hasanuddin University focused on data analytics, building projects from forecasting to automation, with a proven record in leadership, organizations, and competitions.
           </p>
 
           {/* Two columns of near-equal rows (5 left, 4 right) so they end close to level */}
