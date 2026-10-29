@@ -14,7 +14,7 @@ export default function ProjectCard({ project, onClick, variant = "default" }: P
         type="button"
         onClick={() => onClick(project)}
         aria-label={`Open details for ${project.title}`}
-        className="group relative text-left rounded-3xl border border-white/15 bg-[#111111] p-4 transition-all duration-300 hover:-translate-y-1 active:scale-[0.98] hover:border-white/40 hover:shadow-[0_8px_32px_rgba(255,255,255,0.08),0_0_0_1px_rgba(255,255,255,0.12)] flex items-center gap-4 w-full h-full"
+        className="group relative text-left rounded-3xl border border-white/15 bg-[#111111] p-4 transition-all duration-300 active:scale-[0.98] hover:border-white/40 hover:shadow-[0_8px_32px_rgba(255,255,255,0.08),0_0_0_1px_rgba(255,255,255,0.12)] focus-visible:outline-none focus-visible:border-white/40 focus-visible:shadow-[0_8px_32px_rgba(255,255,255,0.08),0_0_0_1px_rgba(255,255,255,0.12)] flex items-center gap-4 w-full h-full"
       >
 
         {project.logo && (
@@ -41,7 +41,7 @@ export default function ProjectCard({ project, onClick, variant = "default" }: P
       type="button"
       onClick={() => onClick(project)}
       aria-label={`Open details for ${project.title}`}
-      className="group relative text-left rounded-3xl border border-white/15 bg-[#111111] p-3 transition-all duration-300 hover:-translate-y-1 active:scale-[0.98] hover:border-white/40 hover:shadow-[0_8px_32px_rgba(255,255,255,0.08),0_0_0_1px_rgba(255,255,255,0.12)] w-full h-full flex flex-col"
+      className="group relative text-left rounded-3xl border border-white/15 bg-[#111111] p-3 transition-all duration-300 active:scale-[0.98] hover:border-white/40 hover:shadow-[0_8px_32px_rgba(255,255,255,0.08),0_0_0_1px_rgba(255,255,255,0.12)] focus-visible:outline-none focus-visible:border-white/40 focus-visible:shadow-[0_8px_32px_rgba(255,255,255,0.08),0_0_0_1px_rgba(255,255,255,0.12)] w-full h-full flex flex-col"
     >
       {variant !== "research" && project.heroImage && (
         <div className="relative overflow-hidden rounded-2xl h-48 sm:h-56 w-full">
@@ -63,7 +63,7 @@ export default function ProjectCard({ project, onClick, variant = "default" }: P
         <h3 className={`mt-1 font-semibold text-white ${variant === 'research' ? 'line-clamp-2 md:truncate md:block text-base sm:text-lg min-h-[3rem] sm:min-h-[3.5rem] md:min-h-0' : 'truncate text-lg sm:text-xl lg:text-xl'}`}>
           {project.title}
         </h3>
-        <p className={`text-xs text-white/60 truncate ${variant === 'research' ? 'mt-1' : 'mt-2'}`}>
+        <p className={`text-xs text-white/60 line-clamp-2 ${variant === 'research' ? 'mt-1' : 'mt-2'}`}>
           {project.shortDesc}
         </p>
       </div>

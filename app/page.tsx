@@ -91,7 +91,7 @@ export default function Home() {
   const homeLogoNodes = useMemo(() => logosData.map(({ file, name }) => {
     return {
       node: (
-        <div className="flex flex-col items-center justify-center px-6 sm:px-8 transition-all duration-300 hover:scale-105 gap-2 sm:gap-3">
+        <div className="flex flex-col items-center justify-center px-6 sm:px-8 gap-2 sm:gap-3">
           <div className="h-7 sm:h-9 flex items-center justify-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
