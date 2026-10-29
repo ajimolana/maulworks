@@ -29,9 +29,12 @@ export type Project = {
   ctaLabel?: string;
 };
 
+export type AchievementIcon = "paper" | "sports" | "ambassador" | "creative" | "recognition";
+
 export type AchievementItem = {
   title: string;
-  competitionType: string;
+  /** Decorative only; the title already says what kind of achievement it is */
+  icon: AchievementIcon;
   organizer: string;
   date: string;
   /** ID matching a project in researchData, projectsData, experiencesData, or organizationsData */
@@ -492,63 +495,63 @@ export const organizationsData: Project[] = [
 export const achievements: AchievementItem[] = [
   {
     title: "Top 10 Paper",
-    competitionType: "Paper",
+    icon: "paper",
     organizer: "Aksinomi Sulampua, BI Sulsel",
     date: "Oct 2025",
     linkedProjectId: "sipekan",
   },
   {
     title: "Top 10 Ambassador",
-    competitionType: "Ambassador",
+    icon: "ambassador",
     organizer: "CBP Rupiah, BI Sulsel",
     date: "Jun 2025",
   },
   {
     title: "Outstanding Student",
-    competitionType: "Recognition",
+    icon: "recognition",
     organizer: "Faculty of Math & Science, Unhas",
     date: "Aug 2024",
   },
   {
     title: "Outstanding Student",
-    competitionType: "Recognition",
+    icon: "recognition",
     organizer: "Math Department, Unhas",
     date: "Aug 2024",
   },
   {
     title: "1st Place Softball Men's",
-    competitionType: "Sports",
+    icon: "sports",
     organizer: "Airlangga National Championship, Unair",
     date: "Jul 2024",
     linkedProjectId: "org-softball",
   },
   {
     title: "4th Runner-Up Infographic",
-    competitionType: "Creative",
+    icon: "creative",
     organizer: "Celebes Plano Fest, UINAM",
     date: "Nov 2023",
   },
   {
     title: "Outstanding Student",
-    competitionType: "Recognition",
+    icon: "recognition",
     organizer: "Math Department, Unhas",
     date: "Aug 2023",
   },
   {
     title: "2nd Place Softball Men's",
-    competitionType: "Sports",
+    icon: "sports",
     organizer: "UGM Cup, UGM",
     date: "Jun 2023",
   },
   {
     title: "2nd Place Videography",
-    competitionType: "Creative",
+    icon: "creative",
     organizer: "National Environmental Expo, Unhas",
     date: "Jun 2023",
   },
   {
     title: "1st Place Paper",
-    competitionType: "Paper",
+    icon: "paper",
     organizer: "Milky Way Scientific Paper Competition, UNEJ",
     date: "Dec 2022",
     linkedProjectId: "smartcelldrybox",

@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { AchievementItem, Project } from "../../data/portfolio";
+import { AchievementIcon as AchievementIconName, AchievementItem, Project } from "../../data/portfolio";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-function CategoryIcon({ type, className, strokeWidth = 1.8 }: { type: string; className?: string; strokeWidth?: number }) {
+function AchievementIcon({ type, className, strokeWidth = 1.8 }: { type: AchievementIconName; className?: string; strokeWidth?: number }) {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -22,9 +22,9 @@ function CategoryIcon({ type, className, strokeWidth = 1.8 }: { type: string; cl
   );
 }
 
-function iconPaths(type: string) {
+function iconPaths(type: AchievementIconName) {
   switch (type) {
-    case "Paper":
+    case "paper":
       return (
         <>
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -33,7 +33,7 @@ function iconPaths(type: string) {
           <line x1="16" y1="17" x2="8" y2="17" />
         </>
       );
-    case "Sports":
+    case "sports":
       return (
         <>
           <circle cx="12" cy="12" r="10" />
@@ -41,14 +41,14 @@ function iconPaths(type: string) {
           <path d="M18.6 18.6c-2.8-1.4-5.3-4-5.8-7.3" />
         </>
       );
-    case "Ambassador":
+    case "ambassador":
       return (
         <>
           <path d="m3 11 18-5v12L3 14v-3z" />
           <path d="M11.6 16.8a3 3 0 1 1-5.8-1.6" />
         </>
       );
-    case "Creative":
+    case "creative":
       return (
         <>
           <circle cx="13.5" cy="6.5" r=".5" fill="currentColor" stroke="none" />
@@ -58,8 +58,7 @@ function iconPaths(type: string) {
           <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z" />
         </>
       );
-    case "Recognition":
-    default:
+    case "recognition":
       return (
         <>
           <circle cx="12" cy="8" r="6" />
@@ -67,50 +66,6 @@ function iconPaths(type: string) {
         </>
       );
   }
-}
-
-// ─── Desktop Card ──────────────────────────────────────────────────────────────
-
-function AchievementCard({ item, isClickable }: { item: AchievementItem; isClickable: boolean }) {
-  return (
-    <div
-      className={`
-        group relative overflow-hidden rounded-2xl
-        border border-white/10 bg-white/[0.02]
-        p-4 sm:p-5
-        flex flex-col justify-between h-full
-        transition-all duration-300 ease-out active:scale-[0.98]
-        hover:border-white/35 hover:bg-white/[0.04]
-        group-focus-visible/ach:border-white/35 group-focus-visible/ach:bg-white/[0.04]
-        hover:shadow-[0_8px_32px_rgba(255,255,255,0.04)]
-        ${isClickable ? "cursor-pointer" : "cursor-default"}
-      `}
-    >
-      <div className="flex items-start justify-between gap-2">
-        <span className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-widest border border-white/15 rounded-full px-2 py-0.5 text-white/60 bg-white/[0.03] font-medium">
-          <CategoryIcon type={item.competitionType} className="w-3 h-3 flex-none" />
-          {item.competitionType}
-        </span>
-        {isClickable && (
-          <svg viewBox="0 0 24 24" aria-hidden="true" className="w-3.5 h-3.5 flex-none text-white/40 group-hover:text-white/70 transition-colors" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M7 17L17 7" /><path d="M7 7h10v10" />
-          </svg>
-        )}
-      </div>
-      <div className="mt-4">
-        <p className="text-white font-semibold text-sm sm:text-base leading-tight line-clamp-3">
-          {item.title}
-        </p>
-        <p className="text-white/50 text-xs mt-1.5 leading-snug line-clamp-2">
-          {item.organizer}
-        </p>
-        <p className="text-white/50 text-[11px] mt-2 tabular-nums">
-          {item.date}
-        </p>
-      </div>
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-    </div>
-  );
 }
 
 // ─── Single Row ────────────────────────────────────────────────────────────────
@@ -126,17 +81,16 @@ function AchievementRow({ item, onClick }: RowProps) {
   const inner = (
     <div
       className={`
-        flex items-center gap-3 py-3
+        flex items-center gap-3 py-3 -mx-3 px-3 rounded-xl
         border-b border-white/[0.06]
         transition-all duration-200
         group
-        ${isClickable ? "cursor-pointer" : "cursor-default"}
-        ${isClickable ? "hover:bg-white/[0.025] group-focus-visible/row:bg-white/[0.05] -mx-3 px-3 rounded-xl" : ""}
+        ${isClickable ? "cursor-pointer hover:bg-white/[0.025] group-focus-visible/row:bg-white/[0.05]" : "cursor-default"}
       `}
     >
       {/* Icon */}
-      <div className="flex-none text-white/50 group-hover:text-white/70 transition-colors" title={item.competitionType}>
-        <CategoryIcon type={item.competitionType} className="w-4 h-4" />
+      <div className="flex-none text-white/50 group-hover:text-white/70 transition-colors">
+        <AchievementIcon type={item.icon} className="w-4 h-4" />
       </div>
 
       {/* Main info */}
@@ -189,22 +143,20 @@ export default function AchievementShelf({ items, findProject, onOpenModal }: Ac
 
   return (
     <div className="w-full">
-      {/* ── Tablet/Desktop: card grid ── */}
-      <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-5 gap-3">
+      {/* ── Tablet/Desktop: the same rows, all shown in two columns ── */}
+      {/* Fills top-to-bottom, then the right column, so the date order reads down like the mobile list */}
+      <div
+        className="hidden md:grid grid-cols-2 grid-flow-col gap-x-10 lg:gap-x-16"
+        style={{ gridTemplateRows: `repeat(${Math.ceil(items.length / 2)}, auto)` }}
+      >
         {items.map((item, i) => {
           const linked = item.linkedProjectId ? findProject(item.linkedProjectId) : undefined;
-          const card = <AchievementCard item={item} isClickable={!!linked} />;
-          if (!linked) return <div key={`ach-desk-${i}`}>{card}</div>;
           return (
-            <button
+            <AchievementRow
               key={`ach-desk-${i}`}
-              type="button"
-              onClick={() => onOpenModal(linked)}
-              aria-label={`View details for ${item.title}`}
-              className="group/ach text-left rounded-2xl focus-visible:outline-none"
-            >
-              {card}
-            </button>
+              item={item}
+              onClick={linked ? () => onOpenModal(linked) : undefined}
+            />
           );
         })}
       </div>
