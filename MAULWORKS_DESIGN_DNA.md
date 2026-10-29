@@ -61,7 +61,8 @@ All shapes use aggressive, generous border-radius values to feel soft, tactile, 
   - Hero headline: `text-5xl md:text-6xl lg:text-[5.5rem] font-bold tracking-tight`
   - Body text: `text-sm md:text-base text-white` (readable, well-spaced)
   - **Labels / metadata / tags:** `text-[10px] uppercase tracking-wider text-white/60` — strict pattern applied across category labels, metadata rows, and pill tags.
-  - Subtle text: `text-white/40` or `text-white/30` for secondary metadata, dates, and item counters.
+  - **Project modal (reading surface):** labels `text-[11px] sm:text-xs`, body `text-[13px] sm:text-sm leading-relaxed`, title `text-base sm:text-lg`. Compact, but people read here longest, so nothing below 11px.
+  - Subtle text: `text-white/50` minimum (`/40` only for purely decorative glyphs) for secondary metadata, dates, and item counters, at `text-[11px]` or larger. Lower opacities fail WCAG AA contrast on `#111`.
 
 ### Shadows — Glows, Not Shadows
 Never use standard drop shadows like `shadow-md` or `shadow-lg` (blurry black shadows). Depth in Maulworks is created through subtle luminous glows and hairline border illumination:
@@ -86,46 +87,25 @@ Achievement cards feature a hairline animated gradient line at the top edge that
 " />
 ```
 
-### Decorative Background Icons
-In achievement/metric cards, large SVG icons are placed as atmospheric watermarks in the bottom corner with ultra-low opacity:
-```css
-/* Watermark icon in card background */
-absolute -bottom-4 -right-4 w-32 h-32 text-white/[0.03] -rotate-12
-group-hover:text-white/[0.05] transition-colors duration-300
-```
-
----
-
-## 2. ⚡ Interaction & Animation DNA (The Feel)
-
-### Animation Library: Framer Motion
-All mounting/unmounting transitions, layout morphs, and gestures use **Motion** (formerly Framer Motion), imported from `motion/react` (never `framer-motion`). No choppy CSS-only hacks for overlay states. The app is wrapped in `MotionProvider` (`<MotionConfig reducedMotion="user">`) so every animation respects `prefers-reduced-motion`.
-
-### Easing — The Signature Curves
-Consistently applied easing values:
-- **For modals/overlays:** `ease: [0.32, 0.72, 0, 1]` — rapid entry with an ultra-smooth, cushioned stop.
-- **For spring animations:** `type: "spring", stiffness: 350, damping: 30` (nav active pill) or `damping: 25, stiffness: 300` (modals/lightbox).
-
-### Scroll-Into-View Animations (AnimatedSection)
-Every major section wraps its content in `<AnimatedSection>` — a reusable component leveraging `useInView`. Sections enter smoothly from `y: 30, opacity: 0` to `y: 0, opacity: 1` with `staggerChildren: 0.1` when entering the viewport.
-```tsx
-// Usage
-<AnimatedSection id="projects" className="w-full mt-12 md:mt-20 scroll-mt-28">
-  ...
-</AnimatedSection>
-```
+### Category Icons
+Achievement categories show a small line icon (`w-3 h-3`) inside the category pill on desktop and at the start of each row on mobile. No oversized watermark icons: at low opacity they vanish on most screens and repeat the label.
 
 ### Tactile Feedback (Active States)
 Primary clickable elements (CTAs, project/organization cards, achievement cards, contact submit) feature `active:scale-95` or `active:scale-[0.98]`. Small utility controls (carousel arrows, About info cards) may rely on hover/background feedback instead.
 
-### Hover States — Elevation & Glow
-Hoverable cards use a consistent trio of micro-interactions:
+### Hover States — Glow, No Lift
+Hoverable cards stay in place. Feedback comes from light, not movement:
 ```css
-hover:-translate-y-1          /* Subtle vertical lift */
 hover:border-white/40         /* Border illumination */
 hover:shadow-[...]            /* Luminous glow activation */
 transition-all duration-300   /* Smooth transition */
 ```
+Never use `hover:-translate-y-*` on cards: it stacks with the glow and image zoom, and Tailwind's `hover:` sticks after a tap on touch devices. Keyboard focus (`focus-visible:`) mirrors the hover border and glow.
+
+### Clickable Card Signal
+Only Achievement cards and rows show a ↗ arrow, because only some of them link to a detail modal. Project, Research, Experience and Organization cards are all clickable, so they carry no arrow: an arrow beside the year reads as if it opens the year.
+
+Achievement rows on mobile show the date after the organizer (`Organizer · Oct 2025`), never in a right-hand column that the arrow would push out of line, and carry no index numbers (`01`, `02`, …).
 
 ### The "Shine" Effect on CTA Buttons
 Primary CTA buttons ("Explore Projects", "Send Message") have an animated shimmer that sweeps across on hover:
@@ -219,12 +199,14 @@ Strictly cleaned up in the `useEffect` unmount callback.
 ### Input Method Detection — `pointer: fine`
 Uses `window.matchMedia('(pointer: fine)').matches` to distinguish mouse users from touch users:
 - Horizontal carousel scroll arrows are displayed **only** to mouse users.
+- Horizontal carousels snap items to the center (`snap-center snap-always`) and show `ScrollDots` (`app/components/ScrollDots.tsx`, decorative, `aria-hidden`): the active dot stretches to `w-4 bg-white/80`, the rest are `w-1.5 bg-white/25`. Page carousels show them below `md`; the modal Documentation gallery shows them at every size. Dots hide themselves when nothing overflows.
+- Touch targets are at least 44px (`w-11 h-11`), even when the visible icon is smaller (footer social icons). The larger hit area stays invisible: footer icons keep their `hover:opacity-80` feedback, no background.
 - Touch users interact via natural touch swipe.
 - Custom scrollbar styling is scoped to mouse environments (`@media (pointer: fine)`).
 
 ### Adaptive Component Layouts (Mobile vs. Desktop)
 Key components feature distinct structural adaptations for mobile and desktop served by a single component:
-- **AchievementShelf:** Desktop = `grid-cols-5` card grid; Mobile = paginated list rows with dot indicators.
+- **AchievementShelf:** Tablet = `grid-cols-2`, desktop (`lg`) = `grid-cols-5` card grid; Mobile = paginated list rows with dot indicators.
 - **Project & Research Sections:** Desktop = CSS Grid (`md:grid-cols-3`); Mobile = Horizontal snap-scroll carousel.
 
 ### Horizontal Snap Scroll (Mobile Carousel Pattern)
@@ -306,8 +288,8 @@ Single components handle diverse presentation variants via a clean `variant` pro
 <ProjectCard variant="organization" />  // Horizontal row with logo
 ```
 
-### Detail Content — "Highlight" Impact Pattern
-In modal detail views, key outcome labels (`result`, `impact`, `metrics`, `hasil`) automatically receive an accented callout treatment (themed border + accent color) to highlight quantifiable value over routine duties.
+### Detail Content — Data Order, One Style
+Modal details render in the order they appear in `portfolio.ts` (e.g. Problem → My Role → Method → Result), all with the same label + body style. No label gets a callout box or is pulled to the top: a boxed Result above the Problem reads backwards.
 
 ### useMemo & useCallback — Performance Hygiene
 Heavy object transformations, filtered lists, and callback handlers passed to children are systematically wrapped in `useMemo` and `useCallback` to prevent redundant re-renders.
@@ -355,6 +337,7 @@ Horizontal swipe rows use the `scrollbar-hide` utility to preserve clean present
 
 ## 10. 🧹 Maintenance Rules
 
+- **Layout components live outside `page.tsx`.** `AboutSection` and `Footer` are their own files; their copy (scholarships, About modal data) comes from `portfolio.ts`. About: a profile row (small round portrait `w-12`/`w-16` from `public/assets/about/portrait.png`, the only photo of the owner on the site, plus name and field), a full-width bio adapted from the CV profile (below `sm` only the opening line "I turn numbers into decisions." shows, the rest sits behind "..." and an inline "more" link (no "less": tapping the open text collapses it; bio text is `text-sm` on phones) at the end of the text, social-caption style, not on its own line; always full from `sm` up), then two equal columns from `lg` up, Education + Tech Stack and Certifications + Scholarships, with near-equal row counts so both columns end close to level. Rows, not cards; a row without a detail modal (Apple Developer Academy, until it has content) renders as plain text with no hover. Keep the row counts balanced when adding items. Tech Stack lists tools only (skills belong in projects and the bio), one row per category: label left, `·`-separated tools right from `sm` up; below `sm` the label stacks above the tools so no tool list wraps. Below `lg` (single column) Tech Stack moves to the bottom of the card as a collapsed section with a chevron toggle.
 - **No unused dependencies or dead code.** Remove a package when its last import goes; run `npx tsc --noEmit` and `npm run lint` before committing.
 - **Size assets for their display size.** Logos are exported at ~4x their rendered size; screenshots stay under ~500KB. Public files are world-readable, so do not put private documents (e.g. the CV) in `public/`.
 - **Portfolio copy lives in `app/data/portfolio.ts`.** Keep it in English, keep `year` consistent with `period`, and never commit placeholder values such as `"-"`. A project `link` that points to a section must use an in-page action, not `target="_blank"` to a `#hash`.
