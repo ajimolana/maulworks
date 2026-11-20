@@ -238,7 +238,7 @@ export default function Home() {
         <div className="absolute inset-0 w-full h-full pointer-events-none">
           <div style={{ width: '100%', height: '100%', position: 'relative', WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%)', maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%)' }}>
             <Aurora
-              colorStops={["#7cff67", "#B497CF", "#5227FF"]}
+              colorStops={["#2a2a2e", "#c8c8d0", "#2a2a2e"]}
               blend={0.5}
               amplitude={1.0}
               speed={1}
@@ -250,17 +250,13 @@ export default function Home() {
           <div className="w-full max-w-5xl relative z-10 flex flex-col items-center justify-center text-center">
 
             {/* Badge */}
-            <div className="inline-flex items-center gap-2.5 sm:gap-3 p-1 pr-4 sm:pr-5 rounded-full border border-white/10 bg-[#151515]/60 backdrop-blur-md mb-10 sm:mb-8">
-              <span className="bg-white text-black text-[10px] sm:text-xs font-bold px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full uppercase tracking-wider">
-                Based in
-              </span>
-              <span className="text-[#a1a1aa] text-xs sm:text-sm font-medium">
-                Jakarta, Indonesia
-              </span>
+            <div className="inline-flex items-center gap-1.5 px-4 py-1.5 sm:px-5 sm:py-2 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-md mb-10 sm:mb-8 text-xs sm:text-sm font-medium">
+              <span className="text-[#a1a1aa]">Based in</span>
+              <span className="text-white/90">Jakarta, Indonesia</span>
             </div>
 
             {/* Headline */}
-            <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-[5.5rem] font-bold tracking-tight text-white leading-[1.1] mb-2 sm:mb-4 font-sans text-balance lg:whitespace-nowrap">
+            <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-[clamp(4.5rem,8vw,5.5rem)] font-bold tracking-tight text-white leading-[1.1] mb-2 sm:mb-4 font-sans text-balance lg:whitespace-nowrap">
               Maulana Raji Shofil Fuadi
             </h1>
 
@@ -270,14 +266,10 @@ export default function Home() {
             </h2>
 
             {/* CTAs */}
-            <div className="flex flex-row flex-wrap items-center justify-center gap-3 sm:gap-4 w-full mb-16 px-4">
+            <div className="flex flex-row flex-wrap items-center justify-center gap-3 sm:gap-4 w-full sm:mb-16 px-4">
               <a href="#projects" className="relative px-4 py-2 sm:px-8 sm:py-3 text-xs sm:text-base bg-[var(--theme-accent)] text-[var(--theme-main)] font-bold rounded-full transition-all duration-300 whitespace-nowrap overflow-hidden group hover:shadow-[0_0_20px_var(--theme-accent)] active:scale-95">
                 <span className="relative z-10">Explore Projects</span>
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out" />
-              </a>
-              <a href="#about" className="relative px-4 py-2 sm:px-8 sm:py-3 text-xs sm:text-base bg-white/5 text-white font-bold rounded-full border border-white/20 transition-all duration-300 whitespace-nowrap overflow-hidden group hover:border-white/40 hover:shadow-[0_0_15px_rgba(255,255,255,0.15)] active:scale-95">
-                <span className="relative z-10">About Me</span>
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out" />
               </a>
             </div>
 
@@ -335,7 +327,7 @@ export default function Home() {
               </div>
             ))}
           </div>
-          <ScrollDots scrollRef={projectsRef} count={projectsData.length} className="md:hidden" />
+          <ScrollDots scrollRef={projectsRef} count={projectsData.length} itemLabel="project" showNav={!isMouse} className="md:hidden" />
         </div>
       </AnimatedSection>
 
@@ -353,7 +345,7 @@ export default function Home() {
               </div>
             ))}
           </div>
-          <ScrollDots scrollRef={researchRef} count={researchData.length} className="md:hidden" />
+          <ScrollDots scrollRef={researchRef} count={researchData.length} itemLabel="paper" showNav={!isMouse} className="md:hidden" />
         </div>
       </AnimatedSection>
 

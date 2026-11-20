@@ -96,7 +96,11 @@ void main() {
   vec3 rampColor;
   COLOR_RAMP(colors, uv.x, rampColor);
   
-  float height = snoise(vec2(uv.x * 2.0 + uTime * 0.1, uTime * 0.25)) * 0.5 * uAmplitude;
+  // Keep wave width tied to physical width: narrow (portrait) screens get a lower
+  // horizontal frequency so the waves aren't squeezed together.
+  float aspect = uResolution.x / uResolution.y;
+  float xScale = clamp(aspect / 1.6, 0.4, 1.0);
+  float height = snoise(vec2(uv.x * 2.0 * xScale + uTime * 0.1, uTime * 0.25)) * 0.5 * uAmplitude;
   height = exp(height);
   height = (uv.y * 2.0 - height + 0.2);
   float intensity = 0.6 * height;
@@ -161,7 +165,8 @@ export default function Aurora(props: AuroraProps) {
       const height = ctn.offsetHeight;
       renderer.setSize(width, height);
       if (program) {
-        program.uniforms.uResolution.value = [width, height];
+        // gl_FragCoord is in drawing-buffer pixels (CSS size × DPR), so match it here.
+        program.uniforms.uResolution.value = [gl.canvas.width, gl.canvas.height];
       }
       // Resizing clears the canvas; redraw right away while the animation loop is paused.
       if (!animateId && mesh) renderer.render({ scene: mesh });
@@ -187,7 +192,7 @@ export default function Aurora(props: AuroraProps) {
         uTime: { value: 0 },
         uAmplitude: { value: amplitude },
         uColorStops: { value: colorStopsArray },
-        uResolution: { value: [ctn.offsetWidth, ctn.offsetHeight] },
+        uResolution: { value: [gl.canvas.width || 1, gl.canvas.height || 1] },
         uBlend: { value: blend },
         uLightMode: { value: lightMode ? 1 : 0 }
       }

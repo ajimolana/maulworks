@@ -9,12 +9,12 @@ export default function Footer({ onContact }: { onContact: () => void }) {
         <div className="flex flex-row items-center justify-between w-full">
           {/* Left: Get in Touch */}
           <div className="flex justify-start">
-            <h2 className="text-xl sm:text-3xl font-semibold text-white">Get in Touch</h2>
+            <h2 className="text-lg min-[360px]:text-xl sm:text-3xl font-semibold text-white whitespace-nowrap">Get in Touch</h2>
           </div>
 
           {/* Right: Social Icons */}
           <div className="flex justify-end">
-            <div className="flex items-center gap-1 sm:gap-3 -mr-2">
+            <div className="flex items-center gap-0 min-[360px]:gap-1 sm:gap-3 -mr-2">
               <button onClick={onContact} className="flex items-center justify-center w-11 h-11 transition-opacity hover:opacity-80" aria-label="Email Maulana">
                 <Image src="/assets/footer/mail.svg" alt="Email Logo" width={28} height={28} className="w-6 h-6 sm:w-7 sm:h-7" />
               </button>
