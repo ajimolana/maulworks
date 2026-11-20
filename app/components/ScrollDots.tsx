@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState, RefObject } from "react";
+import { useEffect, useRef, useState, RefObject } from "react";
+import { pressPulse } from "./pressPulse";
 
 // Position indicator and controls for a horizontal snap carousel: Prev / Next and clickable dots,
 // styled like the AchievementShelf pager, so the carousel works without a swipe gesture (WCAG 2.5.1).
@@ -39,28 +40,79 @@ export default function ScrollDots({
     };
   }, [scrollRef, count]);
 
-  // Dot i maps to an even share of the scroll range (the same mapping `active` uses), so it works whether
-  // a dot stands for one card or a page of photos; scroll snapping settles the exact position
+  // Index the last tap is heading to, so quick repeated taps step from there, not from a mid-scroll position
+  const pendingRef = useRef<number | null>(null);
+  // Removes the listeners/timers of the scroll in flight and turns snapping back on
+  const settleRef = useRef<(() => void) | null>(null);
+
+  useEffect(() => () => settleRef.current?.(), []);
+
+  // Where card i rests when snapped: its snap-center or snap-start position, clamped to the scroll range.
+  // When a dot stands for a page of photos (count != number of children), use an even share of the range.
+  const targetLeft = (el: HTMLDivElement, i: number) => {
+    const max = el.scrollWidth - el.clientWidth;
+    const card = el.children[i] as HTMLElement | undefined;
+    if (!card || el.children.length !== count) return (i / (count - 1)) * max;
+    const elRect = el.getBoundingClientRect();
+    const cardRect = card.getBoundingClientRect();
+    const offset = el.scrollLeft + cardRect.left - elRect.left;
+    const left = getComputedStyle(card).scrollSnapAlign.includes("center")
+      ? offset - (el.clientWidth - cardRect.width) / 2
+      : offset - (parseFloat(getComputedStyle(el).scrollPaddingLeft) || 0);
+    return Math.min(max, Math.max(0, left));
+  };
+
+  // iOS Safari pulls a programmatic smooth scroll on a scroll-snap container back to a snap point mid-way,
+  // often the card it started from. So snapping is switched off for the scroll and restored once the scroll
+  // has been idle for 150ms (1.2s at most). The target is the card's exact snap position, so restoring snap
+  // doesn't move it.
   const goTo = (i: number) => {
     const el = scrollRef.current;
     if (!el) return;
-    const max = el.scrollWidth - el.clientWidth;
+    settleRef.current?.();
+    pendingRef.current = i;
+
+    let idle: ReturnType<typeof setTimeout> | undefined;
+    let cap: ReturnType<typeof setTimeout> | undefined;
+    const onScroll = () => {
+      clearTimeout(idle);
+      idle = setTimeout(settle, 150);
+    };
+    const settle = () => {
+      clearTimeout(idle);
+      clearTimeout(cap);
+      el.removeEventListener("scroll", onScroll);
+      el.style.scrollSnapType = "";
+      pendingRef.current = null;
+      settleRef.current = null;
+    };
+    settleRef.current = settle;
+
+    el.style.scrollSnapType = "none";
+    el.addEventListener("scroll", onScroll, { passive: true });
+    idle = setTimeout(settle, 300); // in case no scroll event fires (already at the target)
+    cap = setTimeout(settle, 1200);
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    el.scrollTo({ left: (i / (count - 1)) * max, behavior: reduceMotion ? "auto" : "smooth" });
+    el.scrollTo({ left: targetLeft(el, i), behavior: reduceMotion ? "auto" : "smooth" });
   };
+
+  const current = () => pendingRef.current ?? active;
 
   if (!overflows || count < 2) return null;
 
-  // -my-[11px]: a 44px tap area that only takes 22px of layout, so Prev / Next doesn't push the row away from the cards
+  // 44px tap area (-my-[11px] keeps it to 22px of layout). The press scale runs from the click handler (pressPulse),
+  // not CSS :active, so taps iOS Safari redirects to the button still show it. No pressed background (owner's choice).
   const navClass =
-    "flex items-center gap-1.5 min-h-11 -my-[11px] px-2 -mx-2 text-sm text-white/60 disabled:opacity-20 transition-opacity active:scale-95";
+    "flex items-center gap-1.5 min-h-11 -my-[11px] px-3 -mx-3 text-sm text-white/60 transition-opacity [-webkit-tap-highlight-color:transparent] disabled:opacity-20";
 
   return (
-    <div className={`flex items-center ${showNav ? "justify-between" : "justify-center"} ${className}`}>
+    // relative z-10: the carousel track's bottom padding (room for card shadows) reaches into this row, and iOS Safari
+    // lets that scroll layer swallow taps on Prev / Next and the dots unless this row sits above it
+    <div className={`relative z-10 flex items-center ${showNav ? "justify-between" : "justify-center"} ${className}`}>
       {showNav && (
       <button
         type="button"
-        onClick={() => goTo(Math.max(0, active - 1))}
+        onClick={(e) => { pressPulse(e.currentTarget); goTo(Math.max(0, current() - 1)); }}
         disabled={active === 0}
         className={navClass}
         aria-label={`Previous ${itemLabel}`}
@@ -94,7 +146,7 @@ export default function ScrollDots({
       {showNav && (
       <button
         type="button"
-        onClick={() => goTo(Math.min(count - 1, active + 1))}
+        onClick={(e) => { pressPulse(e.currentTarget); goTo(Math.min(count - 1, current() + 1)); }}
         disabled={active === count - 1}
         className={navClass}
         aria-label={`Next ${itemLabel}`}

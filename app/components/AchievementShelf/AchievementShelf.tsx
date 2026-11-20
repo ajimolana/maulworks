@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { AchievementIcon as AchievementIconName, AchievementItem, Project } from "../../data/portfolio";
+import { pressPulse } from "../pressPulse";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -176,14 +177,14 @@ export default function AchievementShelf({ items, findProject, onOpenModal }: Ac
           );
         })}
 
-        {/* Pagination controls */}
+        {/* Pagination controls. Prev / Next: 44px tap area; the press scale runs on click (pressPulse) so redirected iOS taps show it too; no pressed background */}
         {totalPages > 1 && (
           <div className="flex items-center justify-between mt-4 pt-1">
             <button
               type="button"
-              onClick={() => setPage(p => Math.max(0, p - 1))}
+              onClick={(e) => { pressPulse(e.currentTarget); setPage(p => Math.max(0, p - 1)); }}
               disabled={page === 0}
-              className="flex items-center gap-1.5 min-h-11 px-2 -mx-2 text-sm text-white/60 disabled:opacity-20 transition-opacity active:scale-95"
+              className="flex items-center gap-1.5 min-h-11 px-3 -mx-3 text-sm text-white/60 transition-opacity [-webkit-tap-highlight-color:transparent] disabled:opacity-20"
               aria-label="Previous page"
             >
               <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -210,9 +211,9 @@ export default function AchievementShelf({ items, findProject, onOpenModal }: Ac
 
             <button
               type="button"
-              onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
+              onClick={(e) => { pressPulse(e.currentTarget); setPage(p => Math.min(totalPages - 1, p + 1)); }}
               disabled={page === totalPages - 1}
-              className="flex items-center gap-1.5 min-h-11 px-2 -mx-2 text-sm text-white/60 disabled:opacity-20 transition-opacity active:scale-95"
+              className="flex items-center gap-1.5 min-h-11 px-3 -mx-3 text-sm text-white/60 transition-opacity [-webkit-tap-highlight-color:transparent] disabled:opacity-20"
               aria-label="Next page"
             >
               Next

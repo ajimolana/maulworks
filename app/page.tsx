@@ -18,6 +18,7 @@ import AchievementShelf from "./components/AchievementShelf/AchievementShelf";
 import AboutSection from "./components/AboutSection";
 import Footer from "./components/Footer";
 import ScrollDots from "./components/ScrollDots";
+import { pressPulse } from "./components/pressPulse";
 import { useUniformLines } from "./components/useUniformLines";
 import { pageCarousel, useScrollEdges } from "./components/carousel";
 
@@ -267,7 +268,8 @@ export default function Home() {
 
             {/* CTAs */}
             <div className="flex flex-row flex-wrap items-center justify-center gap-3 sm:gap-4 w-full sm:mb-16 px-4">
-              <a href="#projects" className="relative px-4 py-2 sm:px-8 sm:py-3 text-xs sm:text-base bg-[var(--theme-accent)] text-[var(--theme-main)] font-bold rounded-full transition-all duration-300 whitespace-nowrap overflow-hidden group hover:shadow-[0_0_20px_var(--theme-accent)] active:scale-95">
+              {/* Press scale runs on click (pressPulse), not CSS :active, so taps iOS Safari redirects to the button still show it */}
+              <a href="#projects" onClick={(e) => pressPulse(e.currentTarget)} className="relative px-4 py-2 sm:px-8 sm:py-3 text-xs sm:text-base bg-[var(--theme-accent)] text-[var(--theme-main)] font-bold rounded-full transition-all duration-300 whitespace-nowrap overflow-hidden group hover:shadow-[0_0_20px_var(--theme-accent)] [-webkit-tap-highlight-color:transparent]">
                 <span className="relative z-10">Explore Projects</span>
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out" />
               </a>
