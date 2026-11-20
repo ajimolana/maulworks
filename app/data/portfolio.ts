@@ -150,6 +150,7 @@ export const projectsData: Project[] = [
       ["/assets/projects/behindworldcup/Insights Page.png", "Insights Page"],
       ["/assets/projects/behindworldcup/Detailed Team Breakdown.png", "Detailed Team Breakdown"],
     ],
+    link: "https://behindworldcup.vercel.app/"
   },
   {
     id: "intelligentcoffeeshop",
