@@ -218,7 +218,7 @@ export default function ProjectModal({ activeProject, onClose, onOpenLightbox, v
                     })}
                   </div>
                   {/* One dot per page (1, 2 or 3 photos depending on width), not per photo */}
-                  <ScrollDots scrollRef={scrollRef} count={pages} />
+                  <ScrollDots scrollRef={scrollRef} count={pages} itemLabel="photo page" showNav={!isMouse} />
                 </div>
               )}
 
