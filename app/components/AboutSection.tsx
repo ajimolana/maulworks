@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import AnimatedSection from "./AnimatedSection";
 import { aboutModalData, scholarships, techStack, Project } from "../data/portfolio";
+import { techIcons } from "../data/techIcons";
 
 const groupLabelClass = "text-[10px] sm:text-[11px] uppercase tracking-widest font-semibold text-white/60";
 
@@ -43,14 +43,29 @@ function RowGroup({ label, children, className = "" }: { label: string; children
   );
 }
 
-// Below sm the label stacks over the tools so each tool list stays on one line
+// Each tool is a chip with its monochrome logo, like the GitHub profile badges. Below sm the label
+// stacks over the chips; from sm up the label sits left. Chips may wrap.
 function TechStackRows() {
   return (
     <>
       {techStack.map(({ group, items }) => (
-        <div key={group} className="flex flex-col sm:flex-row sm:items-baseline gap-0.5 sm:gap-4 py-1.5 sm:py-2">
-          <p className="sm:w-32 flex-none text-white/60 text-xs sm:text-sm">{group}</p>
-          <p className="flex-1 min-w-0 font-medium text-white text-sm sm:text-base">{items.join(" · ")}</p>
+        <div key={group} className="flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-4 py-2">
+          <p className="sm:w-32 sm:pt-1 flex-none text-white/60 text-xs sm:text-sm">{group}</p>
+          <ul className="flex-1 min-w-0 flex flex-wrap gap-1.5 sm:gap-2">
+            {items.map((tool) => (
+              <li
+                key={tool}
+                className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-xs sm:text-sm font-medium text-white/90"
+              >
+                {techIcons[tool] && (
+                  <svg viewBox="0 0 24 24" aria-hidden="true" className="w-3.5 h-3.5 flex-none fill-current text-white/80">
+                    <path d={techIcons[tool]} />
+                  </svg>
+                )}
+                {tool}
+              </li>
+            ))}
+          </ul>
         </div>
       ))}
     </>
@@ -66,36 +81,31 @@ export default function AboutSection({ onOpenProject }: { onOpenProject: (projec
       <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
         <h2 className="text-3xl sm:text-4xl font-semibold text-white mb-6">About Me</h2>
         <div className="bg-[#111111] border border-white/15 rounded-3xl p-5 sm:p-8 shadow-[0_20px_60px_rgba(255,255,255,0.05)]">
-          {/* Profile header (portrait + name + field), bio full width below */}
-          <div className="flex items-center gap-3 sm:gap-4">
-            {/* Head-and-shoulders crop of the LinkedIn photo (opaque cream backdrop); the light fill only shows while it loads */}
-            <div className="relative flex-none w-12 h-12 sm:w-16 sm:h-16 rounded-full overflow-hidden bg-neutral-200">
-              <Image src="/assets/about/portrait.png" alt="Maulana Raji Shofil Fuadi" fill sizes="64px" quality={90} className="object-cover" />
-            </div>
-            <div className="min-w-0">
-              <p className="font-semibold text-white text-base sm:text-xl leading-tight truncate">Maulana Raji Shofil Fuadi</p>
-              {/* Current role only, the first part of the LinkedIn headline: Apple Developer Academy is in Education right below and the field is in the hero */}
-              <p className="text-white/60 text-xs sm:text-sm mt-0.5 sm:mt-1 truncate">Reinsurance Data Analyst Intern @Askrindo</p>
-            </div>
-          </div>
-          {/* Opening quote is the one tagline; the bio below is plain facts. Same text and order as the LinkedIn About */}
-          {/* Phone shows only the quote with an inline "more", social-caption style; tapping the open bio collapses it. sm+ always shows the full bio */}
-          <p className="mt-3 sm:mt-5 text-white/80 italic leading-relaxed text-sm sm:text-lg">
-            &ldquo;I turn numbers into decisions.&rdquo;{" "}
+          {/* Plain bio: no portrait or name (the hero already introduces the owner), no tagline */}
+          {/* Phone shows the opening clause with an inline "... more", social-caption style; tapping the open bio collapses it. sm+ always shows the full bio */}
+          <p
+            id="about-bio"
+            onClick={() => bioOpen && setBioOpen(false)}
+            className="text-white/90 leading-relaxed text-sm sm:text-lg text-pretty"
+          >
+            Actuarial Science graduate from Hasanuddin University focused on data analytics
+            <span className={bioOpen ? "inline" : "hidden sm:inline"}>
+              , building projects from forecasting to automation, with a proven record in leadership, organizations, and competitions.
+            </span>
             {!bioOpen && (
-              <button
-                type="button"
-                onClick={() => setBioOpen(true)}
-                aria-expanded={false}
-                aria-controls="about-bio"
-                className="sm:hidden not-italic font-medium text-white/50 hover:text-white transition-colors"
-              >
-                more
-              </button>
+              <>
+                <span className="sm:hidden">... </span>
+                <button
+                  type="button"
+                  onClick={() => setBioOpen(true)}
+                  aria-expanded={false}
+                  aria-controls="about-bio"
+                  className="sm:hidden font-medium text-white/50 hover:text-white transition-colors"
+                >
+                  more
+                </button>
+              </>
             )}
-          </p>
-          <p id="about-bio" onClick={() => setBioOpen(false)} className={`${bioOpen ? "block" : "hidden sm:block"} mt-2 sm:mt-3 text-white leading-relaxed text-sm sm:text-lg text-pretty`}>
-            Actuarial Science graduate from Hasanuddin University focused on data analytics, building projects from forecasting to automation, with a proven record in leadership, organizations, and competitions.
           </p>
 
           {/* Two columns of near-equal rows (5 left, 4 right) so they end close to level */}

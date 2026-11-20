@@ -114,7 +114,7 @@ export const projectsData: Project[] = [
     cardTag: "Python, NextJS",
     year: "2026",
     title: "Data Science for World Cup 2026",
-    shortDesc: "Look into World Cup through Data Science lens",
+    shortDesc: "The World Cup through a data science lens",
     period: "June 2026",
     roleLabel: "Tools",
     role: "Python, NextJS",
@@ -156,7 +156,7 @@ export const projectsData: Project[] = [
     cardTag: "NextJS, n8n",
     year: "2026",
     title: "Intelligent Coffee Shop Automation",
-    shortDesc: "AI Generated Insights for Coffee Shop Businesses",
+    shortDesc: "AI-generated business insights for coffee shops",
     period: "May 2026",
     roleLabel: "Tools",
     role: "NextJS, n8n",
@@ -198,7 +198,7 @@ export const projectsData: Project[] = [
     cardTag: "Streamlit",
     year: "2025",
     title: "Food Security Forecasting System",
-    shortDesc: "Food Security System for Sulampua's Region.",
+    shortDesc: "Food security forecasting for the Sulampua region",
     period: "Jul 2025 - Sep 2025",
     roleLabel: "Tools",
     role: "Streamlit",
@@ -238,7 +238,7 @@ export const projectsData: Project[] = [
     cardTag: "Streamlit",
     year: "2025",
     title: "Pension Fund Actuarial Simulator",
-    shortDesc: "Count pension fund premium costs.",
+    shortDesc: "Pension fund premium cost calculator",
     period: "Oct 2025 - Jan 2026",
     roleLabel: "Tools",
     role: "Streamlit",
@@ -279,7 +279,7 @@ export const projectsData: Project[] = [
     cardTag: "Colab, Looker",
     year: "2024",
     title: "Smart Highland Agriculture",
-    shortDesc: "Forecasts the best planting times for crops.",
+    shortDesc: "Forecasts optimal planting times for crops",
     period: "Apr 2024 - Jun 2024",
     roleLabel: "Tools",
     role: "Google Colab, Looker Studio",
@@ -641,7 +641,7 @@ export const aboutModalData: Record<string, Project> = {
 export const techStack: { group: string; items: string[] }[] = [
   { group: "Data & Analysis", items: ["Python", "SQL", "R", "Excel", "Google Sheets"] },
   { group: "BI & Dashboard", items: ["Power BI", "Tableau", "Looker Studio"] },
-  { group: "Automation", items: ["n8n"] },
+  { group: "Automation & Apps", items: ["n8n", "Next.js", "Streamlit"] },
 ];
 
 export const scholarships: { name: string; year: string; desc: string; modalKey: string }[] = [
