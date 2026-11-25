@@ -4,9 +4,13 @@ export type DetailItem = {
   list?: boolean;
 };
 
+export type LinkPlatform = "colab" | "lookerstudio";
+
 export type ProjectLink = {
   label: string;
   href: string;
+  /** Where the link leads, for its logo. Read from the address when left out; set it for short links (bit.ly) that hide it. */
+  platform?: LinkPlatform;
 };
 
 export type GalleryItem = string | [string, string];
@@ -315,11 +319,13 @@ export const projectsData: Project[] = [
     links: [
       {
         label: "Open Notebook",
-        href: "https://bit.ly/NotebookDigdaya"
+        href: "https://bit.ly/NotebookDigdaya",
+        platform: "colab"
       },
       {
         label: "Open Dashboard",
-        href: "https://bit.ly/DashboardDigdaya"
+        href: "https://bit.ly/DashboardDigdaya",
+        platform: "lookerstudio"
       }
     ]
   }
