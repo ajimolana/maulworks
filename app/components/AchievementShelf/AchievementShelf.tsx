@@ -193,8 +193,9 @@ export default function AchievementShelf({ items, findProject, onOpenModal }: Ac
               Prev
             </button>
 
-            {/* Dots */}
-            <div className="flex items-center gap-1.5">
+            {/* Dots: same spacing and look as ScrollDots in the other sections (6px apart, set by each dot's own
+                3px side padding; the old 10px padding plus gap spread them about 18px apart) */}
+            <div className="flex items-center">
               {Array.from({ length: totalPages }).map((_, i) => (
                 <button
                   key={i}
@@ -202,9 +203,9 @@ export default function AchievementShelf({ items, findProject, onOpenModal }: Ac
                   onClick={() => setPage(i)}
                   aria-label={`Go to page ${i + 1}`}
                   aria-current={i === page ? "true" : undefined}
-                  className="p-2.5 -m-1 group/dot"
+                  className="px-[3px] py-2 group/dot"
                 >
-                  <span className={`block rounded-full transition-all duration-200 ${i === page ? "w-4 h-1.5 bg-white/70" : "w-1.5 h-1.5 bg-white/20 group-hover/dot:bg-white/40"}`} />
+                  <span className={`block h-1.5 rounded-full transition-all duration-300 ${i === page ? "w-4 bg-white/80" : "w-1.5 bg-white/25 group-hover/dot:bg-white/40"}`} />
                 </button>
               ))}
             </div>

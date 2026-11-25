@@ -306,10 +306,10 @@ export default function Home() {
       <AboutSection onOpenProject={openProjectModal} />
 
       {/* 1. SECTION EXPERIENCES */}
-      <AnimatedSection id="experiences" className="w-full mt-12 md:mt-20 scroll-mt-24 md:scroll-mt-28">
+      <AnimatedSection id="experiences" className="w-full mt-10 md:mt-20 scroll-mt-24 md:scroll-mt-28">
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
-          <h2 className="text-3xl sm:text-4xl font-semibold text-white mb-6">Experiences</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+          <h2 className="text-2xl sm:text-4xl font-semibold text-white mb-4 sm:mb-6">Experiences</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
             {experiencesData.map((project) => (
               <ProjectCard key={project.id} project={project} onClick={openProjectModal} variant="organization" />
             ))}
@@ -318,15 +318,15 @@ export default function Home() {
       </AnimatedSection>
 
       {/* 2. SECTION PROJECTS */}
-      <AnimatedSection id="projects" className="w-full mt-12 md:mt-20 scroll-mt-24 md:scroll-mt-28">
+      <AnimatedSection id="projects" className="w-full mt-10 md:mt-20 scroll-mt-24 md:scroll-mt-28">
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
-          <div className="flex flex-row items-center justify-between mb-6">
-            <h2 className="text-3xl sm:text-4xl font-semibold text-white">Projects</h2>
+          <div className="flex flex-row items-center justify-between mb-4 sm:mb-6">
+            <h2 className="text-2xl sm:text-4xl font-semibold text-white">Projects</h2>
             {isMouse && <ScrollArrows scrollRef={projectsRef} />}
           </div>
-          <div ref={projectsRef} className="flex overflow-x-auto snap-x snap-mandatory scroll-px-4 sm:scroll-px-6 overscroll-x-contain gap-4 pt-12 -mt-12 pb-12 -mb-6 -mx-4 px-4 sm:-mx-6 sm:px-6 md:mx-0 md:px-0 md:pt-0 md:mt-0 md:pb-0 md:mb-0 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-6 scrollbar-hide md:overflow-visible">
+          <div ref={projectsRef} className="flex overflow-x-auto snap-x snap-mandatory scroll-px-4 sm:scroll-px-6 overscroll-x-contain gap-3 sm:gap-4 pt-12 -mt-12 pb-12 -mb-6 -mx-4 px-4 sm:-mx-6 sm:px-6 md:mx-0 md:px-0 md:pt-0 md:mt-0 md:pb-0 md:mb-0 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-6 scrollbar-hide md:overflow-visible">
             {projectsData.map((project) => (
-              <div key={project.id} className={`${isMouse ? "snap-start" : "snap-center"} snap-always flex-none w-[80vw] sm:w-[45vw] md:w-auto`}>
+              <div key={project.id} className={`${isMouse ? "snap-start" : "snap-center"} snap-always flex-none w-[74vw] sm:w-[45vw] md:w-auto`}>
                 <ProjectCard project={project} onClick={openProjectModal} variant="default" lines={projectLines} />
               </div>
             ))}
@@ -336,15 +336,15 @@ export default function Home() {
       </AnimatedSection>
 
       {/* 3. SECTION RESEARCH */}
-      <AnimatedSection id="research" className="w-full mt-12 md:mt-20 scroll-mt-24 md:scroll-mt-28">
+      <AnimatedSection id="research" className="w-full mt-10 md:mt-20 scroll-mt-24 md:scroll-mt-28">
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
-          <div className="flex flex-row items-center justify-between mb-6">
-            <h2 className="text-3xl sm:text-4xl font-semibold text-white">Research</h2>
+          <div className="flex flex-row items-center justify-between mb-4 sm:mb-6">
+            <h2 className="text-2xl sm:text-4xl font-semibold text-white">Research</h2>
             {isMouse && <ScrollArrows scrollRef={researchRef} />}
           </div>
-          <div ref={researchRef} className="flex overflow-x-auto snap-x snap-mandatory scroll-px-4 sm:scroll-px-6 overscroll-x-contain gap-4 pt-12 -mt-12 pb-12 -mb-6 -mx-4 px-4 sm:-mx-6 sm:px-6 md:mx-0 md:px-0 md:pt-0 md:mt-0 md:pb-0 md:mb-0 md:grid md:grid-cols-3 md:gap-4 lg:gap-6 scrollbar-hide md:overflow-visible">
+          <div ref={researchRef} className="flex overflow-x-auto snap-x snap-mandatory scroll-px-4 sm:scroll-px-6 overscroll-x-contain gap-3 sm:gap-4 pt-12 -mt-12 pb-12 -mb-6 -mx-4 px-4 sm:-mx-6 sm:px-6 md:mx-0 md:px-0 md:pt-0 md:mt-0 md:pb-0 md:mb-0 md:grid md:grid-cols-3 md:gap-4 lg:gap-6 scrollbar-hide md:overflow-visible">
             {researchData.map((project) => (
-              <div key={project.id} className={`${isMouse ? "snap-start" : "snap-center"} snap-always flex-none w-[80vw] sm:w-[45vw] md:w-auto`}>
+              <div key={project.id} className={`${isMouse ? "snap-start" : "snap-center"} snap-always flex-none w-[74vw] sm:w-[45vw] md:w-auto`}>
                 <ProjectCard project={project} onClick={openProjectModal} variant="research" lines={researchLines} />
               </div>
             ))}
@@ -354,10 +354,10 @@ export default function Home() {
       </AnimatedSection>
 
       {/* 4. SECTION ORGANIZATIONS */}
-      <AnimatedSection id="organizations" className="w-full mt-12 md:mt-20 scroll-mt-24 md:scroll-mt-28">
+      <AnimatedSection id="organizations" className="w-full mt-10 md:mt-20 scroll-mt-24 md:scroll-mt-28">
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
-          <h2 className="text-3xl sm:text-4xl font-semibold text-white mb-6">Organizations</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+          <h2 className="text-2xl sm:text-4xl font-semibold text-white mb-4 sm:mb-6">Organizations</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
             {organizationsData.map((project) => (
               <ProjectCard key={project.id} project={project} onClick={openProjectModal} variant="organization" />
             ))}
@@ -366,9 +366,9 @@ export default function Home() {
       </AnimatedSection>
 
       {/* 5. SECTION ACHIEVEMENTS */}
-      <AnimatedSection id="achievements" className="w-full mt-12 md:mt-20 scroll-mt-24 md:scroll-mt-28">
+      <AnimatedSection id="achievements" className="w-full mt-10 md:mt-20 scroll-mt-24 md:scroll-mt-28">
         <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
-          <h2 className="text-3xl sm:text-4xl font-semibold text-white mb-6">Achievements</h2>
+          <h2 className="text-2xl sm:text-4xl font-semibold text-white mb-4 sm:mb-6">Achievements</h2>
           <AchievementShelf
             items={achievements}
             findProject={findProject}

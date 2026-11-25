@@ -13,21 +13,21 @@ function InfoRow({ title, meta, subtitle, onClick }: { title: string; meta: stri
   const content = (
     <>
       <div className="flex items-baseline justify-between gap-3">
-        <p className="font-medium text-white text-sm sm:text-base truncate">{title}</p>
+        <p className="font-medium text-white text-[13px] sm:text-base truncate">{title}</p>
         <p className="text-white/50 text-[11px] sm:text-xs tabular-nums whitespace-nowrap shrink-0">{meta}</p>
       </div>
-      <p className="text-white/60 text-xs sm:text-sm truncate mt-0.5">{subtitle}</p>
+      <p className="text-white/60 text-[11px] sm:text-sm truncate mt-0.5">{subtitle}</p>
     </>
   );
 
-  if (!onClick) return <div className="py-2">{content}</div>;
+  if (!onClick) return <div className="py-1.5 sm:py-2">{content}</div>;
 
   return (
     <button
       type="button"
       onClick={onClick}
       aria-label={`Open details for ${title}`}
-      className="w-[calc(100%+1.5rem)] text-left -mx-3 px-3 py-2 rounded-xl transition-colors duration-200 hover:bg-white/[0.05] focus-visible:outline-none focus-visible:bg-white/[0.05] active:scale-[0.99]"
+      className="w-[calc(100%+1.5rem)] text-left -mx-3 px-3 py-1.5 sm:py-2 rounded-xl transition-colors duration-200 hover:bg-white/[0.05] focus-visible:outline-none focus-visible:bg-white/[0.05] active:scale-[0.99]"
     >
       {content}
     </button>
@@ -36,7 +36,7 @@ function InfoRow({ title, meta, subtitle, onClick }: { title: string; meta: stri
 
 function RowGroup({ label, children, className = "" }: { label: string; children: React.ReactNode; className?: string }) {
   return (
-    <div className={`pt-4 first:pt-0 border-t border-white/10 first:border-t-0 ${className}`}>
+    <div className={`pt-3 sm:pt-4 first:pt-0 border-t border-white/10 first:border-t-0 ${className}`}>
       <h3 className={`${groupLabelClass} mb-1`}>{label}</h3>
       {children}
     </div>
@@ -77,10 +77,10 @@ export default function AboutSection({ onOpenProject }: { onOpenProject: (projec
   const [stackOpen, setStackOpen] = useState(false);
 
   return (
-    <AnimatedSection id="about" className="w-full mt-12 md:mt-20 scroll-mt-24 md:scroll-mt-28">
+    <AnimatedSection id="about" className="w-full mt-10 md:mt-20 scroll-mt-24 md:scroll-mt-28">
       <div className="mx-auto max-w-[1366px] px-4 sm:px-6">
-        <h2 className="text-3xl sm:text-4xl font-semibold text-white mb-6">About Me</h2>
-        <div className="bg-[#111111] border border-white/15 rounded-3xl p-5 sm:p-8 shadow-[0_20px_60px_rgba(255,255,255,0.05)]">
+        <h2 className="text-2xl sm:text-4xl font-semibold text-white mb-4 sm:mb-6">About Me</h2>
+        <div className="bg-[#111111] border border-white/15 rounded-2xl sm:rounded-3xl p-4 sm:p-8 shadow-[0_20px_60px_rgba(255,255,255,0.05)]">
           {/* Plain bio: no portrait or name (the hero already introduces the owner), no tagline */}
           {/* Phone shows the opening clause with an inline "... more", social-caption style; tapping the open bio collapses it. sm+ always shows the full bio */}
           <p
@@ -109,8 +109,8 @@ export default function AboutSection({ onOpenProject }: { onOpenProject: (projec
           </p>
 
           {/* Two columns of near-equal rows (5 left, 4 right) so they end close to level */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-12 mt-5 sm:mt-6 pt-5 sm:pt-6 border-t border-white/10">
-            <div className="space-y-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 lg:gap-12 mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-white/10">
+            <div className="space-y-3 sm:space-y-4">
               <RowGroup label="Education">
                 <InfoRow title="Apple Developer Academy" meta="2027" subtitle="Incoming Learner, Cohort 2027 @ UC, Jakarta" />
                 <InfoRow title="Hasanuddin University" meta="2021 – 2026" subtitle="Bachelor of Actuarial Science" onClick={() => onOpenProject(aboutModalData.education)} />
@@ -121,7 +121,7 @@ export default function AboutSection({ onOpenProject }: { onOpenProject: (projec
               </RowGroup>
             </div>
 
-            <div className="space-y-4 border-t border-white/10 pt-4 lg:border-t-0 lg:pt-0">
+            <div className="space-y-3 sm:space-y-4 border-t border-white/10 pt-3 sm:pt-4 lg:border-t-0 lg:pt-0">
               <RowGroup label="Certifications">
                 <InfoRow title="Data Analyst" meta="Oct 2025" subtitle="National Professional Certification Agency" onClick={() => onOpenProject(aboutModalData.cert_data_analyst)} />
                 <InfoRow title="Data Science & AI" meta="Feb – Jun 2024" subtitle="Startup Campus" onClick={() => onOpenProject(aboutModalData.cert_data_science)} />
@@ -135,7 +135,7 @@ export default function AboutSection({ onOpenProject }: { onOpenProject: (projec
 
             {/* Single column: Tech Stack moves to the bottom, collapsed, so it doesn't add scroll length */}
             {/* -my-2.5 keeps the 44px tap target without adding visible space under the label */}
-            <div className="lg:hidden border-t border-white/10 pt-4">
+            <div className="lg:hidden border-t border-white/10 pt-3 sm:pt-4">
               <button
                 type="button"
                 onClick={() => setStackOpen((o) => !o)}
