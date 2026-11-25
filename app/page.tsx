@@ -12,6 +12,7 @@ const LogoLoop = dynamic(() => import("./components/LogoLoop/LogoLoop"));
 const ProjectModal = dynamic(() => import("./components/ProjectModal"));
 const Lightbox = dynamic(() => import("./components/Lightbox"));
 const ContactModal = dynamic(() => import("./components/ContactModal"));
+import type { LightboxOrigin } from "./components/Lightbox";
 import AnimatedSection from "./components/AnimatedSection";
 import ProjectCard from "./components/ProjectCard";
 import AchievementShelf from "./components/AchievementShelf/AchievementShelf";
@@ -55,7 +56,8 @@ export default function Home() {
     isOpen: false,
     images: [] as string[],
     captions: [] as string[],
-    index: 0
+    index: 0,
+    origin: undefined as LightboxOrigin | undefined
   });
   const [isContactOpen, setIsContactOpen] = useState(false);
 
@@ -168,9 +170,9 @@ export default function Home() {
   const openFromAchievement = useCallback((project: Project) => openProjectModal(project, true), [openProjectModal]);
   const closeProjectModal = useCallback(() => window.history.back(), []);
 
-  const openLightbox = useCallback((images: string[], captions: string[], index: number) => {
+  const openLightbox = useCallback((images: string[], captions: string[], index: number, origin?: LightboxOrigin) => {
     window.history.pushState({ lightboxOpen: true }, "");
-    setLightbox({ isOpen: true, images, captions, index });
+    setLightbox({ isOpen: true, images, captions, index, origin });
   }, []);
   const closeLightbox = useCallback(() => window.history.back(), []);
   const setLightboxIndex = useCallback((index: number) => setLightbox(prev => ({ ...prev, index })), []);
@@ -391,6 +393,7 @@ export default function Home() {
         images={lightbox.images}
         captions={lightbox.captions}
         index={lightbox.index}
+        origin={lightbox.origin}
         onClose={closeLightbox}
         setIndex={setLightboxIndex}
       />
