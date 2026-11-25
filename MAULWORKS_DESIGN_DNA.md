@@ -55,7 +55,7 @@ Rule: Floating elements (nav pill, close/lightbox controls, badges) use transluc
 All shapes use aggressive, generous border-radius values to feel soft, tactile, and modern:
 | Element | Radius |
 |---|---|
-| Main page containers / modals | `rounded-3xl` |
+| Main page containers / modals | `rounded-3xl` (`rounded-2xl` on phones, below `sm`) |
 | Inner image blocks / sub-cards | `rounded-2xl` |
 | Nav items / inner list items | `rounded-xl` or `rounded-2xl` |
 | Buttons, badges, pills, tags | `rounded-full` |
@@ -64,7 +64,8 @@ All shapes use aggressive, generous border-radius values to feel soft, tactile, 
 - **Font:** `Poppins` (Google Font) — loaded via `next/font/google` with weights `400, 500, 600, 700`.
 - Applied globally on `<html>` and `<body>` via the `font-sans` utility class and `--font-poppins` CSS variable.
 - **Hierarchy rules:**
-  - Section headings: `text-3xl sm:text-4xl font-semibold text-white`
+  - Section headings: `text-2xl sm:text-4xl font-semibold text-white`, `mb-4 sm:mb-6`
+  - Phones (below `sm`) run a compact scale modelled on the Achievement shelf, while `sm` and up stay as they were: card titles `text-sm`, descriptions `text-[11px]`, tags `text-[10px]`; cards `rounded-2xl` with `p-2.5`/`p-3`, organization logos 40px; carousel cards `w-[74vw]`; grid and carousel gaps `gap-3`; sections `mt-10`; the About card `p-4`, its rows `text-[13px]` over `text-[11px]` with `py-1.5`, groups `pt-3`/`space-y-3`
   - Hero headline: `text-5xl md:text-6xl lg:text-[5.5rem] font-bold tracking-tight`
   - Body text: `text-sm md:text-base text-white` (readable, well-spaced)
   - **Labels / metadata / tags:** `text-[10px] uppercase tracking-wider text-white/60` — strict pattern applied across category labels, metadata rows, and pill tags.
@@ -137,7 +138,7 @@ Image quality: card hero images and modal gallery thumbnails use `quality={85}`.
 
 Modal gallery thumbnails show a spinner while loading and fade in (`opacity-0 → opacity-100` via `transition-opacity duration-500 ease-in-out` on the `onLoad` event). Card thumbnails rely on `next/image` lazy loading.
 
-The Lightbox never blanks between photos: the on-screen photo stays until the requested one has loaded (it loads invisibly), then they crossfade (0.2s). The previous and next photos preload in a hidden block with the same image props, so they hit the same URL and switching is instant. The spinner appears only when a load takes longer than 200ms.
+The Lightbox photos sit on a strip, one screen width apart: previous off the left edge, current, next off the right, all with the same image props so the neighbours are loaded before they slide in. On a phone the strip follows the finger once the drag is clearly sideways; letting go past a fifth of the screen or with a quick flick slides on to the next photo (0.32s, `[0.22, 1, 0.36, 1]`), otherwise it springs back. A single photo only gives a little. The Prev/Next buttons and the arrow keys slide the same way. Each slide shows its photo only once loaded, fading it in (0.2s), never half-drawn. The spinner appears only when a load takes longer than 200ms, fades in, and is absolutely centred on the photo area (never `position: fixed` inside the scaling container, which made it jump down once the spring settled). Opening from a documentation thumbnail zooms: the already-loaded thumbnail grows from its card to the exact spot the full photo will occupy (0.4s, `[0.22, 1, 0.36, 1]`, corner radius 16 → 0) while the backdrop darkens, then the full-size photo crossfades in over it. Closing reverses it: the photo on screen shrinks back into its own thumbnail (the carousel is first scrolled, instantly and hidden, to the card of whichever photo is open) while the overlay fades out. The real thumbnail stays in its card throughout (the backdrop is see-through, so hiding it left a visible hole that popped back): the copy lifts off it and settles back onto it. Reduced motion, a thumbnail that hasn't loaded, or one cut off by a scroll edge falls back to the plain fade.
 
 ---
 
@@ -173,7 +174,7 @@ On mobile devices, navigation transforms into a draggable bottom drawer:
 ### The Three Overlay Layers
 Maulworks maintains a strict z-index and interaction hierarchy for overlays:
 1. **ProjectModal** (`z-40`) and **ContactModal** (`z-[9999]`) — Primary content modals. They scale and fade in; ContactModal uses spring physics.
-2. **Lightbox** — Full-screen media viewer (`z-[100]`), ultra-dark backdrop (`bg-black/95`).
+2. **Lightbox** — Full-screen media viewer (`z-[100]`), see-through backdrop with a barely-there blur (`bg-black/70 backdrop-blur-[2px]`): the photo stays the focus while the modal behind still shows, so the zoom in and out of a thumbnail reads as one movement.
 3. **PillNav Mobile Sheet** — Navigation bottom drawer (`z-[99]`).
 
 ### Modal Structure — Standard Architecture
@@ -244,7 +245,7 @@ For mobile card rows:
 <div ref={ref} className="flex overflow-x-auto snap-x snap-mandatory overscroll-x-contain scrollbar-hide
   ... md:grid md:grid-cols-3 md:overflow-visible">
   {items.map(item => (
-    <div className="snap-center snap-always flex-none w-[80vw] sm:w-[45vw] md:w-auto">
+    <div className="snap-center snap-always flex-none w-[74vw] sm:w-[45vw] md:w-auto">
       <Card />
     </div>
   ))}
@@ -318,9 +319,11 @@ Single components handle diverse presentation variants via a clean `variant` pro
 ```
 
 ### Detail Content — Data Order, One Style
+Modal layout: the links are plain pills with no "Link" label. From `sm` up they sit in the fixed header beside the title, the way App Store, GitHub or Behance put the main action next to the name, and stay in reach while the details are read. On phones they are the first row of the body, right under the title: in the header they doubled its height and squeezed the body. The body runs Period/Role, then Documentation, then the details: short first, longest last, with the photos as the quickest proof. Sections without content are left out. While the body has more to scroll, a 48px fade from `#111111` sits over its bottom edge and goes once the end is reached. Detail paragraphs and lists stop at `max-w-[70ch]` (full-width desktop lines ran ~100 characters). Focus is trapped in the modal's layer (the floating X included) by `useDialogFocus`, and the Lightbox uses the same hook, so over a modal Tab stays in the photo viewer and focus returns to the thumbnail on close.
+
 Modal details render in the order they appear in `portfolio.ts` (e.g. Problem → My Role → Method → Result), all with the same label + body style. No label gets a callout box or is pulled to the top: a boxed Result above the Problem reads backwards. List details use a drawn 4px dot (`before:` on the `li`, `pl-4`, dot at `left-1`, centred on the first line), not `list-disc`: the browser marker sat far left of the text with a gap that can't be tightened. Wrapped lines align with the text, not the dot.
 
-The Link group holds the external links (`links`, or a single `link` + `ctaLabel`) and, when the modal was opened from an Achievement row, a "View in Research/Projects/Organizations/Experiences" pill with an up arrow (in-page, not the external ↗; every section it can lead to sits above Achievements, so if it is ever offered from elsewhere the arrow must follow the real direction). It closes the modal, scrolls the card to the middle of the screen (sliding a phone carousel to it) and pulses a white ring around it. Opened from the card itself, the pill is not shown. Cards carry `data-card-id={project.id}` for this.
+The header's link pills are the external links (`links`, or a single `link` + `ctaLabel`) — each pill is the destination's mark, then the label, with no arrow: the Google Colab logo (Simple Icons, in currentColor), a bar chart for Looker Studio, and a globe for any website, including project apps on Streamlit and Vercel. The mark is read from the address; short links (bit.ly) set `platform` in the data and, when the modal was opened from an Achievement row, a "View in Research/Projects/Organizations/Experiences" pill with an up arrow before the label (in-page, not the external ↗; every section it can lead to sits above Achievements, so if it is ever offered from elsewhere the arrow must follow the real direction). It closes the modal, scrolls the card to the middle of the screen (sliding a phone carousel to it) and pulses a white ring around it. Opened from the card itself, the pill is not shown. Cards carry `data-card-id={project.id}` for this.
 
 ### Copy — Written by a Person
 Portfolio text must not read as AI-written. No em dashes (`—`) in visible copy: use a comma, a period or a new sentence. En dashes stay only in ranges (`2021 – 2026`, `2018–2024`). Avoid the tells: "not just X, it was Y", "true leadership is about", and brochure words like "innovative", "cutting-edge", "seamless". Plain, concrete sentences, like the Method bullets. Team size is not stated in project roles. Project card `shortDesc` lines are sentence case with no trailing period, worded like the matching "Selected Projects" row in the GitHub profile README, so the two stay in sync.
